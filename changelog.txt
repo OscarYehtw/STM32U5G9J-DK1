@@ -1,0 +1,39 @@
+3.0.7
+- Updated to STM32CubeMX 6.15.0
+- Updated to Firmware Package FW_U5 1.8.0
+- Added print of memory usage to TouchGFX Designer "Run target" build script log
+
+3.0.6
+- Updated to STM32CubeMX 6.14.0
+- Updated to TouchGFX 4.25.0
+- Increase ChipSelectHighTimeCycle to 4 for HSPI PSRAM interface
+
+3.0.5
+- Updated to STM32CubeMX 6.13.0
+- Updated to Firmware Package FW_U5 1.7.0
+- Nema buffers added to GCC and STM32CubeIDE linker scripts
+
+3.0.4
+- Updated to STM32CubeMX 6.12.0
+- Updated to Firmware Package FW_U5 V1.6.0
+
+3.0.3
+- Updated to TouchGFX 4.24.0
+
+3.0.2
+- Updated to STM32CubeMX 6.11.0
+- Updated to Firmware Package FW_U5 V1.5.0
+- Updated BSP driver files
+
+3.0.1
+- Support for MDK-ARM Keil IDE
+
+3.0.0
+First released version
+- TouchGFX 4.23.0
+- STM32CubeMX 6.10.0
+- firmware FW U5 1.4.0
+- X-CUBE-FREERTOS 1.0.0
+- support for STM32CubeIDE
+- support for EWARM
+- support "Run target" in TouchGFX Designer
