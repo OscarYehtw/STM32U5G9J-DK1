@@ -935,6 +935,22 @@ ams_errno_t sensor_config(ams_config_feature_t cfg_type, void *cfg)
     return(ret);
 }
 
+void sensor_log(int level, const char *message)
+{
+    const char *level_str;
+
+    switch (level)
+    {
+        case LOG_ERROR:    level_str = "ERROR"; break;
+        case LOG_WARNING:  level_str = "WARN "; break;
+        case LOG_INFO:     level_str = "INFO "; break;
+        case LOG_DEBUG:    level_str = "DEBUG"; break;
+        default:           level_str = "UNKWN"; break;
+    }
+
+    printf("[%s] %s\r\n", level_str, message);
+}
+
 void sensor_clear_sai(void)
 {
     AMS_LOG_PRINTF_IRQ(LOG_INFO, "Clearing SAI_ACTIVE");
@@ -985,6 +1001,7 @@ ams_errno_t ams_sensor_init(struct ams_device *device)
     device->pon       = sensor_pon;
     device->log_irq   = sensor_log_irq;
     device->configure = sensor_config;
+    device->log       = sensor_log;
     device->status    = sensor_status;
     device->setup     = sensor_setup;
 

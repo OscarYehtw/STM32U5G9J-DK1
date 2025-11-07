@@ -105,6 +105,10 @@ void Error_Handler(void);
 #define FRAME_RATE_Pin GPIO_PIN_14
 #define FRAME_RATE_GPIO_Port GPIOF
 
+#define AMS_INT_Pin       GPIO_PIN_4
+#define AMS_INT_GPIO_Port GPIOC
+#define AMS_INT_EXTI_IRQn EXTI4_IRQn
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

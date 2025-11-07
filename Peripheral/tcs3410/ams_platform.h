@@ -42,6 +42,10 @@
 #define EVENT2_LED                         (2)
 #define EVENT3_LED                         (3)
 
+#define STM32_LOG_INFO(...)  platform_log_output(__VA_ARGS__)
+#define STM32_LOG_WARNING(...)  platform_log_output(__VA_ARGS__)
+#define STM32_LOG_DEBUG(...)  platform_log_output(__VA_ARGS__)
+#define STM32_LOG_ERROR(...) platform_log_output(__VA_ARGS__)
 
 /* Platform Specific Definitions */
 typedef ams_errno_t (*platform_i2c_init)(uint8_t scl_pin, uint8_t sda_pin);

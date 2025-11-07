@@ -23,13 +23,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.      *
  *****************************************************************************
  */
-
+#include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdarg.h>
 #include "ams_device.h"
 #include "ams_errno.h"
 #include "ams_platform.h"
 #include "stm32u5x9j_discovery_bus.h"
 #include "stm32u5x9j_discovery_errno.h"
+
+void AMS_IRQ_Init(void);
+
+// === log buffer ===
+static char log_buffer[256];
+
+// === log_push ===
+static inline char * platform_log_push(const char *p_str)
+{
+    strncpy(log_buffer, p_str, sizeof(log_buffer) - 1);
+    log_buffer[sizeof(log_buffer) - 1] = '\0';
+    return log_buffer;
+}
+
+static void platform_log_output(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+
+    vprintf(fmt, args);
+    printf("\r\n");
+
+    va_end(args);
+}
 
 /*
  * Not currently used by tcs3410 - But make sure they are init'd off.
@@ -37,7 +63,6 @@
 
 static ams_errno_t ams_stm32_i2c_init(uint8_t scl_pin, uint8_t sda_pin)
 {
-
     return BSP_I2C1_Init();
 }
 
@@ -52,22 +77,22 @@ static void ams_stm32_platform_log(int level, const char *pLogMsg)
     {
         case LOG_INFO:
         {
-            //NRF_LOG_INFO("%s", nrf_log_push((char *)pLogMsg));
+            STM32_LOG_INFO("[INFO] %s", platform_log_push((char *)pLogMsg));
             break;
         }
         case LOG_WARNING:
         {
-            //NRF_LOG_WARNING("%s", nrf_log_push((char *)pLogMsg));
+            STM32_LOG_WARNING("[WARNING] %s", platform_log_push((char *)pLogMsg));
             break;
         }
         case LOG_DEBUG: /* Currently this is Nordic broke */
         {
-            //NRF_LOG_DEBUG("%s", nrf_log_push((char *)pLogMsg));
+            STM32_LOG_DEBUG("[DEBUG] %s", platform_log_push((char *)pLogMsg));
             break;
         }
         case LOG_ERROR:
         {
-            //NRF_LOG_ERROR("%s", nrf_log_push((char *)pLogMsg));
+            STM32_LOG_ERROR("[ERROR] %s", platform_log_push((char *)pLogMsg));
             break;
         }
     }
@@ -77,6 +102,8 @@ static void ams_stm32_platform_log(int level, const char *pLogMsg)
 
 static void ams_stm32_irq_init(uint32_t irq_pin)
 {
+
+    AMS_IRQ_Init();
 
     return;
 }

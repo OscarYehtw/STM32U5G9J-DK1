@@ -1269,6 +1269,31 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_2 */
 }
 
+/**
+  * @brief AMS IRQ Initialization Function
+  * @param None
+  * @retval None
+  */
+void AMS_IRQ_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+
+  /*Configure GPIO pin : AMS_INT_Pin */
+  GPIO_InitStruct.Pin = AMS_INT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(AMS_INT_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(AMS_INT_EXTI_IRQn, 10, 0);
+  HAL_NVIC_EnableIRQ(AMS_INT_EXTI_IRQn);
+}
+
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */

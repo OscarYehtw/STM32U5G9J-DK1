@@ -27,7 +27,8 @@
 #ifndef __TCS3410_HWDEF_H__
 #define __TCS3410_HWDEF_H__
 
-#define SLAVE_ADDR_0 (0x39)
+/* TCS34103 0x39 1.8V I²C */
+#define SLAVE_ADDR_0 (0x39 << 1)
 
 /* unit milliseconds */
 #define MOD_CLOCK_STEP_MS (0.001388889)
