@@ -29,6 +29,7 @@
 #include "stm32u5x9j_discovery_hspi.h"
 #include "stm32u5x9j_discovery_ospi.h"
 
+#include "app_freertos.h"
 #include "ams_device.h"
 /* USER CODE END Includes */
 
@@ -48,6 +49,10 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+volatile uint8_t txBusy = 0;
+uint8_t txByte;
+uint8_t rxByte;
+
 CRC_HandleTypeDef hcrc;
 
 DCACHE_HandleTypeDef hdcache1;
@@ -124,7 +129,8 @@ PUTCHAR_PROTOTYPE
 {
   /* Place your implementation of fputc here */
   /* e.g. write a character to the USART1 and Loop until the end of transmission */
-  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+  //HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+  sendchar(ch);
 
   return ch;
 }
@@ -1294,6 +1300,46 @@ void AMS_IRQ_Init(void)
   HAL_NVIC_EnableIRQ(AMS_INT_EXTI_IRQn);
 }
 
+/**
+  * @brief  Tx Transfer completed callback
+  * @param  UartHandle: UART handle.
+  * @note   This example shows a simple way to report end of DMA Tx transfer, and
+  *         you can add your own implementation.
+  * @retval None
+  */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+  if (UartHandle->Instance == USART1) {
+      txBusy = 0;
+  }
+}
+
+/**
+  * @brief  Rx Transfer completed callback
+  * @param  UartHandle: UART handle
+  * @note   This example shows a simple way to report end of DMA Rx transfer, and
+  *         you can add your own implementation.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+  if (UartHandle->Instance == USART1) {
+      osMessageQueuePut(uartRxQueueHandle, &rxByte, 0, 0);
+      HAL_UART_Receive_IT(UartHandle, &rxByte, 1);
+  }
+}
+
+/**
+  * @brief  UART error callbacks
+  * @param  UartHandle: UART handle
+  * @note   This example shows a simple way to report transfer error, and you can
+  *         add your own implementation.
+  * @retval None
+  */
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
+{
+    Error_Handler();
+}
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */

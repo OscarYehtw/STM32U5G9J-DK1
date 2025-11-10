@@ -46,6 +46,10 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+extern UART_HandleTypeDef huart1;
+extern volatile uint8_t txBusy;
+extern uint8_t txByte;
+extern uint8_t rxByte;
 
 /* USER CODE END EM */
 

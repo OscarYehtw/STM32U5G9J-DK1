@@ -24,14 +24,15 @@ typedef struct scmd {
 } SCMD;
 
 /* External functions */
-extern bool getline (char *, uint32_t);
-extern int  getkey (void);
 
 /* Command Functions */
+void cmd_alsread (char *par);
+void cmd_alswrite (char *par);
 void cmd_help (char *par);
 
 /* Local Function Prototypes */
 char *get_entry (char *cp, char **pNext);
+void DispatchCmd (void);
 
 /*----------------------------------------------------------------------------
  * end of file

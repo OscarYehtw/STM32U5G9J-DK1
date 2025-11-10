@@ -1,7 +1,5 @@
 /*----------------------------------------------------------------------------
- *      R T L   F l a s h   F i l e   S y s t e m   E x a m p l e
- *----------------------------------------------------------------------------
- *      Name:    SD_FILE.C
+ *      Name:    CLI.C
  *      Purpose: File manipulation example program
  *      Rev.:    V3.24
  *----------------------------------------------------------------------------
@@ -11,20 +9,193 @@
 
 #include <stdio.h>                    /* standard I/O .h-file                */
 #include <string.h>                   /* string and memory functions         */
+#include <ctype.h>                    /* character functions                 */
+#include <stdint.h>
+#include <stdbool.h>
+#include "cmsis_os2.h"
+#include "app_freertos.h"
 #include "cli.h"
+#include "ams_device.h"
+#include "tcs3410_hwdef.h"
+#include "tcs3410.h"
 
 const char Cli_Help[] = 
    "+ COMMAND ------------------+ FUNCTION ---------------------------------+\n"
+   "| ALSR <reg> <bytes>        | Read <bytes> from sensor register <reg>   |\n"
+   "| ALSW <reg> <data >        | Write <data> to sensor register <reg>     |\n"
    "| HELP  or  ?               | displays this help                        |\n"
    "+---------------------------+-------------------------------------------+\n";
 
 const SCMD cmd[] = {
+   "ALSR",   cmd_alsread,
+   "ALSW",   cmd_alswrite,
    "HELP",   cmd_help,
    "?",      cmd_help};
 
 #define CMD_COUNT   (sizeof (cmd) / sizeof (cmd[0]))
 
 char in_line[160];
+
+/*----------------------------------------------------------------------------
+ *        cmd_alsread
+ *---------------------------------------------------------------------------*/
+void cmd_alsread (char *par) {
+  char *next;
+  uint32_t reg = 0;
+  uint32_t bytes = 0;
+  uint8_t buffer[256];
+  uint8_t i;
+  char *pReg;
+  char *pBytes;
+
+  // Check if parameters exist
+  if (par == NULL || *par == 0) {
+      printf("Usage: ALSR <reg> <bytes>\n");
+      return;
+  }
+
+  // Get the first parameter (register)
+  pReg = get_entry(par, &next);
+  if (pReg == NULL) {
+      printf("Invalid register address.\n");
+      return;
+  }
+
+  // Convert register (hexadecimal)
+  if (sscanf(pReg, "%x", &reg) != 1) {
+      printf("Invalid register format.\n");
+      return;
+  }
+
+  // Get the second parameter (bytes)
+  pBytes = get_entry(next, &next);
+  if (pBytes == NULL) {
+      printf("Missing bytes count.\n");
+      return;
+  }
+
+  // Convert byte count
+  if (sscanf(pBytes, "%x", &bytes) != 1 || bytes == 0 || bytes > sizeof(buffer)) {
+      printf("Invalid byte count (1~%d allowed)\n", (int)sizeof(buffer));
+      return;
+  }
+
+  // Perform sensor read
+  memset(buffer, 0, sizeof(buffer));
+    
+  if (device.read)
+      device.read(reg, buffer, bytes);
+  else
+      printf("No [ams_device_read] callback defined for this sensor.\n");
+
+  // Output result
+  printf("Read [0x%02X], %d bytes:\n", (uint8_t)reg, bytes);
+  for (i = 0; i < bytes; i++) {
+      printf("0x%02X ", buffer[i]);
+  }
+  printf("\n");
+}
+
+/*----------------------------------------------------------------------------
+ *        cmd_write
+ *---------------------------------------------------------------------------*/
+void cmd_alswrite (char *par) {
+  char *next;
+  uint32_t reg = 0;
+  uint32_t data = 0;
+  char *pReg;
+  char *pData;
+
+  // Check parameters
+  if (par == NULL || *par == 0) {
+      printf("Usage: ALSW <reg> <data>\r\n");
+      return;
+  }
+
+  // Get the first parameter (register)
+  pReg = get_entry(par, &next);
+  if (pReg == NULL) {
+      printf("Invalid register address.\r\n");
+      return;
+  }
+
+  // Convert register (hexadecimal)
+  if (sscanf(pReg, "%x", &reg) != 1) {
+      printf("Invalid register format.\r\n");
+      return;
+  }
+
+  // Get the second parameter (data)
+  pData = get_entry(next, &next);
+  if (pData == NULL) {
+      printf("Missing data value.\r\n");
+      return;
+  }
+
+  // Convert data (hexadecimal)
+  if (sscanf(pData, "%x", &data) != 1) {
+      printf("Invalid data format.\r\n");
+      return;
+  }
+
+  if (device.write) {
+      device.write(reg, sh, data);
+  } else {
+      printf("No [ams_device_write] callback defined for this sensor.\n");
+  }
+
+  printf("Write [0x%02X] = 0x%02X\r\n", (uint8_t)reg, data);
+}
+
+/*----------------------------------------------------------------------------
+ *        Display Command Syntax help
+ *---------------------------------------------------------------------------*/
+void cmd_help (char *par) {
+   printf (Cli_Help);
+}
+
+/*----------------------------------------------------------------------------
+ *      Line Editor
+ *---------------------------------------------------------------------------*/
+bool getline (char *lp, uint32_t n) {
+   uint32_t cnt = 0;
+   char c;
+
+   do {
+      c = getkey ();
+      switch (c) {
+         case CNTLQ:                       /* ignore Control S/Q             */
+         case CNTLS:
+            break;;
+         case BACKSPACE:
+         case DEL:
+            if (cnt == 0) {
+               break;
+            }
+            cnt--;                         /* decrement count                */
+            lp--;                          /* and line pointer               */
+            putchar (0x08);                /* echo backspace                 */
+            putchar (' ');
+            putchar (0x08);
+            break;
+         case ESC:
+            *lp = 0;                       /* ESC - stop editing line        */
+            return (false);
+         case CR:                          /* CR - done, stop editing line   */
+            *lp = c;
+            lp++;                          /* increment line pointer         */
+            cnt++;                         /* and count                      */
+            c = LF;
+         default:
+            putchar (*lp = c);             /* echo and store character       */
+            lp++;                          /* increment line pointer         */
+            cnt++;                         /* and count                      */
+            break;
+      }
+   } while (cnt < n - 2  &&  c != LF);     /* check limit and CR             */
+   *lp = 0;                                /* mark end of string             */
+   return (true);
+}
 
 /*----------------------------------------------------------------------------
  *        Process input string for long or short name entry
@@ -57,8 +228,43 @@ char *get_entry (char *cp, char **pNext) {
 }
 
 /*----------------------------------------------------------------------------
- *        Display Command Syntax help
+ *        DispatchCmd: 
  *---------------------------------------------------------------------------*/
-void cmd_help (char *par) {
-   printf (Cli_Help);
+void DispatchCmd (void) {
+	char *sp,*cp,*next;
+	uint32_t i;
+
+   /* display prompt */
+   printf ("\nCmd> ");
+
+   /* get command line input */
+	if (getline (in_line, sizeof (in_line)) == false) {
+		return;
+	}
+
+	sp = get_entry (&in_line[0], &next);
+	if (*sp == 0) {
+		return;
+    }
+	
+	for (cp = sp; *cp && *cp != ' '; cp++) {
+      /* command to upper-case */
+		*cp = toupper (*cp);
+	}
+    
+	for (i = 0; i < CMD_COUNT; i++) {
+   
+		if (strcmp (sp, (const char *)&cmd[i].val)) {
+			continue;
+		}
+
+		/* execute command function */
+		cmd[i].func (next);
+		break;                           
+	}
+	
+	if (i == CMD_COUNT) {
+		printf ("\nCommand error\n");
+	}
+	return;
 }
