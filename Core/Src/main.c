@@ -22,7 +22,7 @@
 #include "main.h"
 #include "jpeg_utils_conf.h"
 #include "cmsis_os2.h"
-//OscarYeh #include "app_touchgfx.h"
+//#include "app_touchgfx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -41,7 +41,15 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-/* USER CODE END PD */
+/* Definitions of environment analog values */
+  /* Value of analog reference voltage (Vref+), connected to analog voltage   */
+  /* supply Vdda (unit: mV).                                                  */
+  #define VDDA_APPLI                       (3300UL)
+
+  /* Init variable out of expected ADC conversion data range */
+  #define VAR_CONVERTED_DATA_INIT_VALUE    (__LL_ADC_DIGITAL_SCALE(ADC1, LL_ADC_RESOLUTION_12B) + 1)
+
+  /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
@@ -69,6 +77,7 @@ XSPI_HandleTypeDef hxspi1;
 JPEG_HandleTypeDef hjpeg;
 DMA_HandleTypeDef handle_GPDMA1_Channel1;
 DMA_HandleTypeDef handle_GPDMA1_Channel0;
+DMA_HandleTypeDef hdma_adc4;
 
 LTDC_HandleTypeDef hltdc;
 
@@ -77,6 +86,7 @@ OSPI_HandleTypeDef hospi1;
 TIM_HandleTypeDef htim8;
 
 UART_HandleTypeDef huart1;
+ADC_HandleTypeDef hadc4;
 
 /* USER CODE BEGIN PV */
 
@@ -102,6 +112,7 @@ static void MX_HSPI1_Init(void);
 static void MX_DCACHE1_Init(void);
 static void MX_DCACHE2_Init(void);
 static void MX_ICACHE_Init(void);
+static void MX_ADC4_Init(void);
 static void MX_JPEG_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
@@ -110,6 +121,9 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/* Variable containing ADC conversions data */
+uint32_t   aADCxConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
+
 #if defined(__ICCARM__)
 /* New definition from EWARM V9, compatible with EWARM8 */
 int iar_fputc(int ch);
@@ -183,6 +197,7 @@ int main(void)
   MX_DCACHE1_Init();
   MX_DCACHE2_Init();
   MX_ICACHE_Init();
+  MX_ADC4_Init();
   MX_JPEG_Init();
 
   MX_USART1_UART_Init();
@@ -193,10 +208,23 @@ int main(void)
       printf("als ams_tcs3410 init failed!!! \n\r");
   }
 
-  //OscarYeh MX_TouchGFX_Init();
+  //MX_TouchGFX_Init();
   /* Call PreOsInit function */
-  //OscarYeh MX_TouchGFX_PreOSInit();
+  //MX_TouchGFX_PreOSInit();
   /* USER CODE BEGIN 2 */
+  MX_ADCQueue_Config();
+  __HAL_LINKDMA(&hadc4, DMA_Handle, hdma_adc4);
+  if (HAL_DMAEx_List_LinkQ(&hdma_adc4, &ADCQueue) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_ADC_Start_DMA(&hadc4,
+                        (uint32_t *)aADCxConvertedData,
+                        (ADC_CONVERTED_DATA_BUFFER_SIZE)
+                       ) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   /* USER CODE END 2 */
 
@@ -239,7 +267,9 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
@@ -587,6 +617,24 @@ static void MX_GPDMA1_Init(void)
     HAL_NVIC_SetPriority(GPDMA1_Channel1_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(GPDMA1_Channel1_IRQn);
 
+  /* GPDMA1 interrupt Init */
+    HAL_NVIC_SetPriority(GPDMA1_Channel10_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(GPDMA1_Channel10_IRQn);
+
+  hdma_adc4.Instance = GPDMA1_Channel10;
+  hdma_adc4.InitLinkedList.Priority = DMA_LOW_PRIORITY_LOW_WEIGHT;
+  hdma_adc4.InitLinkedList.LinkStepMode = DMA_LSM_FULL_EXECUTION;
+  hdma_adc4.InitLinkedList.LinkAllocatedPort = DMA_LINK_ALLOCATED_PORT1;
+  hdma_adc4.InitLinkedList.TransferEventMode = DMA_TCEM_LAST_LL_ITEM_TRANSFER;
+  hdma_adc4.InitLinkedList.LinkedListMode = DMA_LINKEDLIST_CIRCULAR;
+  if (HAL_DMAEx_List_Init(&hdma_adc4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_DMA_ConfigChannelAttributes(&hdma_adc4, DMA_CHANNEL_NPRIV) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN GPDMA1_Init 1 */
 
   /* USER CODE END GPDMA1_Init 1 */
@@ -1276,6 +1324,79 @@ static void MX_GPIO_Init(void)
 }
 
 /**
+  * @brief ADC4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC4_Init(void)
+{
+
+  /* USER CODE BEGIN ADC4_Init 0 */
+
+  /* USER CODE END ADC4_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC4_Init 1 */
+
+  /* USER CODE END ADC4_Init 1 */
+
+  /** Common config
+  */
+  hadc4.Instance = ADC4;
+  hadc4.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV4;
+  hadc4.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc4.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc4.Init.ScanConvMode = ADC4_SCAN_ENABLE;
+  hadc4.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc4.Init.LowPowerAutoPowerOff = ADC_LOW_POWER_NONE;
+  hadc4.Init.LowPowerAutoWait = DISABLE;
+  hadc4.Init.ContinuousConvMode = ENABLE;
+  hadc4.Init.NbrOfConversion = 2;
+  hadc4.Init.DiscontinuousConvMode = DISABLE;
+  hadc4.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc4.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc4.Init.DMAContinuousRequests = ENABLE;
+  hadc4.Init.TriggerFrequencyMode = ADC_TRIGGER_FREQ_LOW;
+  hadc4.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc4.Init.SamplingTimeCommon1 = ADC4_SAMPLETIME_79CYCLES_5;
+  hadc4.Init.SamplingTimeCommon2 = ADC4_SAMPLETIME_79CYCLES_5;
+  hadc4.Init.OversamplingMode = DISABLE;
+  if (HAL_ADC_Init(&hadc4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_9;
+  sConfig.Rank = ADC4_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC4_SAMPLINGTIME_COMMON_1;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
+  if (HAL_ADC_ConfigChannel(&hadc4, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_10;
+  sConfig.Rank = ADC4_REGULAR_RANK_2;
+  if (HAL_ADC_ConfigChannel(&hadc4, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC4_Init 2 */
+  if (HAL_ADCEx_Calibration_Start(&hadc4, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE END ADC4_Init 2 */
+
+}
+
+/**
   * @brief AMS IRQ Initialization Function
   * @param None
   * @retval None
@@ -1299,6 +1420,10 @@ void AMS_IRQ_Init(void)
   HAL_NVIC_SetPriority(AMS_INT_EXTI_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ(AMS_INT_EXTI_IRQn);
 }
+
+/******************************************************************************/
+/*   USER IRQ HANDLER TREATMENT                                               */
+/******************************************************************************/
 
 /**
   * @brief  Tx Transfer completed callback

@@ -55,6 +55,7 @@ void DebugMon_Handler(void);
 void EXTI8_IRQHandler(void);
 void GPDMA1_Channel0_IRQHandler(void);
 void GPDMA1_Channel1_IRQHandler(void);
+void GPDMA1_Channel10_IRQHandler(void);
 void TIM6_IRQHandler(void);
 void DMA2D_IRQHandler(void);
 void GPU2D_IRQHandler(void);
@@ -62,6 +63,7 @@ void GPU2D_ER_IRQHandler(void);
 void LTDC_IRQHandler(void);
 void LTDC_ER_IRQHandler(void);
 void JPEG_IRQHandler(void);
+void ADC1_2_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

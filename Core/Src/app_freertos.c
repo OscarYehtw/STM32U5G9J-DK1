@@ -71,7 +71,7 @@ osThreadId_t GUI_TaskHandle;
 const osThreadAttr_t GUI_Task_attributes = {
   .name = "GUI_Task",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 8192 * 4
+  .stack_size = 128 * 4
 };
 /* Definitions for UART_TxTask */
 osThreadId_t UART_TxTaskHandle;
@@ -85,7 +85,7 @@ osThreadId_t CLI_TaskHandle;
 const osThreadAttr_t CLI_Task_attributes = {
   .name = "CLI_Task",
   .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 1024 * 4,
+  .stack_size = 1024 * 16,
 };
 
 /* Private function prototypes -----------------------------------------------*/

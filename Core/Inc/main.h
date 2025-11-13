@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "linked_list.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -39,13 +39,16 @@ extern "C" {
 
 /* USER CODE END ET */
 
+#define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  2)   /* Size of array aADCxConvertedData[] */
+
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+extern DMA_QListTypeDef ADCQueue;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+extern uint32_t aADCxConvertedData[];
 extern UART_HandleTypeDef huart1;
 extern volatile uint8_t txBusy;
 extern uint8_t txByte;

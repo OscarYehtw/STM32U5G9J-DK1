@@ -13,7 +13,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "cmsis_os2.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "app_freertos.h"
+#include "main.h"
 #include "cli.h"
 #include "ams_device.h"
 #include "tcs3410_hwdef.h"
@@ -23,12 +26,14 @@ const char Cli_Help[] =
    "+ COMMAND ------------------+ FUNCTION ---------------------------------+\n"
    "| ALSR <reg> <bytes>        | Read <bytes> from sensor register <reg>   |\n"
    "| ALSW <reg> <data >        | Write <data> to sensor register <reg>     |\n"
+   "| TMR                       | Show TMR-ADC values                       |\n"
    "| HELP  or  ?               | displays this help                        |\n"
    "+---------------------------+-------------------------------------------+\n";
 
 const SCMD cmd[] = {
    "ALSR",   cmd_alsread,
    "ALSW",   cmd_alswrite,
+   "TMR",    cmd_tmradc,
    "HELP",   cmd_help,
    "?",      cmd_help};
 
@@ -145,6 +150,43 @@ void cmd_alswrite (char *par) {
   }
 
   printf("Write [0x%02X] = 0x%02X\r\n", (uint8_t)reg, data);
+}
+
+/*----------------------------------------------------------------------------
+ *        cmd_tmradc  --  Display ADC4 conversion results
+ *---------------------------------------------------------------------------*/
+void cmd_tmradc (char *par)
+{
+    (void)par;
+    const float VREF     = 3.3f;
+    const float ADC_MAX  = 4095.0f;
+    char buf[32];
+    uint32_t adc1, adc2;
+    float v1, v2;
+
+    printf("=== TMR-ADC monitor mode ===\n");
+    printf("Press [ESC] to exit.\n\n");
+
+    while (1)
+    {
+        taskENTER_CRITICAL();
+        adc1 = aADCxConvertedData[0];
+        adc2 = aADCxConvertedData[1];
+        taskEXIT_CRITICAL();
+
+        v1 = (adc1 * VREF) / ADC_MAX;
+        v2 = (adc2 * VREF) / ADC_MAX;
+        printf("ADC1=%lu (%.3f V), ADC2=%lu (%.3f V)\n", (unsigned long)adc1, v1, (unsigned long)adc1, v1);
+
+        int ch = (int) READ_REG(huart1.Instance->RDR);
+        if (ch == ESC)  // ESC key
+        {
+            printf("\nExit TMR-ADC monitor.\n");
+            break;
+        }
+        osDelay(500);
+
+    }
 }
 
 /*----------------------------------------------------------------------------
