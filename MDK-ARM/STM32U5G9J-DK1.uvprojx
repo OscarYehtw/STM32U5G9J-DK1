@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32U5G9xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../TouchGFX/App;../TouchGFX/Target/generated;../TouchGFX/Target;../Drivers/STM32U5xx_HAL_Driver/Inc;../Drivers/STM32U5xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32U5xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include/;../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure/;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/;../Middlewares/Third_Party/CMSIS/RTOS2/Include/;../Drivers/BSP/STM32U5x9J-DK;../Drivers/BSP/Components/mx25um51245g;../middlewares/st/touchgfx/framework/include;../touchgfx/generated/fonts/include;../touchgfx/generated/gui_generated/include;../touchgfx/generated/images/include;../touchgfx/generated/texts/include;../touchgfx/generated/videos/include;../touchgfx/gui/include;../Middlewares/ST/touchgfx_components/gpu2d/NemaGFX/include;../Middlewares/ST/touchgfx_components/gpu2d/TouchGFXNema/include;..\Peripheral\tcs3410;..\Source\cli</IncludePath>
+              <IncludePath>../Core/Inc;../TouchGFX/App;../TouchGFX/Target/generated;../TouchGFX/Target;../Drivers/STM32U5xx_HAL_Driver/Inc;../Drivers/STM32U5xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32U5xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include/;../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ/non_secure/;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/;../Middlewares/Third_Party/CMSIS/RTOS2/Include/;../Drivers/BSP/STM32U5x9J-DK;../Drivers/BSP/Components/mx25um51245g;../middlewares/st/touchgfx/framework/include;../touchgfx/generated/fonts/include;../touchgfx/generated/gui_generated/include;../touchgfx/generated/images/include;../touchgfx/generated/texts/include;../touchgfx/generated/videos/include;../touchgfx/gui/include;../Middlewares/ST/touchgfx_components/gpu2d/NemaGFX/include;../Middlewares/ST/touchgfx_components/gpu2d/TouchGFXNema/include;..\Peripheral\tcs3410;..\Source\cli;..\Utilities\lcd;..\Utilities\Fonts;..\Drivers\BSP\Components\Common</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -740,6 +740,11 @@
               <FileName>stm32u5x9j_discovery_ospi.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/BSP/STM32U5x9J-DK/stm32u5x9j_discovery_ospi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32u5x9j_discovery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\BSP\STM32U5x9J-DK\stm32u5x9j_discovery.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2036,6 +2041,16 @@
               <FileName>cli.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Source\cli\cli.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>STM32_LCD</GroupName>
+          <Files>
+            <File>
+              <FileName>stm32_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Utilities\lcd\stm32_lcd.c</FilePath>
             </File>
           </Files>
         </Group>

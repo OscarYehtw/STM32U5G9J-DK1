@@ -17,8 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <stdio.h>
-#include <string.h>
 #include "main.h"
 #include "jpeg_utils_conf.h"
 #include "cmsis_os2.h"
@@ -75,6 +73,7 @@ GPU2D_HandleTypeDef hgpu2d;
 XSPI_HandleTypeDef hxspi1;
 
 JPEG_HandleTypeDef hjpeg;
+
 DMA_HandleTypeDef handle_GPDMA1_Channel1;
 DMA_HandleTypeDef handle_GPDMA1_Channel0;
 DMA_HandleTypeDef hdma_adc4;
@@ -86,12 +85,21 @@ OSPI_HandleTypeDef hospi1;
 TIM_HandleTypeDef htim8;
 
 UART_HandleTypeDef huart1;
+
+ADC_HandleTypeDef hadc1;
 ADC_HandleTypeDef hadc4;
 
 /* USER CODE BEGIN PV */
-
 XSPI_HandleTypeDef xospi1;
 
+LCD_UTILS_Drv_t      LCD_Driver;
+char str_display[60]   = "";
+static uint32_t ImageIndex = 0;
+static const uint32_t * Images[] =
+{
+  image_320x240_argb8888,
+  life_augmented_argb8888,
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,6 +107,7 @@ void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 static void SystemPower_Config(void);
 void MX_FREERTOS_Init(void);
+static void MX_USART1_UART_Init(void);
 static void MX_GPIO_Init(void);
 static void MX_GPDMA1_Init(void);
 static void MX_CRC_Init(void);
@@ -107,16 +116,28 @@ static void MX_DMA2D_Init(void);
 static void MX_GPU2D_Init(void);
 static void MX_DSIHOST_DSI_Init(void);
 static void MX_LTDC_Init(void);
+static void MX_LCD_Init(void);
 static void MX_OCTOSPI1_Init(void);
 static void MX_HSPI1_Init(void);
 static void MX_DCACHE1_Init(void);
 static void MX_DCACHE2_Init(void);
 static void MX_ICACHE_Init(void);
+static void MX_ADC1_Init(void);
 static void MX_ADC4_Init(void);
 static void MX_JPEG_Init(void);
-static void MX_USART1_UART_Init(void);
+static void MX_AMS_Init(void);
 /* USER CODE BEGIN PFP */
-
+static uint32_t SetPanelConfig(void);
+static void CopyBuffer(uint32_t *pSrc, uint32_t *pDst, uint16_t x, uint16_t y, uint16_t xsize, uint16_t ysize);
+//static uint8_t CheckForUserInput(void);
+int32_t LCD_FillRGBRect(uint32_t Instance, uint32_t Xpos, uint32_t Ypos, uint8_t *pData, uint32_t Width,
+                            uint32_t Height);
+int32_t LCD_FillRect(uint32_t Instance, uint32_t Xpos, uint32_t Ypos, uint32_t Width, uint32_t Height,
+                         uint32_t Color);
+int32_t LCD_GetXSize(uint32_t Instance, uint32_t *Xsize);
+int32_t LCD_GetYSize(uint32_t Instance, uint32_t *Ysize);
+int32_t LCD_GetFormat(uint32_t Instance, uint32_t *Format);
+void LCD_Set_Default_Clock(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -156,7 +177,6 @@ PUTCHAR_PROTOTYPE
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -184,48 +204,27 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  MX_USART1_UART_Init();
   MX_GPIO_Init();
   MX_GPDMA1_Init();
   MX_CRC_Init();
   MX_TIM8_Init();
   MX_DMA2D_Init();
+  MX_ICACHE_Init();
   MX_GPU2D_Init();
   MX_DSIHOST_DSI_Init();
   MX_LTDC_Init();
+  MX_LCD_Init();
   MX_OCTOSPI1_Init();
   MX_HSPI1_Init();
   MX_DCACHE1_Init();
   MX_DCACHE2_Init();
-  MX_ICACHE_Init();
+  //MX_ADC1_Init();
   MX_ADC4_Init();
   MX_JPEG_Init();
+  MX_AMS_Init();
 
-  MX_USART1_UART_Init();
-  //printf("MX_USART1_UART_Init - Done\n\r");
-
-  if (ams_device_init() != AMS_SUCCESS)
-  {
-      printf("als ams_tcs3410 init failed!!! \n\r");
-  }
-
-  //MX_TouchGFX_Init();
-  /* Call PreOsInit function */
-  //MX_TouchGFX_PreOSInit();
   /* USER CODE BEGIN 2 */
-  MX_ADCQueue_Config();
-  __HAL_LINKDMA(&hadc4, DMA_Handle, hdma_adc4);
-  if (HAL_DMAEx_List_LinkQ(&hdma_adc4, &ADCQueue) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_ADC_Start_DMA(&hadc4,
-                        (uint32_t *)aADCxConvertedData,
-                        (ADC_CONVERTED_DATA_BUFFER_SIZE)
-                       ) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -242,10 +241,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
   }
+  /* USER CODE END WHILE */
+
+  /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 
@@ -460,12 +459,22 @@ static void MX_DMA2D_Init(void)
 
   /* USER CODE END DMA2D_Init 1 */
   hdma2d.Instance = DMA2D;
-  hdma2d.Init.Mode = DMA2D_R2M;
-  hdma2d.Init.ColorMode = DMA2D_OUTPUT_RGB888;
+  hdma2d.Init.Mode = DMA2D_M2M;
+  hdma2d.Init.ColorMode = DMA2D_OUTPUT_ARGB8888;
   hdma2d.Init.OutputOffset = 0;
   hdma2d.Init.BytesSwap = DMA2D_BYTES_REGULAR;
   hdma2d.Init.LineOffsetMode = DMA2D_LOM_PIXELS;
+  hdma2d.LayerCfg[1].InputOffset = 0;
+  hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_ARGB8888;
+  hdma2d.LayerCfg[1].AlphaMode = DMA2D_NO_MODIF_ALPHA;
+  hdma2d.LayerCfg[1].InputAlpha = 0xFF;
+  hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
+  hdma2d.LayerCfg[1].RedBlueSwap = DMA2D_RB_REGULAR;
   if (HAL_DMA2D_Init(&hdma2d) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -484,10 +493,7 @@ static void MX_DSIHOST_DSI_Init(void)
 {
 
   /* USER CODE BEGIN DSIHOST_Init 0 */
-  HAL_GPIO_WritePin(DSI_PWR_ON_GPIO_Port, DSI_PWR_ON_Pin, GPIO_PIN_SET);
-  HAL_Delay(5);
-  HAL_GPIO_WritePin(DSI_PWR_ON_GPIO_Port, DSI_PWR_ON_Pin, GPIO_PIN_RESET);
-  HAL_Delay(11);
+
   /* USER CODE END DSIHOST_Init 0 */
 
   DSI_PLLInitTypeDef PLLInit = {0};
@@ -557,12 +563,12 @@ static void MX_DSIHOST_DSI_Init(void)
   VidCfg.HorizontalSyncActive = 6;
   VidCfg.HorizontalBackPorch = 3;
   VidCfg.HorizontalLine = 1452;
-  VidCfg.VerticalSyncActive = 20;
+  VidCfg.VerticalSyncActive = 1;
   VidCfg.VerticalBackPorch = 12;
-  VidCfg.VerticalFrontPorch = 200;
+  VidCfg.VerticalFrontPorch = 50;
   VidCfg.VerticalActive = 481;
-  VidCfg.LPCommandEnable = DSI_LP_COMMAND_ENABLE;
-  VidCfg.LPLargestPacketSize = 64;
+  VidCfg.LPCommandEnable = DSI_LP_COMMAND_DISABLE;
+  VidCfg.LPLargestPacketSize = 0;
   VidCfg.LPVACTLargestPacketSize = 0;
   VidCfg.LPHorizontalFrontPorchEnable = DSI_LP_HFP_ENABLE;
   VidCfg.LPHorizontalBackPorchEnable = DSI_LP_HBP_ENABLE;
@@ -580,18 +586,7 @@ static void MX_DSIHOST_DSI_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN DSIHOST_Init 2 */
-
-  // Start DSI
-  if (HAL_DSI_Start(&hdsi) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* Switch to DSI PHY PLL clock */
-  RCC_PeriphCLKInitTypeDef PeriphClkInit;
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_DSI;
-  PeriphClkInit.DsiClockSelection    = RCC_DSICLKSOURCE_DSIPHY;
-  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
+  LCD_Set_Default_Clock();
   /* USER CODE END DSIHOST_Init 2 */
 
 }
@@ -816,13 +811,13 @@ static void MX_LTDC_Init(void)
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
   hltdc.Init.HorizontalSync = 1;
-  hltdc.Init.VerticalSync = 19;
+  hltdc.Init.VerticalSync = 0;
   hltdc.Init.AccumulatedHBP = 2;
-  hltdc.Init.AccumulatedVBP = 31;
+  hltdc.Init.AccumulatedVBP = 12;
   hltdc.Init.AccumulatedActiveW = 482;
-  hltdc.Init.AccumulatedActiveH = 512;
+  hltdc.Init.AccumulatedActiveH = 493;
   hltdc.Init.TotalWidth = 483;
-  hltdc.Init.TotalHeigh = 712;
+  hltdc.Init.TotalHeigh = 543;
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
   hltdc.Init.Backcolor.Red = 0;
@@ -831,17 +826,17 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   pLayerCfg.WindowX0 = 0;
-  pLayerCfg.WindowX1 = 480;
-  pLayerCfg.WindowY0 = 1;
-  pLayerCfg.WindowY1 = 481;
-  pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB888;
-  pLayerCfg.Alpha = 255;
+  pLayerCfg.WindowX1 = LCD_WIDTH;
+  pLayerCfg.WindowY0 = 0;
+  pLayerCfg.WindowY1 = LCD_HEIGHT;
+  pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
+  pLayerCfg.Alpha = 0xFF;
   pLayerCfg.Alpha0 = 0;
-  pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
-  pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
-  pLayerCfg.FBStartAdress = 0x0;
-  pLayerCfg.ImageWidth = 480;
-  pLayerCfg.ImageHeight = 480;
+  pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
+  pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
+  pLayerCfg.FBStartAdress = LCD_FRAME_BUFFER;
+  pLayerCfg.ImageWidth = LCD_WIDTH;
+  pLayerCfg.ImageHeight = LCD_HEIGHT;
   pLayerCfg.Backcolor.Blue = 0;
   pLayerCfg.Backcolor.Green = 0;
   pLayerCfg.Backcolor.Red = 0;
@@ -850,174 +845,246 @@ static void MX_LTDC_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN LTDC_Init 2 */
-  HAL_Delay(10);
-  HAL_DSI_EnterULPM(&hdsi);
-  HAL_Delay(10);
 
-  HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
-  HAL_Delay(10);
-  HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
-  HAL_Delay(150);
-
-  HAL_DSI_ExitULPM(&hdsi);
-  HAL_Delay(10);
-
-  // CMD Mode
-  uint8_t InitParam1[3] = {0xFF ,0x83 , 0x79};
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 3, 0xB9, InitParam1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // SETPOWER
-  uint8_t InitParam3[16] = {0x44,0x1C,0x1C,0x37,0x57,0x90,0xD0,0xE2,0x58,0x80,0x38,0x38,0xF8,0x33,0x34,0x42};
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 16, 0xB1, InitParam3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // SETDISP
-  uint8_t InitParam4[9] = {0x80,0x14,0x0C,0x30,0x20,0x50,0x11,0x42,0x1D};
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 9, 0xB2, InitParam4) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // Set display cycle timing
-  uint8_t InitParam5[10] = {0x01,0xAA,0x01,0xAF,0x01,0xAF,0x10,0xEA,0x1C,0xEA};
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 10, 0xB4, InitParam5) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // SETVCOM
-  uint8_t InitParam60[4] = {00,00,00,0xC0};
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 4, 0xC7, InitParam60) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // Set Panel Related Registers
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xCC, 0x02) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xD2, 0x77) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam50[37] = {
-    0x00,0x07,0x00,0x00,0x00,0x08,0x08,0x32,0x10,0x01,0x00,0x01,0x03,0x72,0x03,0x72,0x00,0x08,0x00,
-    0x08,0x33,0x33,0x05,0x05,0x37,0x05,0x05,0x37,0x0A,0x00,0x00,0x00,0x0A,0x00,0x01,0x00,0x0E
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 37, 0xD3, InitParam50) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam51[34] = {
-    0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x19,0x19,0x18,0x18,0x18,0x18,0x19,0x19,0x01,0x00,
-    0x03,0x02,0x05,0x04,0x07,0x06,0x23,0x22,0x21,0x20,0x18,0x18,0x18,0x18,0x00,0x00
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 34, 0xD5, InitParam51) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam52[35] = {
-    0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x19,0x19,0x18,0x18,0x19,0x19,0x18,0x18,0x06,0x07,
-    0x04,0x05,0x02,0x03,0x00,0x01,0x20,0x21,0x22,0x23,0x18,0x18,0x18,0x18
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 35, 0xD6, InitParam52) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // SET GAMMA
-  uint8_t InitParam8[42] = {
-    0x00,0x16,0x1B,0x30,0x36,0x3F,0x24,0x40,0x09,0x0D,0x0F,0x18,0x0E,0x11,0x12,0x11,0x14,0x07,
-    0x12,0x13,0x18,0x00,0x17,0x1C,0x30,0x36,0x3F,0x24,0x40,0x09,0x0C,0x0F,0x18,0x0E,0x11,0x14,
-    0x11,0x12,0x07,0x12,0x14,0x18
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xE0, InitParam8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam44[3] = {0x2C,0x2C,00};
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 3, 0xB6, InitParam44) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x00) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam14[] = {
-    0x01,0x00,0x07,0x0F,0x16,0x1F,0x27,0x30,0x38,0x40,0x47,0x4E,0x56,0x5D,0x65,0x6D,0x74,0x7D,
-    0x84,0x8A,0x90,0x99,0xA1,0xA9,0xB0,0xB6,0xBD,0xC4,0xCD,0xD4,0xDD,0xE5,0xEC,0xF3,0x36,0x07,
-    0x1C,0xC0,0x1B,0x01,0xF1,0x34,0x00
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xC1, InitParam14) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x01) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam15[] = {
-    0x00,0x08,0x0F,0x16,0x1F,0x28,0x31,0x39,0x41,0x48,0x51,0x59,0x60,0x68,0x70,0x78,0x7F,0x87,
-    0x8D,0x94,0x9C,0xA3,0xAB,0xB3,0xB9,0xC1,0xC8,0xD0,0xD8,0xE0,0xE8,0xEE,0xF5,0x3B,0x1A,0xB6,
-    0xA0,0x07,0x45,0xC5,0x37,0x00
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xC1, InitParam15) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x02) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  uint8_t InitParam20[42] = {
-    0x00,0x09,0x0F,0x18,0x21,0x2A,0x34,0x3C,0x45,0x4C,0x56,0x5E,0x66,0x6E,0x76,0x7E,0x87,0x8E,
-    0x95,0x9D,0xA6,0xAF,0xB7,0xBD,0xC5,0xCE,0xD5,0xDF,0xE7,0xEE,0xF4,0xFA,0xFF,0x0C,0x31,0x83,
-    0x3C,0x5B,0x56,0x1E,0x5A,0xFF
-  };
-
-  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xC1, InitParam20) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x00) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  // Exit Sleep Mode
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, DSI_EXIT_SLEEP_MODE, 0x00) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  HAL_Delay(120);
   /* USER CODE END LTDC_Init 2 */
 
+}
+
+/**
+  * @brief LCD Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_LCD_Init(void)
+{
+  if(SetPanelConfig() != 0)
+  {
+    Error_Handler();
+  }
+
+  /* Prepare area to display on LCD */
+  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 50);
+
+  /* Set UTIL_LCD functions */
+  LCD_Driver.DrawBitmap  = 0;
+  LCD_Driver.FillRGBRect = LCD_FillRGBRect;
+  LCD_Driver.DrawHLine   = 0;
+  LCD_Driver.DrawVLine   = 0;
+  LCD_Driver.FillRect    = LCD_FillRect;
+  LCD_Driver.GetPixel    = 0;
+  LCD_Driver.SetPixel    = 0;
+  LCD_Driver.GetXSize    = LCD_GetXSize;
+  LCD_Driver.GetYSize    = LCD_GetYSize;
+  LCD_Driver.SetLayer    = 0;
+  LCD_Driver.GetFormat   = LCD_GetFormat;
+
+  UTIL_LCD_SetFuncDriver(&LCD_Driver);
+
+  /* Clear LCD */
+  UTIL_LCD_Clear(UTIL_LCD_COLOR_BLACK);
+
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_WHITE);
+  UTIL_LCD_SetFont(&Font20);
+
+  /* Display title */
+  UTIL_LCD_FillRect(0, 70, LCD_WIDTH, 40, UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_DisplayStringAt(0, 80, (uint8_t *) "Google CF0F Example", CENTER_MODE);
+  //UTIL_LCD_DisplayStringAt(0, 100, (uint8_t *) " example ", CENTER_MODE);
+  CopyBuffer((uint32_t *)Images[ImageIndex++], (uint32_t *)LCD_FRAME_BUFFER, 67, 140, IMAGE_WIDTH, IMAGE_HEIGHT);
+}
+
+/* USER CODE BEGIN 4 */
+/**
+  * @brief  Converts a line to an ARGB8888 pixel format.
+  * @param  pSrc: Pointer to source buffer
+  * @param  pDst: Output color
+  * @param  xSize: Buffer width
+  * @param  ColorMode: Input color mode
+  * @retval None
+  */
+static void CopyBuffer(uint32_t *pSrc, uint32_t *pDst, uint16_t x, uint16_t y, uint16_t xsize, uint16_t ysize)
+{
+
+  uint32_t destination = (uint32_t)pDst + (y * 480 + x) * 4;
+  uint32_t source      = (uint32_t)pSrc;
+
+  hdma2d.Init.OutputOffset = 480 - xsize;
+
+
+  /* DMA2D Initialization */
+  if(HAL_DMA2D_Init(&hdma2d) == HAL_OK)
+  {
+      if (HAL_DMA2D_Start(&hdma2d, source, destination, xsize, ysize) == HAL_OK)
+      {
+        /* Polling For DMA transfer */
+        HAL_DMA2D_PollForTransfer(&hdma2d, 100);
+    }
+  }
+}
+
+/**
+  * @brief  Check for user input.
+  * @param  None
+  * @retval Input state (1 : active / 0 : Inactive)
+  */
+static uint32_t SetPanelConfig(void)
+{
+
+  if(HAL_DSI_Start(&hdsi) != HAL_OK) return 1;
+
+  /* CMD Mode */
+  uint8_t InitParam1[3] = {0xFF ,0x83 , 0x79};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 3, 0xB9, InitParam1) != HAL_OK) return 1;
+
+  /* SETPOWER */
+  uint8_t InitParam3[16] = {0x44,0x1C,0x1C,0x37,0x57,0x90,0xD0,0xE2,0x58,0x80,0x38,0x38,0xF8,0x33,0x34,0x42};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 16, 0xB1, InitParam3) != HAL_OK) return 2;
+
+  /* SETDISP */
+  uint8_t InitParam4[9] = {0x80,0x14,0x0C,0x30,0x20,0x50,0x11,0x42,0x1D};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 9, 0xB2, InitParam4) != HAL_OK) return 3;
+
+  /* Set display cycle timing */
+  uint8_t InitParam5[10] = {0x01,0xAA,0x01,0xAF,0x01,0xAF,0x10,0xEA,0x1C,0xEA};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 10, 0xB4, InitParam5) != HAL_OK) return 4;
+
+  /* SETVCOM */
+  uint8_t InitParam60[4] = {00,00,00,0xC0};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 4, 0xC7, InitParam60) != HAL_OK) return 5;
+
+  /* Set Panel Related Registers */
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xCC, 0x02) != HAL_OK) return 6;
+
+  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xD2, 0x77) != HAL_OK) return 7;
+
+  uint8_t InitParam50[37] = {0x00,0x07,0x00,0x00,0x00,0x08,0x08,0x32,0x10,0x01,0x00,0x01,0x03,0x72,0x03,0x72,0x00,0x08,0x00,0x08,0x33,0x33,0x05,0x05,0x37,0x05,0x05,0x37,0x0A,0x00,0x00,0x00,0x0A,0x00,0x01,0x00,0x0E};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 37, 0xD3, InitParam50) != HAL_OK) return 8;
+
+  uint8_t InitParam51[34] = {0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x19,0x19,0x18,0x18,0x18,0x18,0x19,0x19,0x01,0x00,0x03,0x02,0x05,0x04,0x07,0x06,0x23,0x22,0x21,0x20,0x18,0x18,0x18,0x18,0x00,0x00};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 34, 0xD5, InitParam51) != HAL_OK) return 9;
+
+  uint8_t InitParam52[35] = {0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x18,0x19,0x19,0x18,0x18,0x19,0x19,0x18,0x18,0x06,0x07,0x04,0x05,0x02,0x03,0x00,0x01,0x20,0x21,0x22,0x23,0x18,0x18,0x18,0x18};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 35, 0xD6, InitParam52) != HAL_OK) return 10;
+
+  /* SET GAMMA */
+  uint8_t InitParam8[42] = {0x00,0x16,0x1B,0x30,0x36,0x3F,0x24,0x40,0x09,0x0D,0x0F,0x18,0x0E,0x11,0x12,0x11,0x14,0x07,0x12,0x13,0x18,0x00,0x17,0x1C,0x30,0x36,0x3F,0x24,0x40,0x09,0x0C,0x0F,0x18,0x0E,0x11,0x14,0x11,0x12,0x07,0x12,0x14,0x18};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xE0, InitParam8) != HAL_OK) return 11;
+
+  uint8_t InitParam44[3] = {0x2C,0x2C,00};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 3, 0xB6, InitParam44) != HAL_OK) return 12;
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x00) != HAL_OK) return 13;
+
+  uint8_t InitParam14[] = {0x01,0x00,0x07,0x0F,0x16,0x1F,0x27,0x30,0x38,0x40,0x47,0x4E,0x56,0x5D,0x65,0x6D,0x74,0x7D,0x84,0x8A,0x90,0x99,0xA1,0xA9,0xB0,0xB6,0xBD,0xC4,0xCD,0xD4,0xDD,0xE5,0xEC,0xF3,0x36,0x07,0x1C,0xC0,0x1B,0x01,0xF1,0x34,0x00};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xC1, InitParam14) != HAL_OK) return 14;
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x01) != HAL_OK) return 15;
+
+  uint8_t InitParam15[] = {0x00,0x08,0x0F,0x16,0x1F,0x28,0x31,0x39,0x41,0x48,0x51,0x59,0x60,0x68,0x70,0x78,0x7F,0x87,0x8D,0x94,0x9C,0xA3,0xAB,0xB3,0xB9,0xC1,0xC8,0xD0,0xD8,0xE0,0xE8,0xEE,0xF5,0x3B,0x1A,0xB6,0xA0,0x07,0x45,0xC5,0x37,0x00};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xC1, InitParam15) != HAL_OK) return 16;
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x02) != HAL_OK) return 17;
+
+  uint8_t InitParam20[42] = {0x00,0x09,0x0F,0x18,0x21,0x2A,0x34,0x3C,0x45,0x4C,0x56,0x5E,0x66,0x6E,0x76,0x7E,0x87,0x8E,0x95,0x9D,0xA6,0xAF,0xB7,0xBD,0xC5,0xCE,0xD5,0xDF,0xE7,0xEE,0xF4,0xFA,0xFF,0x0C,0x31,0x83,0x3C,0x5B,0x56,0x1E,0x5A,0xFF};
+  if (HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, 42, 0xC1, InitParam20) != HAL_OK) return 18;
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xBD, 0x00) != HAL_OK) return 19;
+
+  /* Exit Sleep Mode*/
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x11, 0x00) != HAL_OK) return 20;
+
+  HAL_Delay(120);
+
+  /* Clear LCD_FRAME_BUFFER */
+  memset((uint32_t *)LCD_FRAME_BUFFER,0x00, 0xFFFFF);
+
+  /* Display On */
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x29, 0x00) != HAL_OK) return 21;
+
+  HAL_Delay(120);
+
+  /* All setting OK */
+  return 0;
+}
+
+
+
+int32_t LCD_FillRGBRect(uint32_t Instance, uint32_t Xpos, uint32_t Ypos, uint8_t *pData, uint32_t Width, uint32_t Height)
+{
+  uint32_t Xaddress = 0;
+  uint32_t StartAddress = 0;
+  uint32_t i;
+  uint32_t j;
+
+  /* Set the start address */
+  StartAddress = (hltdc.LayerCfg[0].FBStartAdress + (4 * (Ypos * 480 + Xpos)));
+
+
+  /* Fill the rectangle */
+  for (i = 0; i < Height; i++)
+  {
+    Xaddress = StartAddress + (480 * 4 * i);
+    for (j = 0; j < Width; j++)
+    {
+      *(__IO uint32_t *)(Xaddress) = *(uint32_t *) pData;
+      pData += 4;
+      Xaddress += 4;
+    }
+  }
+
+  return 0;
+}
+
+int32_t LCD_FillRect(uint32_t Instance, uint32_t Xpos, uint32_t Ypos, uint32_t Width, uint32_t Height, uint32_t Color)
+{
+  uint32_t  Xaddress = 0;
+  uint32_t  Startaddress = 0;
+  uint32_t  i;
+  uint32_t  j;
+
+  /* Get the rectangle start address */
+  Startaddress = (hltdc.LayerCfg[0].FBStartAdress + (4 * (Ypos * 480 + Xpos)));
+
+  /* Fill the rectangle */
+  for (i = 0; i < Height; i++)
+  {
+    Xaddress = Startaddress + (480 * 4 * i);
+    for (j = 0; j < Width; j++)
+    {
+      *(__IO uint32_t *)(Xaddress) = Color;
+      Xaddress += 4;
+    }
+  }
+
+  return 0;
+}
+
+int32_t LCD_GetXSize(uint32_t Instance, uint32_t *Xsize)
+{
+  /* Get the display Xsize */
+  *Xsize = 480U;
+
+  return 0;
+}
+
+int32_t LCD_GetYSize(uint32_t Instance, uint32_t *Ysize)
+{
+
+  /* Get the display Ysize */
+  *Ysize = 480U;
+
+  return 0;
+}
+
+
+int32_t LCD_GetFormat(uint32_t Instance, uint32_t *Format)
+{
+  /* Get pixel format supported by LCD */
+  *Format = LTDC_PIXEL_FORMAT_ARGB8888;
+
+  return 0;
 }
 
 /**
@@ -1324,6 +1391,67 @@ static void MX_GPIO_Init(void)
 }
 
 /**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.GainCompensation = 0;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.LowPowerAutoWait = DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.TriggerFrequencyMode = ADC_TRIGGER_FREQ_HIGH;
+  hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+  hadc1.Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
+  hadc1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+  hadc1.Init.OversamplingMode = DISABLE;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_9;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_391CYCLES_5;
+  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
   * @brief ADC4 Initialization Function
   * @param None
   * @retval None
@@ -1392,8 +1520,36 @@ static void MX_ADC4_Init(void)
   {
     Error_Handler();
   }
+
+  MX_ADCQueue_Config();
+  __HAL_LINKDMA(&hadc4, DMA_Handle, hdma_adc4);
+  if (HAL_DMAEx_List_LinkQ(&hdma_adc4, &ADCQueue) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_ADC_Start_DMA(&hadc4,
+                        (uint32_t *)aADCxConvertedData,
+                        (ADC_CONVERTED_DATA_BUFFER_SIZE)
+                       ) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
   /* USER CODE END ADC4_Init 2 */
 
+}
+
+/**
+  * @brief AMS IRQ Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_AMS_Init(void)
+{
+  if (ams_device_init() != AMS_SUCCESS)
+  {
+      printf("als ams_tcs3410 init failed!!! \n\r");
+  }
 }
 
 /**
@@ -1404,8 +1560,6 @@ static void MX_ADC4_Init(void)
 void AMS_IRQ_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -1466,6 +1620,22 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
     Error_Handler();
 }
 /* USER CODE BEGIN 4 */
+void LCD_Set_Default_Clock(void)
+{
+  RCC_PeriphCLKInitTypeDef  DSIPHYInitPeriph;
+
+  /* Switch to DSI PHY PLL clock */
+  DSIPHYInitPeriph.PeriphClockSelection = RCC_PERIPHCLK_DSI;
+  DSIPHYInitPeriph.DsiClockSelection    = RCC_DSICLKSOURCE_DSIPHY;
+
+  HAL_RCCEx_PeriphCLKConfig(&DSIPHYInitPeriph);
+
+  /* LCD Reset */
+  HAL_Delay(11);
+  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, GPIO_PIN_SET);
+  HAL_Delay(150);
+}
+
 
 /* USER CODE END 4 */
 

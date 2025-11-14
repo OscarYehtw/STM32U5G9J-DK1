@@ -29,6 +29,8 @@ typedef struct scmd {
 void cmd_alsread (char *par);
 void cmd_alswrite (char *par);
 void cmd_tmradc (char *par);
+void cmd_fill (char *par);
+void cmd_backlight (char *par);
 void cmd_help (char *par);
 
 /* Local Function Prototypes */

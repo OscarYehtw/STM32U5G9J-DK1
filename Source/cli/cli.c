@@ -22,11 +22,15 @@
 #include "tcs3410_hwdef.h"
 #include "tcs3410.h"
 
+extern TIM_HandleTypeDef htim8;
+
 const char Cli_Help[] = 
    "+ COMMAND ------------------+ FUNCTION ---------------------------------+\n"
    "| ALSR <reg> <bytes>        | Read <bytes> from sensor register <reg>   |\n"
    "| ALSW <reg> <data >        | Write <data> to sensor register <reg>     |\n"
    "| TMR                       | Show TMR-ADC values                       |\n"
+   "| FILL <rgb888>             | Fill screen with rgb color                |\n"
+   "| BL   <brightness>         | set backlight to brightness [0-100%%]      |\n"
    "| HELP  or  ?               | displays this help                        |\n"
    "+---------------------------+-------------------------------------------+\n";
 
@@ -34,6 +38,8 @@ const SCMD cmd[] = {
    "ALSR",   cmd_alsread,
    "ALSW",   cmd_alswrite,
    "TMR",    cmd_tmradc,
+   "FILL",   cmd_fill,
+   "BL",     cmd_backlight,
    "HELP",   cmd_help,
    "?",      cmd_help};
 
@@ -157,36 +163,104 @@ void cmd_alswrite (char *par) {
  *---------------------------------------------------------------------------*/
 void cmd_tmradc (char *par)
 {
-    (void)par;
-    const float VREF     = 3.3f;
-    const float ADC_MAX  = 4095.0f;
-    char buf[32];
-    uint32_t adc1, adc2;
-    float v1, v2;
+  (void)par;
+  const float VREF     = 3.3f;
+  const float ADC_MAX  = 4095.0f;
+  char buf[32];
+  uint32_t adc1, adc2;
+  float v1, v2;
 
-    printf("=== TMR-ADC monitor mode ===\n");
-    printf("Press [ESC] to exit.\n\n");
+  printf("=== TMR-ADC monitor mode ===\n");
+  printf("Press [ESC] to exit.\n\n");
 
-    while (1)
-    {
-        taskENTER_CRITICAL();
-        adc1 = aADCxConvertedData[0];
-        adc2 = aADCxConvertedData[1];
-        taskEXIT_CRITICAL();
+  while (1)
+  {
+      taskENTER_CRITICAL();
+      adc1 = aADCxConvertedData[0];
+      adc2 = aADCxConvertedData[1];
+      taskEXIT_CRITICAL();
 
-        v1 = (adc1 * VREF) / ADC_MAX;
-        v2 = (adc2 * VREF) / ADC_MAX;
-        printf("ADC1=%lu (%.3f V), ADC2=%lu (%.3f V)\n", (unsigned long)adc1, v1, (unsigned long)adc1, v1);
+      v1 = (adc1 * VREF) / ADC_MAX;
+      v2 = (adc2 * VREF) / ADC_MAX;
+      printf("ADC1=%lu (%.3f V), ADC2=%lu (%.3f V)\n", (unsigned long)adc1, v1, (unsigned long)adc1, v1);
 
-        int ch = (int) READ_REG(huart1.Instance->RDR);
-        if (ch == ESC)  // ESC key
-        {
-            printf("\nExit TMR-ADC monitor.\n");
-            break;
-        }
-        osDelay(500);
+      int ch = (int) READ_REG(huart1.Instance->RDR);
+      if (ch == ESC)  // ESC key
+      {
+          printf("\nExit TMR-ADC monitor.\n");
+          break;
+      }
+      osDelay(500);
+  }
+}
 
-    }
+/*----------------------------------------------------------------------------
+ *        cmd_fill  --  Fill screen with rgb color
+ *---------------------------------------------------------------------------*/
+void cmd_fill (char *par)
+{
+  char *pRGB;
+  uint32_t rgb888;
+
+  if (par == NULL || *par == 0) {
+      printf("Usage: FILL <rgb888>\n");
+      printf("Example: FILL FF0000 (red)\n");
+      return;
+  }
+
+  pRGB = get_entry(par, &par);
+  if (pRGB == NULL) {
+      printf("Invalid parameter.\n");
+      return;
+  }
+
+  if (sscanf(pRGB, "%x", &rgb888) != 1) {
+      printf("Invalid rgb888 format.\n");
+      return;
+  }
+
+  UTIL_LCD_FillRect(0, 0, LCD_WIDTH, LCD_HEIGHT, rgb888);
+}
+
+/*----------------------------------------------------------------------------
+ *        cmd_backlight  --  set backlight to brightness
+ *---------------------------------------------------------------------------*/
+void cmd_backlight (char *par)
+{
+  char *pVal;
+  int percent;
+
+  // No argument ? show usage
+  if (par == NULL || *par == 0) {
+      printf("Usage: BL <brightness>\n");
+      printf("Brightness range: 0 ~ 100\n");
+      return;
+  }
+
+  // Parse CLI argument
+  pVal = get_entry(par, &par);
+  if (pVal == NULL) {
+      printf("Invalid parameter.\n");
+      return;
+  }
+
+  // Convert to integer
+  if (sscanf(pVal, "%d", &percent) != 1) {
+      printf("Invalid brightness value.\n");
+      return;
+  }
+
+  // Range clip
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+
+  // Convert percentage to duty (Period = 139)
+  uint32_t duty = (139 * percent) / 100;
+
+  // Apply PWM duty
+  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, duty);
+
+  printf("Backlight = %d%% (duty=%lu)\n", percent, (unsigned long)duty);
 }
 
 /*----------------------------------------------------------------------------

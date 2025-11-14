@@ -31,6 +31,15 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <string.h>
+#include "stm32u5x9j_discovery.h"
+#include "image_320x240_argb8888.h"
+#include "life_augmented_argb8888.h"
+#include "stm32_lcd.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "linked_list.h"
 /* USER CODE END Includes */
 
@@ -66,6 +75,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define VFP 50
+#define LCD_WIDTH 480
+#define VBP 12
+#define LCD_FRAME_BUFFER 0x200D0000
+#define HACT 480
+#define VSYNC 1
+#define HFP 1
+#define VACT 481
+#define IMAGE_HEIGHT 240
+#define HBP 1
+#define IMAGE_WIDTH 320
+#define LCD_HEIGHT 481
+#define HSYNC 2
+
 #define LED_GREEN_Pin GPIO_PIN_0
 #define LED_GREEN_GPIO_Port GPIOE
 #define LED_RED_Pin GPIO_PIN_1
