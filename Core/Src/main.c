@@ -223,7 +223,9 @@ int main(void)
   MX_ADC4_Init();
   MX_JPEG_Init();
   MX_AMS_Init();
-
+  //MX_TouchGFX_Init();
+  /* Call PreOsInit function */
+  //MX_TouchGFX_PreOSInit();
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 
@@ -241,10 +243,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-  }
-  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
+  }
   /* USER CODE END 3 */
 }
 

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextDatabase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="texts.xsd" Version="4.26.0">
+  <Languages>
+    <Language Id="GB" />
+  </Languages>
+  <Texts>
+    <TextGroup Id="AllTexts">
+      <Text Id="MainSelectedSubDemoSvg" Alignment="Left" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">SVG</Translation>
+      </Text>
+      <Text Id="MainSelectedSubDemoEBike" Alignment="Left" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">E-BIKE</Translation>
+      </Text>
+      <Text Id="MainSelectedSubDemoCompass" Alignment="Left" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">COMPASS</Translation>
+      </Text>
+      <Text Id="MainSelectedSubDemoThermostat" Alignment="Left" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">THERMOSTAT</Translation>
+      </Text>
+      <Text Id="MainSelectedSubDemoWatch" Alignment="Left" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">WATCH</Translation>
+      </Text>
+      <Text Id="__SingleUse_XNFY" Alignment="Center" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_60VL" Alignment="Right" TypographyId="LargeNumber">
+        <Translation Language="GB">&lt;value&gt;°</Translation>
+      </Text>
+      <Text Id="__SingleUse_MUJS" Alignment="Left" TypographyId="LargeNumber">
+        <Translation Language="GB">359</Translation>
+      </Text>
+      <Text Id="__SingleUse_VVZP" Alignment="Left" TypographyId="MainSelectedSubDemo">
+        <Translation Language="GB">NW</Translation>
+      </Text>
+      <Text Id="WatchDigitalClockHour" Alignment="Left" TypographyId="WathDigitalClock">
+        <Translation Language="GB">&lt;hour&gt;</Translation>
+      </Text>
+      <Text Id="WatchDigitalClockSecond" Alignment="Right" TypographyId="WathDigitalClock">
+        <Translation Language="GB">&lt;second&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_5H87" Alignment="Right" TypographyId="VeryLargeNumber">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_SU0H" Alignment="Center" TypographyId="SmallNumberSaira">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_MWN2" Alignment="Left" TypographyId="VeryLargeNumber">
+        <Translation Language="GB">68</Translation>
+      </Text>
+      <Text Id="__SingleUse_WTII" Alignment="Left" TypographyId="SmallNumberSaira">
+        <Translation Language="GB">68.9</Translation>
+      </Text>
+      <Text Id="__SingleUse_NANU" Alignment="Center" TypographyId="HumongousNumber">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_DHPQ" Alignment="Center" TypographyId="MediumNumber">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_QB8T" Alignment="Left" TypographyId="MediumNumber">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_53CM" Alignment="Center" TypographyId="SmallNumber">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_CKZ2" Alignment="Left" TypographyId="SmallText">
+        <Translation Language="GB">TOTAL km</Translation>
+      </Text>
+      <Text Id="__SingleUse_JP0H" Alignment="Left" TypographyId="SmallText">
+        <Translation Language="GB">TOTAL mi</Translation>
+      </Text>
+      <Text Id="__SingleUse_1KU2" Alignment="Left" TypographyId="SmallText">
+        <Translation Language="GB">REMAINING</Translation>
+      </Text>
+      <Text Id="__SingleUse_B6UT" Alignment="Left" TypographyId="HumongousNumber">
+        <Translation Language="GB">36</Translation>
+      </Text>
+      <Text Id="__SingleUse_49Q7" Alignment="Left" TypographyId="MediumNumber">
+        <Translation Language="GB">08:06</Translation>
+      </Text>
+      <Text Id="__SingleUse_52Q4" Alignment="Left" TypographyId="SmallNumber">
+        <Translation Language="GB">+146m</Translation>
+      </Text>
+      <Text Id="__SingleUse_XB5M" Alignment="Left" TypographyId="MediumNumber">
+        <Translation Language="GB">000.0</Translation>
+      </Text>
+      <Text Id="__SingleUse_CQWY" Alignment="Center" TypographyId="VeryLargeNumber">
+        <Translation Language="GB">.</Translation>
+      </Text>
+      <Text Id="__SingleUse_H5WB" Alignment="Left" TypographyId="VeryLargeNumber">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
+      <Text Id="__SingleUse_D90K" Alignment="Left" TypographyId="VeryLargeNumber">
+        <Translation Language="GB">9</Translation>
+      </Text>
+      <Text Id="__SingleUse_5AWG" Alignment="Left" TypographyId="WathDigitalClock">
+        <Translation Language="GB">12</Translation>
+      </Text>
+      <Text Id="__SingleUse_WX1V" Alignment="Left" TypographyId="WathDigitalClock">
+        <Translation Language="GB">15</Translation>
+      </Text>
+    </TextGroup>
+    <TextGroup Id="Unsorted" />
+  </Texts>
+  <Typographies>
+    <Typography Id="MainSelectedSubDemo" Font="Saira_SemiCondensed-SemiBold.ttf" Size="32" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="-" WildcardCharacterRanges="A-Z" />
+    <Typography Id="LargeNumber" Font="ShareTechMono-Regular.ttf" Size="42" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="WathDigitalClock" Font="Saira_SemiCondensed-SemiBold.ttf" Size="72" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters=":" WildcardCharacterRanges="0-9" />
+    <Typography Id="VeryLargeNumber" Font="Saira_SemiCondensed-SemiBold.ttf" Size="150" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="SmallNumberSaira" Font="Saira_SemiCondensed-SemiBold.ttf" Size="24" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="." WildcardCharacterRanges="0-9" />
+    <Typography Id="HumongousNumber" Font="ShareTechMono-Regular.ttf" Size="120" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="MediumNumber" Font="ShareTechMono-Regular.ttf" Size="26" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters=":." WildcardCharacterRanges="0-9" />
+    <Typography Id="SmallNumber" Font="ShareTechMono-Regular.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacters="+mft" WildcardCharacterRanges="0-9" />
+    <Typography Id="SmallText" Font="Saira_SemiCondensed-SemiBold.ttf" Size="16" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="LargeNumberSaira" Font="Saira_SemiCondensed-SemiBold.ttf" Size="42" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" WildcardCharacterRanges="0-9" />
+    <Typography Id="MediumText" Font="Saira_SemiCondensed-SemiBold.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+  </Typographies>
+</TextDatabase>

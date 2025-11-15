@@ -1,3 +1,7 @@
+3.0.8
+- Updated to TouchGFX 4.26.0
+- Invalidate DCACHE2 at initialization
+
 3.0.7
 - Updated to STM32CubeMX 6.15.0
 - Updated to Firmware Package FW_U5 1.8.0

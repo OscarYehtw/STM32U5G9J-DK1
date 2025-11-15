@@ -285,6 +285,10 @@ asm_source_files += $(call find, $(source_paths),*.S)
 
 object_files := $(cpp_source_files) $(c_source_files)
 
+
+object_files := $(filter-out Core/Src/syscalls.c, $(object_files)) # ignore potential cmake duplicate
+object_files := $(filter-out Core/Src/sysmem.c, $(object_files)) # ignore potential cmake duplicate
+
 # Start converting paths
 object_files := $(object_files:$(touchgfx_path)/%.cpp=$(object_output_path)/touchgfx/%.o)
 object_files := $(object_files:%.cpp=$(object_output_path)/%.o)
