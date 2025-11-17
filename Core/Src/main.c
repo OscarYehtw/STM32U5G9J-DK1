@@ -122,7 +122,7 @@ static void MX_HSPI1_Init(void);
 static void MX_DCACHE1_Init(void);
 static void MX_DCACHE2_Init(void);
 static void MX_ICACHE_Init(void);
-static void MX_ADC1_Init(void);
+//static void MX_ADC1_Init(void);
 static void MX_ADC4_Init(void);
 static void MX_JPEG_Init(void);
 static void MX_AMS_Init(void);
@@ -1392,6 +1392,7 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_2 */
 }
 
+#if 0
 /**
   * @brief ADC1 Initialization Function
   * @param None
@@ -1452,6 +1453,7 @@ static void MX_ADC1_Init(void)
   /* USER CODE END ADC1_Init 2 */
 
 }
+#endif
 
 /**
   * @brief ADC4 Initialization Function

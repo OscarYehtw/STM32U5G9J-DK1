@@ -35,13 +35,14 @@ const char Cli_Help[] =
    "+---------------------------+-------------------------------------------+\n";
 
 const SCMD cmd[] = {
-   "ALSR",   cmd_alsread,
-   "ALSW",   cmd_alswrite,
-   "TMR",    cmd_tmradc,
-   "FILL",   cmd_fill,
-   "BL",     cmd_backlight,
-   "HELP",   cmd_help,
-   "?",      cmd_help};
+	{ "ALSR",   cmd_alsread },
+	{ "ALSW",   cmd_alswrite },
+	{ "TMR",    cmd_tmradc },
+	{ "FILL",   cmd_fill },
+	{ "BL",     cmd_backlight },
+	{ "HELP",   cmd_help },
+	{ "?",      cmd_help }
+};
 
 #define CMD_COUNT   (sizeof (cmd) / sizeof (cmd[0]))
 
@@ -52,8 +53,8 @@ char in_line[160];
  *---------------------------------------------------------------------------*/
 void cmd_alsread (char *par) {
   char *next;
-  uint32_t reg = 0;
-  uint32_t bytes = 0;
+  unsigned int reg = 0;
+  unsigned int bytes = 0;
   uint8_t buffer[256];
   uint8_t i;
   char *pReg;
@@ -112,8 +113,8 @@ void cmd_alsread (char *par) {
  *---------------------------------------------------------------------------*/
 void cmd_alswrite (char *par) {
   char *next;
-  uint32_t reg = 0;
-  uint32_t data = 0;
+  unsigned int reg = 0;
+  unsigned int data = 0;
   char *pReg;
   char *pData;
 
@@ -166,7 +167,7 @@ void cmd_tmradc (char *par)
   (void)par;
   const float VREF     = 3.3f;
   const float ADC_MAX  = 4095.0f;
-  char buf[32];
+  //char buf[32];
   uint32_t adc1, adc2;
   float v1, v2;
 
@@ -182,7 +183,7 @@ void cmd_tmradc (char *par)
 
       v1 = (adc1 * VREF) / ADC_MAX;
       v2 = (adc2 * VREF) / ADC_MAX;
-      printf("ADC1=%lu (%.3f V), ADC2=%lu (%.3f V)\n", (unsigned long)adc1, v1, (unsigned long)adc1, v1);
+      printf("ADC1=%lu (%.3f V), ADC2=%lu (%.3f V)\n", (unsigned long)adc1, v1, (unsigned long)adc2, v2);
 
       int ch = (int) READ_REG(huart1.Instance->RDR);
       if (ch == ESC)  // ESC key
@@ -200,7 +201,7 @@ void cmd_tmradc (char *par)
 void cmd_fill (char *par)
 {
   char *pRGB;
-  uint32_t rgb888;
+  unsigned int rgb888;
 
   if (par == NULL || *par == 0) {
       printf("Usage: FILL <rgb888>\n");
@@ -290,9 +291,16 @@ bool getline (char *lp, uint32_t n) {
             }
             cnt--;                         /* decrement count                */
             lp--;                          /* and line pointer               */
+#if defined ( __CC_ARM ) || defined(__ARMCC_VERSION)
+/* ARM Compiler 5/6*/
             putchar (0x08);                /* echo backspace                 */
             putchar (' ');
             putchar (0x08);
+#elif defined(__GNUC__)
+            sendchar(0x08);
+            sendchar(' ');
+            sendchar(0x08);
+#endif /* __ICCARM__ */
             break;
          case ESC:
             *lp = 0;                       /* ESC - stop editing line        */
@@ -303,7 +311,12 @@ bool getline (char *lp, uint32_t n) {
             cnt++;                         /* and count                      */
             c = LF;
          default:
+#if defined ( __CC_ARM ) || defined(__ARMCC_VERSION)
+/* ARM Compiler 5/6*/
             putchar (*lp = c);             /* echo and store character       */
+#elif defined(__GNUC__)
+            sendchar(*lp = c);
+#endif /* __ICCARM__ */
             lp++;                          /* increment line pointer         */
             cnt++;                         /* and count                      */
             break;
@@ -351,7 +364,16 @@ void DispatchCmd (void) {
 	uint32_t i;
 
    /* display prompt */
+#if defined ( __CC_ARM ) || defined(__ARMCC_VERSION)
+/* ARM Compiler 5/6*/
    printf ("\nCmd> ");
+#elif defined(__GNUC__)
+   sendchar('\n');
+   sendchar('C');
+   sendchar('m');
+   sendchar('d');
+   sendchar('>');
+#endif /* __ICCARM__ */
 
    /* get command line input */
 	if (getline (in_line, sizeof (in_line)) == false) {

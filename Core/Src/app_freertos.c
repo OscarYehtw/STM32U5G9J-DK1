@@ -217,7 +217,7 @@ void StartDefaultTask(void *argument)
 
 void TouchGFX_Task(void *argument)
 {
-  uint8_t u8InChar;
+  //uint8_t u8InChar;
 
   /* USER CODE BEGIN defaultTask */
   //printf("TouchGFX_Task \n\r");
