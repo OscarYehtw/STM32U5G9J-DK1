@@ -96,6 +96,7 @@
 									<listOptionValue builtIn="false" value="../../Utilities/lcd"/>
 									<listOptionValue builtIn="false" value="../../Utilities/Fonts"/>
 									<listOptionValue builtIn="false" value="../../Peripheral/tcs3410"/>
+									<listOptionValue builtIn="false" value="../../Peripheral/sensirion-shtv4-sts4x"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1115130998" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
