@@ -49,6 +49,8 @@ void cmd_i2cdetect (char *par) {
       bus = strtoul(par, NULL, 0);
   }
 
+  if (bus == 3) HAL_GPIO_WritePin(TOF_LPN_GPIO_Port, TOF_LPN_Pin, GPIO_PIN_SET);
+
   /* get I2C handle */
   hi2c = get_i2c_bus(bus);
   if (hi2c == NULL) {
@@ -77,5 +79,7 @@ void cmd_i2cdetect (char *par) {
           }
       }
       printf("\r\n");
-    }
+  }
+
+  if (bus == 3) HAL_GPIO_WritePin(TOF_LPN_GPIO_Port, TOF_LPN_Pin, GPIO_PIN_RESET);
 }

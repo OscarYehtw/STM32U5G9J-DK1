@@ -139,6 +139,9 @@ void Error_Handler(void);
 #define AMS_INT_GPIO_Port GPIOC
 #define AMS_INT_EXTI_IRQn EXTI4_IRQn
 
+#define TOF_LPN_Pin       GPIO_PIN_14
+#define TOF_LPN_GPIO_Port GPIOE
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
