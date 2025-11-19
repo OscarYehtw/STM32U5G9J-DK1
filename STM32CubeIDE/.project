@@ -40,9 +40,24 @@
 			<locationURI>PARENT-1-PROJECT_LOC/STM32U5G9J-DK1.ioc</locationURI>
 		</link>
 		<link>
+			<name>CLI/als_rw.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/als_rw.c</locationURI>
+		</link>
+		<link>
 			<name>CLI/cli.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/cli.c</locationURI>
+		</link>
+		<link>
+			<name>CLI/lcdctrl.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/lcdctrl.c</locationURI>
+		</link>
+		<link>
+			<name>CLI/tmr_adc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/tmr_adc.c</locationURI>
 		</link>
 		<link>
 			<name>STM32_LCD/stm32_lcd.c</name>
