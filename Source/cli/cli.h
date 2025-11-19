@@ -19,13 +19,14 @@
 
 /* Command definitions structure. */
 typedef struct scmd {
-   char val[8];
+   char val[9];
    void (*func)(char *par);
 } SCMD;
 
 /* External functions */
 
 /* Command Functions */
+void cmd_i2cdetect (char *par);
 void cmd_alsread (char *par);
 void cmd_alswrite (char *par);
 void cmd_dialstart (char *par);

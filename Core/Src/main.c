@@ -29,6 +29,8 @@
 
 #include "app_freertos.h"
 #include "ams_device.h"
+#include "sensirion_i2c_hal.h"
+#include "sensirion_sensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,6 +128,7 @@ static void MX_ICACHE_Init(void);
 static void MX_ADC4_Init(void);
 static void MX_JPEG_Init(void);
 static void MX_AMS_Init(void);
+static void MX_SENSIRION_Init(void);
 /* USER CODE BEGIN PFP */
 static uint32_t SetPanelConfig(void);
 static void CopyBuffer(uint32_t *pSrc, uint32_t *pDst, uint16_t x, uint16_t y, uint16_t xsize, uint16_t ysize);
@@ -223,6 +226,7 @@ int main(void)
   MX_ADC4_Init();
   MX_JPEG_Init();
   MX_AMS_Init();
+  MX_SENSIRION_Init();
   //MX_TouchGFX_Init();
   /* Call PreOsInit function */
   //MX_TouchGFX_PreOSInit();
@@ -1553,6 +1557,38 @@ static void MX_AMS_Init(void)
   if (ams_device_init() != AMS_SUCCESS)
   {
       printf("als ams_tcs3410 init failed!!! \n\r");
+  }
+}
+
+/**
+  * @brief Sensirion Sensors Initialization Function
+  * @param None
+  * @retval None
+  */
+static sensirion_sensor_t sht4x_sensor;  // Temperature + Humidity sensor
+static sensirion_sensor_t sts4x_sensor;   // Temperature only sensor
+
+static void MX_SENSIRION_Init(void)
+{
+  int16_t error = 0;
+
+  // Initialize I2C HAL only once for all Sensirion sensors
+  sensirion_i2c_hal_init();
+
+  // Initialize SHT4x (Temperature & Humidity sensor on I2C6)
+  error = sensirion_sensor_init(&sht4x_sensor, 
+            SENSIRION_I2C_ADDR_44, SENSOR_TYPE_SHT4X);
+  if (error != 0)
+  {
+      printf("SHT4x sensor init failed!!! \n\r");
+  }
+
+  // Initialize STS4x (Temperature sensor on I2C2)
+  error = sensirion_sensor_init(&sts4x_sensor, 
+            SENSIRION_I2C_ADDR_44, SENSOR_TYPE_STS4X);
+  if (error != 0)
+  {
+      printf("STS4x sensor init failed!!! \n\r");
   }
 }
 

@@ -19,6 +19,7 @@
 
 const char Cli_Help[] = 
    "+ COMMAND ------------------+ FUNCTION ---------------------------------+\n"
+   "| I2CDETECT  <bus>          | Scan I2C bus and list detected addresses  |\n"
    "| ALSR <reg> <bytes>        | Read <bytes> from sensor register <reg>   |\n"
    "| ALSW <reg> <data >        | Write <data> to sensor register <reg>     |\n"
    "| DIAL                      | Show TMR-ADC values                       |\n"
@@ -28,13 +29,14 @@ const char Cli_Help[] =
    "+---------------------------+-------------------------------------------+\n";
 
 const SCMD cmd[] = {
-	{ "ALSR",   cmd_alsread },
-	{ "ALSW",   cmd_alswrite },
-	{ "DIAL",   cmd_dialstart },
-	{ "FILL",   cmd_fill },
-	{ "BL",     cmd_backlight },
-	{ "HELP",   cmd_help },
-	{ "?",      cmd_help }
+	{ "I2CDETECT", cmd_i2cdetect },
+	{ "ALSR",      cmd_alsread },
+	{ "ALSW",      cmd_alswrite },
+	{ "DIAL",      cmd_dialstart },
+	{ "FILL",      cmd_fill },
+	{ "BL",        cmd_backlight },
+	{ "HELP",      cmd_help },
+	{ "?",         cmd_help }
 };
 
 #define CMD_COUNT   (sizeof (cmd) / sizeof (cmd[0]))

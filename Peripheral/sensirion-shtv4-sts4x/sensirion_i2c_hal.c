@@ -34,20 +34,18 @@
 #include "stm32u5xx_hal.h"
 
 /**
- * Use existing I2C instance from BSP
+ * I2C bus handles from BSP
  */
-extern I2C_HandleTypeDef hbus_i2c4;
-static I2C_HandleTypeDef *hi2c = &hbus_i2c4;
+extern I2C_HandleTypeDef hbus_i2c6;  /* SHTV4 on I2C6 */
+extern I2C_HandleTypeDef hbus_i2c2;  /* STS40 on I2C2 */
 
 /**
  * Initialize all hard- and software components that are needed for the I2C
- * communication. (Using existing BSP I2C, no initialization needed)
+ * communication.
  */
 void sensirion_i2c_hal_init(void) {
-    /* sht4x temperature and humidity sensor */
-    BSP_I2C6_Init();
-    /* sts4x temperature sensor */
-    BSP_I2C2_Init();
+    BSP_I2C6_Init();  /* SHTV4 on I2C6 */
+    BSP_I2C2_Init();  /* STS40 on I2C2 */
 }
 
 /**
@@ -59,35 +57,50 @@ void sensirion_i2c_hal_free(void) {
 }
 
 /**
- * Execute one read transaction on the I2C bus, reading a given number of bytes.
- * If the device does not acknowledge the read command, an error shall be
- * returned.
- *
- * @param address 7-bit I2C address to read from
- * @param data    pointer to the buffer where the data is to be stored
- * @param count   number of bytes to read from I2C and store in the buffer
- * @returns 0 on success, error code otherwise
+ * SHT4x specific I2C read (use I2C6)
  */
-int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
-    return (int8_t)HAL_I2C_Master_Receive(hi2c, (uint16_t)(address << 1),
+int8_t sht4x_i2c_read(uint8_t address, uint8_t* data, uint8_t count) {
+    return (int8_t)HAL_I2C_Master_Receive(&hbus_i2c6, (uint16_t)(address << 1),
                                           data, count, 100);
 }
 
 /**
- * Execute one write transaction on the I2C bus, sending a given number of
- * bytes. The bytes in the supplied buffer must be sent to the given address. If
- * the slave device does not acknowledge any of the bytes, an error shall be
- * returned.
- *
- * @param address 7-bit I2C address to write to
- * @param data    pointer to the buffer containing the data to write
- * @param count   number of bytes to read from the buffer and send over I2C
- * @returns 0 on success, error code otherwise
+ * SHT4x specific I2C write (use I2C6)
  */
-int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data,
-                               uint8_t count) {
-    return (int8_t)HAL_I2C_Master_Transmit(hi2c, (uint16_t)(address << 1),
+int8_t sht4x_i2c_write(uint8_t address, const uint8_t* data, uint8_t count) {
+    return (int8_t)HAL_I2C_Master_Transmit(&hbus_i2c6, (uint16_t)(address << 1),
                                            (uint8_t*)data, count, 100);
+}
+
+/**
+ * STS4x specific I2C read (use I2C2)
+ */
+int8_t sts4x_i2c_read(uint8_t address, uint8_t* data, uint8_t count) {
+    return (int8_t)HAL_I2C_Master_Receive(&hbus_i2c2, (uint16_t)(address << 1),
+                                          data, count, 100);
+}
+
+/**
+ * STS4x specific I2C write (use I2C2)
+ */
+int8_t sts4x_i2c_write(uint8_t address, const uint8_t* data, uint8_t count) {
+    return (int8_t)HAL_I2C_Master_Transmit(&hbus_i2c2, (uint16_t)(address << 1),
+                                           (uint8_t*)data, count, 100);
+}
+
+/**
+ * Generic I2C functions for sensirion_i2c.c (should not be used directly)
+ * These exist only for linking sensirion_i2c.o
+ * All sensor drivers use sensor-specific functions via macro redirection
+ */
+int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
+    /* This should never be called - sensors use their specific functions */
+    return -1;
+}
+
+int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data, uint8_t count) {
+    /* This should never be called - sensors use their specific functions */
+    return -1;
 }
 
 /**
