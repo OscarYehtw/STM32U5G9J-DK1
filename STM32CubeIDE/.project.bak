@@ -67,17 +67,17 @@
 		<link>
 			<name>MxPlatform/linked_list.c</name>
 			<type>1</type>
-			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/linked_list.c</location>
+			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/linked_list.c</location>
 		</link>
 		<link>
 			<name>MxPlatform/mxplatform.c</name>
 			<type>1</type>
-			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/mxplatform.c</location>
+			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/mxplatform.c</location>
 		</link>
 		<link>
 			<name>MxPlatform/mxplatformmsp.c</name>
 			<type>1</type>
-			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/mxplatformmsp.c</location>
+			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/mxplatformmsp.c</location>
 		</link>
 		<link>
 			<name>STM32_LCD/stm32_lcd.c</name>

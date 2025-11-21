@@ -10,7 +10,7 @@
 #include <stdio.h>                    /* standard I/O .h-file                */
 #include <stdlib.h>
 #include <stdbool.h>
-#include "main.h"
+#include "mxplatform.h"
 #include "cli.h"
 
 /* Return pointer to I2C handle by bus index */

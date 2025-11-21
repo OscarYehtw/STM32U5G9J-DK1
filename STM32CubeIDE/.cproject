@@ -97,6 +97,7 @@
 									<listOptionValue builtIn="false" value="../../Utilities/Fonts"/>
 									<listOptionValue builtIn="false" value="../../Peripheral/tcs3410"/>
 									<listOptionValue builtIn="false" value="../../Peripheral/sensirion-shtv4-sts4x"/>
+									<listOptionValue builtIn="false" value="../../Source/mxplatform"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1115130998" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -151,7 +152,7 @@
 									<listOptionValue builtIn="false" value=":libnemagfx-float-abi-hard.a"/>
 									<listOptionValue builtIn="false" value=":libtouchgfxnema-float-abi-hard.a"/>
 								</option>
-								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.otherflags.1137648191" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.otherflags" valueType="stringList">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.otherflags.1137648191" name="Other flags" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.option.otherflags" valueType="stringList">
 									<listOptionValue builtIn="false" value="-u _printf_float"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.input.574771027" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.linker.input">

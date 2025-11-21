@@ -12,9 +12,7 @@
 #include <ctype.h>                    /* character functions                 */
 #include <stdint.h>
 #include <stdbool.h>
-#include "cmsis_os2.h"
-#include "app_freertos.h"
-#include "main.h"
+#include "mxplatform.h"
 #include "cli.h"
 
 const char Cli_Help[] = 

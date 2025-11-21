@@ -9,7 +9,7 @@
 
 #include <stdio.h>                    /* standard I/O .h-file                */
 #include <stdbool.h>
-#include "main.h"
+#include "mxplatform.h"
 #include "cli.h"
 
 extern TIM_HandleTypeDef htim8;

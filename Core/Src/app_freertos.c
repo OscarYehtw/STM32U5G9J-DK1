@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
-#include "main.h"
+#include "mxplatform.h"
 #include "cmsis_os2.h"
 #include "cli.h"
 /* Private includes ----------------------------------------------------------*/

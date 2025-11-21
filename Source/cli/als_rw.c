@@ -9,9 +9,8 @@
 
 #include <stdio.h>                    /* standard I/O .h-file                */
 #include <stdbool.h>
-#include "main.h"
+#include "mxplatform.h"
 #include "cli.h"
-#include "ams_device.h"
 #include "tcs3410_hwdef.h"
 #include "tcs3410.h"
 

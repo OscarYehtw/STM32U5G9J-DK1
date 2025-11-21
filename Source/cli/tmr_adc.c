@@ -10,10 +10,7 @@
 #include <stdio.h>                    /* standard I/O .h-file                */
 #include <stdbool.h>
 #include <math.h>
-#include "cmsis_os2.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "main.h"
+#include "mxplatform.h"
 #include "cli.h"
 
 #define PI 3.14159265358979f
