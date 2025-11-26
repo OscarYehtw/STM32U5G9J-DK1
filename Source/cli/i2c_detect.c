@@ -17,23 +17,32 @@
 static I2C_HandleTypeDef *get_i2c_bus(int bus)
 {
   switch (bus) {
-      case 1: return &hbus_i2c1;
+      case 1:
+             if (HAL_I2C_GetState(&hbus_i2c1) == HAL_I2C_STATE_RESET)
+               BSP_I2C1_Init();
+             return &hbus_i2c1;
       case 2:
-             BSP_I2C2_Init();
+             if (HAL_I2C_GetState(&hbus_i2c2) == HAL_I2C_STATE_RESET)
+               BSP_I2C2_Init();
              return &hbus_i2c2;
       case 3:
-             BSP_I2C3_Init();
+             if (HAL_I2C_GetState(&hbus_i2c3) == HAL_I2C_STATE_RESET)
+               BSP_I2C3_Init();
              return &hbus_i2c3;
       case 4:
-             BSP_I2C4_Init();
+             if (HAL_I2C_GetState(&hbus_i2c4) == HAL_I2C_STATE_RESET)
+               BSP_I2C4_Init();
     	     return &hbus_i2c4;
       case 5:
-             BSP_I2C5_Init();
+             if (HAL_I2C_GetState(&hbus_i2c5) == HAL_I2C_STATE_RESET)
+               BSP_I2C5_Init();
     	     return &hbus_i2c5;
       case 6:
-             BSP_I2C6_Init();
+             if (HAL_I2C_GetState(&hbus_i2c6) == HAL_I2C_STATE_RESET)
+               BSP_I2C6_Init();
     	     return &hbus_i2c6;
-      default: return NULL;
+      default:
+             return NULL;
   }
 }
 

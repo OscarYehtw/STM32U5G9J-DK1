@@ -44,16 +44,22 @@ extern I2C_HandleTypeDef hbus_i2c2;  /* STS40 on I2C2 */
  * communication.
  */
 void sensirion_i2c_hal_init(void) {
-    BSP_I2C6_Init();  /* SHTV4 on I2C6 */
-    BSP_I2C2_Init();  /* STS40 on I2C2 */
+    if (HAL_I2C_GetState(&hbus_i2c2) == HAL_I2C_STATE_RESET)
+      BSP_I2C2_Init();  /* STS40 on I2C2 */
+
+    if (HAL_I2C_GetState(&hbus_i2c6) == HAL_I2C_STATE_RESET)
+      BSP_I2C6_Init();  /* SHTV4 on I2C6 */
 }
 
 /**
  * Release all resources initialized by sensirion_i2c_hal_init().
  */
 void sensirion_i2c_hal_free(void) {
-    BSP_I2C6_DeInit();
-    BSP_I2C2_DeInit();
+    if (HAL_I2C_GetState(&hbus_i2c2) == HAL_I2C_STATE_READY)
+      BSP_I2C2_DeInit();  /* STS40 on I2C2 */
+
+    if (HAL_I2C_GetState(&hbus_i2c6) == HAL_I2C_STATE_READY)
+      BSP_I2C6_DeInit();  /* SHTV4 on I2C6 */
 }
 
 /**

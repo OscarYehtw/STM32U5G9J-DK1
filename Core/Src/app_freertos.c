@@ -43,6 +43,7 @@
 /* USER CODE BEGIN PD */
 #define UART_TX_QUEUE_LEN   4096
 #define UART_RX_QUEUE_LEN   64
+#define ADC12_QUEUE_LEN     16
 
 /* USER CODE END PD */
 
@@ -57,6 +58,7 @@
 /* USER CODE BEGIN Variables */
 osMessageQueueId_t uartTxQueueHandle;
 osMessageQueueId_t uartRxQueueHandle;
+osMessageQueueId_t adc12QueueHandle;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -80,6 +82,13 @@ const osThreadAttr_t UART_TxTask_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 512 * 4,
 };
+/* Definitions for ADC_Task */
+osThreadId_t ADC12_TaskHandle;
+const osThreadAttr_t ADC12_Task_attributes = {
+  .name = "ADC12_Task",
+  .priority = (osPriority_t) osPriorityBelowNormal,
+  .stack_size = 128 * 4,
+};
 /* Definitions for CLI_Task */
 osThreadId_t CLI_TaskHandle;
 const osThreadAttr_t CLI_Task_attributes = {
@@ -96,6 +105,7 @@ const osThreadAttr_t CLI_Task_attributes = {
 void StartDefaultTask(void *argument);
 void TouchGFX_Task(void *argument);
 void UART_TxTask(void *argument);
+void ADC12_Task(void *argument);
 void CLI_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -154,13 +164,21 @@ void MX_FREERTOS_Init(void) {
   /* creation of UART_TxTask */
   UART_TxTaskHandle = osThreadNew(UART_TxTask, NULL, &UART_TxTask_attributes);
  
+  /* creation of ADC12_Task */
+  ADC12_TaskHandle = osThreadNew(ADC12_Task, NULL, &ADC12_Task_attributes);
+
   /* creation of GUI_Task */
   CLI_TaskHandle = osThreadNew(CLI_Task, NULL, &CLI_Task_attributes);
 
+  /* Transmit an UART data in interrupt mode */
   uartTxQueueHandle = osMessageQueueNew(UART_TX_QUEUE_LEN, sizeof(uint8_t), NULL);
 
   /* Receive an amount of data in interrupt mode */
   uartRxQueueHandle = osMessageQueueNew(UART_RX_QUEUE_LEN, sizeof(uint8_t), NULL);
+
+  /* Receive an ADC1 converted data in interrupt mode */
+  adc12QueueHandle = osMessageQueueNew(ADC12_QUEUE_LEN, sizeof(uint16_t), NULL);
+
   HAL_UART_Receive_IT(&huart1, &rxByte, 1);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -243,6 +261,23 @@ void UART_TxTask(void *argument)
           txBusy = 1;
           txByte = ch;
           HAL_UART_Transmit_IT(&huart1, &txByte, 1);
+      }
+  }
+}
+
+void ADC12_Task(void *argument)
+{
+  uint16_t mVolt;
+
+  /* Start ADC group regular conversion */
+  HAL_ADC_Start_IT(&hadc1);
+
+  for (;;) {
+      if (osMessageQueueGet(adc12QueueHandle, &mVolt, NULL, osWaitForever) == osOK) {
+          //printf("ADC12_Task - mVolt: %d mV\n\r", mVolt);
+          /* Start ADC group regular conversion */
+          HAL_ADC_Start_IT(&hadc1);
+          osDelay(50);
       }
   }
 }

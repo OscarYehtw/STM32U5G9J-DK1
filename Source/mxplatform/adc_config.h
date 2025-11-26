@@ -1,8 +1,7 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : app_freertos.h
-  * @brief          : Header for main.c file.
+  * @file           : adc_config.h
+  * @brief          : Header for adc_config.c file.
   *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
@@ -19,25 +18,35 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_FREE_RTOS_H
-#define __APP_FREE_RTOS_H
+#ifndef __ADC_CONFIG_H
+#define __ADC_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32u5xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
+
+/* Exported variables --------------------------------------------------------*/
+extern ADC_HandleTypeDef    hadc1;
+extern ADC_HandleTypeDef    hadc4;
+
+extern __IO uint8_t aAdc1ConvStatus;
+extern __IO uint16_t aADC1ConvertedData;
+extern uint16_t aADC1ConvertedData_mVolt;
+extern uint32_t aADC4ConvertedData[];
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
@@ -49,25 +58,16 @@ extern "C" {
 
 /* USER CODE END EM */
 
-
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN EFP */
+void MX_ADC1_Init(void);
+void MX_ADC4_Init(void);
 
 /* USER CODE END EFP */
 
-/* Exported Variables --------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-extern osMessageQueueId_t uartTxQueueHandle;
-extern osMessageQueueId_t uartRxQueueHandle;
-extern osMessageQueueId_t adc12QueueHandle;
-
-int sendchar(int ch);
-int getkey(void);
-
-/* USER CODE END ET */
 /* Private defines -----------------------------------------------------------*/
-
 /* USER CODE BEGIN Private defines */
+#define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  8)   /* Size of array aADC4ConvertedData[] */
 
 /* USER CODE END Private defines */
 
@@ -75,4 +75,4 @@ int getkey(void);
 }
 #endif
 
-#endif /* __APP_FREE_RTOS_H */
+#endif /* __ADC_CONFIG_H */

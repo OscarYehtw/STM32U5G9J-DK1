@@ -1,8 +1,7 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : app_freertos.h
-  * @brief          : Header for main.c file.
+  * @file           : uart_config.h
+  * @brief          : Header for uart_config.c file.
   *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
@@ -19,25 +18,35 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_FREE_RTOS_H
-#define __APP_FREE_RTOS_H
+#ifndef __UART_CONFIG_H
+#define __UART_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32u5xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
+
+/* Exported variables --------------------------------------------------------*/
+extern UART_HandleTypeDef  huart1;
+extern UART_HandleTypeDef  huart2;
+extern UART_HandleTypeDef  huart5;
+
+extern volatile uint8_t txBusy;
+extern uint8_t txByte;
+extern uint8_t rxByte;
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
@@ -49,24 +58,15 @@ extern "C" {
 
 /* USER CODE END EM */
 
-
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN EFP */
+void MX_USART1_UART_Init(void);
+void MX_USART2_UART_Init(void);
+void MX_UART5_UART_Init(void);
 
 /* USER CODE END EFP */
 
-/* Exported Variables --------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-extern osMessageQueueId_t uartTxQueueHandle;
-extern osMessageQueueId_t uartRxQueueHandle;
-extern osMessageQueueId_t adc12QueueHandle;
-
-int sendchar(int ch);
-int getkey(void);
-
-/* USER CODE END ET */
 /* Private defines -----------------------------------------------------------*/
-
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -75,4 +75,4 @@ int getkey(void);
 }
 #endif
 
-#endif /* __APP_FREE_RTOS_H */
+#endif /* __UART_CONFIG_H */

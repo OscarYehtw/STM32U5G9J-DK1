@@ -215,7 +215,7 @@ static bool validate_device_id(void)
 
     AMS_LOG_PRINTF(LOG_INFO, "Sensor[0x%02X]: validating id.", SLAVE_ADDR_0);
 
-       /* Validate actual versus expected: */
+    /* Validate actual versus expected: */
     /* REV_ID, DEVICE_ID, REV_ID2       */
     ams_i2c_block_read(SLAVE_ADDR_0, REG_AUXID, buffer, 3);
     id.rev     = (buffer[1] & REV_ID_MASK) >> REV_ID_SHIFT;

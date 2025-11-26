@@ -63,7 +63,16 @@ static void platform_log_output(const char *fmt, ...)
 
 static ams_errno_t ams_stm32_i2c_init(uint8_t scl_pin, uint8_t sda_pin)
 {
-    return BSP_I2C1_Init();
+    ams_errno_t ret_val = AMS_SUCCESS;
+
+    if (HAL_I2C_GetState(&hbus_i2c1) == HAL_I2C_STATE_RESET)
+    {
+       if (BSP_I2C1_Init() != BSP_ERROR_NONE)
+       {
+           ret_val = AMS_I2C_INIT_ERROR;
+       }
+    }
+    return ret_val;
 }
 
 static void ams_stm32_platform_log(int level, const char *pLogMsg)

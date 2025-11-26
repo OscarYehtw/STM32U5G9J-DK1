@@ -30,8 +30,14 @@
 #include "mxplatform.h"
 
 /* Exported types ------------------------------------------------------------*/
+
+/* Exported variables --------------------------------------------------------*/
+extern DMA_QListTypeDef    ADC1Queue;
+extern DMA_QListTypeDef    ADC4Queue;
+
 /* Exported constants --------------------------------------------------------*/
-HAL_StatusTypeDef MX_ADCQueue_Config(void);
+HAL_StatusTypeDef MX_ADC1Queue_Config(void);
+HAL_StatusTypeDef MX_ADC4Queue_Config(void);
 
 #ifdef __cplusplus
 }

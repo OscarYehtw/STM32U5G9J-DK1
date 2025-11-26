@@ -67,17 +67,12 @@
 		<link>
 			<name>MxPlatform/adc_config.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/adc_config.c</locationURI>
+			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/adc_config.c</location>
 		</link>
 		<link>
 			<name>MxPlatform/exti_config.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/exti_config.c</locationURI>
-		</link>
-		<link>
-			<name>MxPlatform/gpio_config.c</name>
-			<type>1</type>
-			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/gpio_config.c</location>
+			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/exti_config.c</location>
 		</link>
 		<link>
 			<name>MxPlatform/linked_list.c</name>
@@ -95,14 +90,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/mxplatformmsp.c</locationURI>
 		</link>
 		<link>
-			<name>MxPlatform/tim_config.c</name>
-			<type>1</type>
-			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/tim_config.c</location>
-		</link>
-		<link>
 			<name>MxPlatform/uart_config.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/uart_config.c</locationURI>
+			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/uart_config.c</location>
 		</link>
 		<link>
 			<name>STM32_LCD/stm32_lcd.c</name>

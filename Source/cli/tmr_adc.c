@@ -51,8 +51,8 @@ void cmd_dialstart (char *par)
 
   /* Take the first sample as prev */
   taskENTER_CRITICAL();
-  prev_adc1 = aADCxConvertedData[0];
-  prev_adc2 = aADCxConvertedData[1];
+  prev_adc1 = aADC4ConvertedData[0];
+  prev_adc2 = aADC4ConvertedData[1];
   taskEXIT_CRITICAL();
 
   min1 = max1 = prev_adc1;
@@ -62,8 +62,8 @@ void cmd_dialstart (char *par)
   while (!(saw_seq1 && saw_seq2))
   {
       taskENTER_CRITICAL();
-      adc1 = aADCxConvertedData[0];
-      adc2 = aADCxConvertedData[1];
+      adc1 = aADC4ConvertedData[0];
+      adc2 = aADC4ConvertedData[1];
       taskEXIT_CRITICAL();
 
       /* Update global min/max */
@@ -180,8 +180,8 @@ void cmd_dialstart (char *par)
   while (1)
   {
       taskENTER_CRITICAL();
-      adc1 = aADCxConvertedData[0];
-      adc2 = aADCxConvertedData[1];
+      adc1 = aADC4ConvertedData[0];
+      adc2 = aADC4ConvertedData[1];
       taskEXIT_CRITICAL();
 
       v1_cal = ((float)adc1 * VREF / ADC_MAX - v1_mid) / v1_amp;  // -1..1
