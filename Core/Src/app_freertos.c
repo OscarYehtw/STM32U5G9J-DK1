@@ -44,6 +44,7 @@
 #define UART_TX_QUEUE_LEN   4096
 #define UART_RX_QUEUE_LEN   64
 #define ADC12_QUEUE_LEN     16
+#define SPI2_QUEUE_LEN      16
 
 /* USER CODE END PD */
 
@@ -58,6 +59,7 @@
 /* USER CODE BEGIN Variables */
 osMessageQueueId_t uartTxQueueHandle;
 osMessageQueueId_t uartRxQueueHandle;
+osMessageQueueId_t spi2QueueHandle;
 osMessageQueueId_t adc12QueueHandle;
 
 /* USER CODE END Variables */
@@ -82,7 +84,14 @@ const osThreadAttr_t UART_TxTask_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 512 * 4,
 };
-/* Definitions for ADC_Task */
+/* Definitions for SPI2_Task */
+osThreadId_t SPI2_TaskHandle;
+const osThreadAttr_t SPI2_Task_attributes = {
+  .name = "SPI2_Task",
+  .priority = (osPriority_t) osPriorityBelowNormal,
+  .stack_size = 128 * 4,
+};
+/* Definitions for ADC12_Task */
 osThreadId_t ADC12_TaskHandle;
 const osThreadAttr_t ADC12_Task_attributes = {
   .name = "ADC12_Task",
@@ -105,6 +114,7 @@ const osThreadAttr_t CLI_Task_attributes = {
 void StartDefaultTask(void *argument);
 void TouchGFX_Task(void *argument);
 void UART_TxTask(void *argument);
+void SPI2_Task(void *argument);
 void ADC12_Task(void *argument);
 void CLI_Task(void *argument);
 
@@ -164,6 +174,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of UART_TxTask */
   UART_TxTaskHandle = osThreadNew(UART_TxTask, NULL, &UART_TxTask_attributes);
  
+  /* creation of SPI2_Task */
+  SPI2_TaskHandle = osThreadNew(SPI2_Task, NULL, &SPI2_Task_attributes);
+
   /* creation of ADC12_Task */
   ADC12_TaskHandle = osThreadNew(ADC12_Task, NULL, &ADC12_Task_attributes);
 
@@ -175,6 +188,9 @@ void MX_FREERTOS_Init(void) {
 
   /* Receive an amount of data in interrupt mode */
   uartRxQueueHandle = osMessageQueueNew(UART_RX_QUEUE_LEN, sizeof(uint8_t), NULL);
+
+  /* Receive an SPI2 converted data in interrupt mode */
+  spi2QueueHandle = osMessageQueueNew(SPI2_QUEUE_LEN, sizeof(uint8_t), NULL);
 
   /* Receive an ADC1 converted data in interrupt mode */
   adc12QueueHandle = osMessageQueueNew(ADC12_QUEUE_LEN, sizeof(uint16_t), NULL);
@@ -265,6 +281,30 @@ void UART_TxTask(void *argument)
   }
 }
 
+void SPI2_Task(void *argument)
+{
+  uint8_t mState;
+
+  //HAL_SPI_TransmitReceive_IT(&hspi2, (uint8_t *)spiTxBuf, (uint8_t *)spiRxBuf, 21);
+
+  for (;;) {
+      if (osMessageQueueGet(spi2QueueHandle, &mState, NULL, osWaitForever) == osOK) {
+          switch (mState)
+          {
+            case TRANSFER_COMPLETE :
+              //wTransferState = TRANSFER_WAIT;
+              //HAL_SPI_TransmitReceive_IT(&hspi2, (uint8_t *)spiTxBuf, (uint8_t *)spiRxBuf, 21);
+              printf("Reception process is complete: %x \n\r",mState);
+              break;
+            default :
+              printf("Processing SPI2 Error: %x \n\r", mState);
+              break;
+          }
+      }
+      osDelay(50);
+  }
+}
+
 void ADC12_Task(void *argument)
 {
   uint16_t mVolt;
@@ -277,8 +317,8 @@ void ADC12_Task(void *argument)
           //printf("ADC12_Task - mVolt: %d mV\n\r", mVolt);
           /* Start ADC group regular conversion */
           HAL_ADC_Start_IT(&hadc1);
-          osDelay(50);
       }
+      osDelay(50);
   }
 }
 

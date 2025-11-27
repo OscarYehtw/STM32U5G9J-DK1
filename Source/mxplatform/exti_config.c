@@ -124,9 +124,39 @@ void EXTI_IRQHandler_Config(void)
   GPIO_InitStructure.Pin  = PMIC_UX_BUTTON_Pin;
   HAL_GPIO_Init(PMIC_UX_BUTTON_GPIO_Port, &GPIO_InitStructure);
 
-  /* Enable and set line 15 Interrupt to the lowest priority */
+  /* Enable and set line 4 Interrupt to the lowest priority */
   HAL_NVIC_SetPriority(EXTI4_IRQn, 10, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
+
+  /* Configure PH.14 pin as input floating */
+  GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStructure.Pull = GPIO_PULLUP;
+  GPIO_InitStructure.Pin  = PMIC_PGOOD_Pin;
+  HAL_GPIO_Init(PMIC_PGOOD_GPIO_Port, &GPIO_InitStructure);
+
+  /* Enable and set line 14 Interrupt to the lowest priority */
+  HAL_NVIC_SetPriority(EXTI14_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ(EXTI14_IRQn);
+
+  /* Configure PI.9 pin as input floating */
+  GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStructure.Pull = GPIO_PULLUP;
+  GPIO_InitStructure.Pin  = BP_IOEXP_INT_Pin;
+  HAL_GPIO_Init(BP_IOEXP_INT_GPIO_Port, &GPIO_InitStructure);
+
+  /* Enable and set line 9 Interrupt to the lowest priority */
+  HAL_NVIC_SetPriority(EXTI9_IRQn, 10, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_IRQn);
+
+  /* Configure PJ.0 pin as input floating */
+  GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStructure.Pull = GPIO_PULLUP;
+  GPIO_InitStructure.Pin  = TOUCH_INT_Pin;
+  HAL_GPIO_Init(TOUCH_INT_GPIO_Port, &GPIO_InitStructure);
+
+  /* Enable and set line 0 Interrupt to the lowest priority */
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 10, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 #endif
 
 }
@@ -146,23 +176,23 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 #if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   if (GPIO_Pin == SSR_INT_Pin)
   {
-    printf("SSR_Y_MCU_INT_L: Interrupt Triggered!\n");
+    printf("SSR_Y_MCU_INT_L: Interrupt Triggered!\r\n");
   }
   if (GPIO_Pin == RADAR_INT_Pin)
   {
-    printf("RADAR_MCU_INT_L: Interrupt Triggered!\n");
+    printf("RADAR_MCU_INT_L: Interrupt Triggered!\r\n");
   }
   if (GPIO_Pin == BP_DETECT_Pin)
   {
-    printf("BP_DETECT: Interrupt Triggered!\n");
+    printf("BP_DETECT: Interrupt Triggered!\r\n");
   }
   if (GPIO_Pin == PMIC_INT_Pin)
   {
-    printf("PMIC_MCU_INT_L: Interrupt Triggered!\n");
+    printf("PMIC_MCU_INT_L: Interrupt Triggered!\r\n");
   }
   if (GPIO_Pin == PMIC_UX_BUTTON_Pin)
   {
-    printf("PMIC_MCU_UX_BUTTON_L: Interrupt Triggered!\n");
+    printf("PMIC_MCU_UX_BUTTON_L: Interrupt Triggered!\r\n");
   }
 #endif
 

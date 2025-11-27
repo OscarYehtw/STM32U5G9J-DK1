@@ -77,7 +77,12 @@
 		<link>
 			<name>MxPlatform/gpio_config.c</name>
 			<type>1</type>
-			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/gpio_config.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/gpio_config.c</locationURI>
+		</link>
+		<link>
+			<name>MxPlatform/i2c_config.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/i2c_config.c</locationURI>
 		</link>
 		<link>
 			<name>MxPlatform/linked_list.c</name>
@@ -95,9 +100,14 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/mxplatformmsp.c</locationURI>
 		</link>
 		<link>
+			<name>MxPlatform/spi_config.c</name>
+			<type>1</type>
+			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/spi_config.c</location>
+		</link>
+		<link>
 			<name>MxPlatform/tim_config.c</name>
 			<type>1</type>
-			<location>E:/j2tv/STM32U5G9J-DK1/Source/mxplatform/tim_config.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/tim_config.c</locationURI>
 		</link>
 		<link>
 			<name>MxPlatform/uart_config.c</name>
@@ -253,6 +263,16 @@
 			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_rcc_ex.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_rcc_ex.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_spi.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_spi.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_spi_ex.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_spi_ex.c</locationURI>
 		</link>
 		<link>
 			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_tim.c</name>

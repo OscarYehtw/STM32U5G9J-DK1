@@ -21,9 +21,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "mxplatform.h"
-#include "ams_device.h"
-#include "sensirion_i2c_hal.h"
-#include "sensirion_sensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -327,10 +324,6 @@ int32_t LCD_GetFormat(uint32_t Instance, uint32_t *Format)
   return 0;
 }
 
-__weak ams_errno_t ams_device_init(void)
-{
-    return(AMS_SUCCESS);
-}
 /* USER CODE END 4 */
 
 /**
@@ -1065,47 +1058,6 @@ static void MX_DCACHE2_Init(void)
 }
 
 /**
-  * @brief I2C Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C_Init(void)
-{
-  /* USER CODE BEGIN I2C_Init 0 */
-  if (BSP_I2C1_Init() != BSP_ERROR_NONE)
-  {
-    printf("BSP_I2C1_Init failed!!! \n\r");
-  }
-
-  if (BSP_I2C2_Init() != BSP_ERROR_NONE)
-  {
-    printf("BSP_I2C2_Init failed!!! \n\r");
-  }
-
-  if (BSP_I2C3_Init() != BSP_ERROR_NONE)
-  {
-    printf("BSP_I2C3_Init failed!!! \n\r");
-  }
-
-  if (BSP_I2C4_Init() != BSP_ERROR_NONE)
-  {
-    printf("BSP_I2C4_Init failed!!! \n\r");
-  }
-
-  if (BSP_I2C5_Init() != BSP_ERROR_NONE)
-  {
-    printf("BSP_I2C5_Init failed!!! \n\r");
-  }
-
-  if (BSP_I2C6_Init() != BSP_ERROR_NONE)
-  {
-    printf("BSP_I2C6_Init failed!!! \n\r");
-  }
-  /* USER CODE END I2C_Init 0 */
-
-}
-
-/**
   * @brief JPEG Initialization Function
   * @param None
   * @retval None
@@ -1129,76 +1081,6 @@ static void MX_JPEG_Init(void)
 
   /* USER CODE END JPEG_Init 2 */
 
-}
-
-/**
-  * @brief AMS IRQ Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_AMS_Init(void)
-{
-  if (ams_device_init() != AMS_SUCCESS)
-  {
-      printf("als ams_tcs3410 init failed!!! \n\r");
-  }
-}
-
-/**
-  * @brief Sensirion Sensors Initialization Function
-  * @param None
-  * @retval None
-  */
-static sensirion_sensor_t sht4x_sensor;  // Temperature + Humidity sensor
-static sensirion_sensor_t sts4x_sensor;   // Temperature only sensor
-
-static void MX_SENSIRION_Init(void)
-{
-  int16_t error = 0;
-
-  // Initialize I2C HAL only once for all Sensirion sensors
-  sensirion_i2c_hal_init();
-
-  // Initialize SHT4x (Temperature & Humidity sensor on I2C6)
-  error = sensirion_sensor_init(&sht4x_sensor, 
-            SENSIRION_I2C_ADDR_44, SENSOR_TYPE_SHT4X);
-  if (error != 0)
-  {
-      printf("SHT4x sensor init failed!!! \n\r");
-  }
-
-  // Initialize STS4x (Temperature sensor on I2C2)
-  error = sensirion_sensor_init(&sts4x_sensor, 
-            SENSIRION_I2C_ADDR_44, SENSOR_TYPE_STS4X);
-  if (error != 0)
-  {
-      printf("STS4x sensor init failed!!! \n\r");
-  }
-}
-
-/**
-  * @brief AMS IRQ Initialization Function
-  * @param None
-  * @retval None
-  */
-void AMS_IRQ_Init(void)
-{
-#if 0
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-
-  /*Configure GPIO pin : AMS_INT_Pin */
-  GPIO_InitStruct.Pin = AMS_INT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(AMS_INT_GPIO_Port, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(AMS_INT_EXTI_IRQn, 10, 0);
-  HAL_NVIC_EnableIRQ(AMS_INT_EXTI_IRQn);
-#endif
 }
 
 /******************************************************************************/
@@ -1230,6 +1112,9 @@ void MX_PLATFORM_Init(void)
   MX_GPIO_Init();
   MX_GPDMA1_Init();
   MX_CRC_Init();
+  MX_SPI2_Init();
+  MX_TIM1_Init();
+  MX_TIM3_Init();
   MX_TIM8_Init();
   MX_DMA2D_Init();
   MX_ICACHE_Init();
@@ -1238,8 +1123,8 @@ void MX_PLATFORM_Init(void)
   MX_LTDC_Init();
   MX_LCD_Init();
 #if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 0)
-  //MX_OCTOSPI1_Init();
-  //MX_HSPI1_Init();
+  MX_OCTOSPI1_Init();
+  MX_HSPI1_Init();
 #endif
   MX_DCACHE1_Init();
   MX_DCACHE2_Init();

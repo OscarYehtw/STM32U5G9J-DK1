@@ -40,6 +40,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+TIM_HandleTypeDef    htim1;
 TIM_HandleTypeDef    htim3;
 TIM_HandleTypeDef    htim8;
 
@@ -65,21 +66,86 @@ TIM_HandleTypeDef    htim8;
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /**
+  * @brief TIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+void MX_TIM1_Init(void)
+{
+#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
+    TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_OC_InitTypeDef sConfigOC = {0};
+    TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
+
+    htim1.Instance = TIM1;
+    htim1.Init.Prescaler = 17;                     // example
+    htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim1.Init.Period = 200;                       // example
+    htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim1.Init.RepetitionCounter = 0;
+    htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim1) != HAL_OK) Error_Handler();
+
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+    if (HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK) Error_Handler();
+
+    if (HAL_TIM_PWM_Init(&htim1) != HAL_OK) Error_Handler();
+
+    /** Master config */
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK) Error_Handler();
+
+    /** PWM config */
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 100;                         // 50% duty example
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
+    sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
+
+    if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+        Error_Handler();
+
+    /** Dead time config (if needed) */
+    sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
+    sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+    sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+    sBreakDeadTimeConfig.DeadTime = 0;             // piezo usually not need
+    sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+    sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+    sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+
+    if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
+        Error_Handler();
+
+    HAL_TIM_MspPostInit(&htim1);
+
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+#endif
+
+}
+
+/**
   * @brief TIM3 Initialization Function
   * @param None
   * @retval None
   */
 void MX_TIM3_Init(void)
 {
+#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* TIM3 base config */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 18;                     // same as TIM8
+  htim3.Init.Prescaler = 18;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 139;                       // same as TIM8
+  htim3.Init.Period = 139;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 
@@ -115,7 +181,7 @@ void MX_TIM3_Init(void)
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
 
-  /* TIM3 → channel 1 (instead of TIM8_CH2) */
+  /* TIM3 -> channel 1 (instead of TIM3_CH1) */
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
@@ -123,6 +189,11 @@ void MX_TIM3_Init(void)
 
   /* GPIO Init for TIM3 CH1 */
   HAL_TIM_MspPostInit(&htim3);
+
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
+#endif
+
 }
 
 /**
@@ -216,6 +287,23 @@ void MX_TIM8_Init(void)
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(htim->Instance == TIM1)
+  {
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+
+    /* PE9 -> TIM1_CH1 */
+    GPIO_InitStruct.Pin   = PWM_PIEZO_P_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+    HAL_GPIO_Init(PWM_PIEZO_GPIO_Port, &GPIO_InitStruct);
+
+    /* PE8 -> TIM1_CH1N */
+    GPIO_InitStruct.Pin = PWM_PIEZO_N_Pin;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+    HAL_GPIO_Init(PWM_PIEZO_GPIO_Port, &GPIO_InitStruct);
+  }
   if(htim->Instance==TIM3)
   {
     /* USER CODE BEGIN TIM3_MspPostInit 0 */
@@ -223,7 +311,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     /* USER CODE END TIM3_MspPostInit 0 */
 
     __HAL_RCC_GPIOC_CLK_ENABLE();
-    /**TIM8 GPIO Configuration
+    /**TIM3 GPIO Configuration
     PC6     ------> TIM3_CH1
     */
     GPIO_InitStruct.Pin  = HVAC_PWR_LOAD_Pin;

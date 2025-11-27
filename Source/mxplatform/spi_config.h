@@ -1,8 +1,7 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : app_freertos.h
-  * @brief          : Header for main.c file.
+  * @file           : spi_config.h
+  * @brief          : Header for spi_config.c file.
   *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
@@ -19,25 +18,36 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_FREE_RTOS_H
-#define __APP_FREE_RTOS_H
+#ifndef __SPI_CONFIG_H
+#define __SPI_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32u5xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
+
+/* Exported variables --------------------------------------------------------*/
+extern SPI_HandleTypeDef    hspi2;
+
+/* Buffer used for transmission */
+extern uint8_t spiTxBuf[];
+
+/* Buffer used for reception */
+extern uint8_t spiRxBuf[];
+extern __IO uint8_t wTransferState;
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
@@ -46,29 +56,26 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
 /* USER CODE END EM */
 
-
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN EFP */
+void MX_SPI2_Init(void);
 
 /* USER CODE END EFP */
 
-/* Exported Variables --------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-extern osMessageQueueId_t uartTxQueueHandle;
-extern osMessageQueueId_t uartRxQueueHandle;
-extern osMessageQueueId_t spi2QueueHandle;
-extern osMessageQueueId_t adc12QueueHandle;
-
-int sendchar(int ch);
-int getkey(void);
-
-/* USER CODE END ET */
 /* Private defines -----------------------------------------------------------*/
-
 /* USER CODE BEGIN Private defines */
+enum
+{
+  TRANSFER_WAIT,
+  TRANSFER_COMPLETE,
+  TRANSFER_ERROR
+};
+
+#define BUFFERSIZE                       (COUNTOF(spiTxBuf) - 1)
 
 /* USER CODE END Private defines */
 
@@ -76,4 +83,4 @@ int getkey(void);
 }
 #endif
 
-#endif /* __APP_FREE_RTOS_H */
+#endif /* __SPI_CONFIG_H */

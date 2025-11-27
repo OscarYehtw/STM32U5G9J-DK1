@@ -94,7 +94,7 @@ uint32_t   aADC4ConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
   */
 void MX_ADC1_Init(void)
 {
-
+//#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   /* USER CODE BEGIN ADC1_Init 0 */
 
   /* USER CODE END ADC1_Init 0 */
@@ -151,6 +151,7 @@ void MX_ADC1_Init(void)
   }
 
   /* USER CODE END ADC1_Init 2 */
+//#endif
 
 }
 
@@ -328,6 +329,183 @@ void MX_ADC4_Init(void)
 
   /* USER CODE END ADC4_Init 2 */
 
+}
+
+/**
+  * @brief ADC MSP Initialization
+  * This function configures the hardware resources used in this example
+  * @param hadc: ADC handle pointer
+  * @retval None
+  */
+void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+  if(hadc->Instance==ADC1)
+  {
+    /* USER CODE BEGIN ADC1_MspInit 0 */
+
+    /* USER CODE END ADC1_MspInit 0 */
+
+    /* Initializes the peripherals clock */
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADCDAC;
+    PeriphClkInit.AdcDacClockSelection = RCC_ADCDACCLKSOURCE_HSI;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Peripheral clock enable */
+    __HAL_RCC_ADC12_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**ADC1 GPIO Configuration
+    PA7     ------> ADC1_IN12
+    */
+    GPIO_InitStruct.Pin = PMIC_VREF_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(PMIC_VREF_GPIO_Port, &GPIO_InitStruct);
+
+    /* ADC1 interrupt Init */
+    HAL_NVIC_SetPriority(ADC1_2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
+    /* USER CODE BEGIN ADC1_MspInit 1 */
+
+    /* USER CODE END ADC1_MspInit 1 */
+
+  }
+  if(hadc->Instance==ADC4)
+  {
+    /* USER CODE BEGIN ADC4_MspInit 0 */
+
+    /* USER CODE END ADC4_MspInit 0 */
+
+    /* Initializes the peripherals clock */
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADCDAC;
+    PeriphClkInit.AdcDacClockSelection = RCC_ADCDACCLKSOURCE_HSI;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Peripheral clock enable */
+    __HAL_RCC_ADC4_CLK_ENABLE();
+
+#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+    /**ADC4 GPIO Configuration
+    PC2     ------> ADC4_IN3
+    PC3     ------> ADC4_IN4
+    PD11    ------> ADC4_IN15
+    PD12    ------> ADC4_IN16
+    PD13    ------> ADC4_IN17
+    PF15    ------> ADC4_IN6
+    PG0     ------> ADC4_IN7
+    PG1     ------> ADC4_IN8
+    */
+    GPIO_InitStruct.Pin = WHEEL_VOUT2_Pin|WHEEL_VOUT1_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(WHEEL_VOUT_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = ANA_USB1_VBUS_Pin|ANA_VBAT_MEAS_Pin|ANA_BP_MUX_OUT_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ANA_ADC4_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = ANA_DCIN1_MEAS_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ANA_DCIN1_MEAS_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = ANA_THERM_NTC_Pin|ANA_HW_ID_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ANA_HW_ID_GPIO_Port, &GPIO_InitStruct);
+#else
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**ADC4 GPIO Configuration
+    PA4     ------> ADC4_IN9
+    PA5     ------> ADC4_IN10
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+#endif
+
+    /* USER CODE BEGIN ADC4_MspInit 1 */
+
+    /* USER CODE END ADC4_MspInit 1 */
+
+  }
+
+}
+
+/**
+  * @brief ADC MSP De-Initialization
+  * This function freeze the hardware resources used in this example
+  * @param hadc: ADC handle pointer
+  * @retval None
+  */
+void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
+{
+  if(hadc->Instance==ADC1)
+  {
+    /* USER CODE BEGIN ADC1_MspDeInit 0 */
+
+    /* USER CODE END ADC1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_ADC12_CLK_DISABLE();
+
+    /**ADC1 GPIO Configuration
+    PA7     ------> ADC1_IN12
+    */
+    HAL_GPIO_DeInit(PMIC_VREF_GPIO_Port, PMIC_VREF_Pin);
+
+    /* USER CODE BEGIN ADC4_MspDeInit 1 */
+
+    /* USER CODE END ADC4_MspDeInit 1 */
+  }
+  if(hadc->Instance==ADC4)
+  {
+    /* USER CODE BEGIN ADC4_MspDeInit 0 */
+
+    /* USER CODE END ADC4_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_ADC4_CLK_DISABLE();
+
+#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
+    /**ADC4 GPIO Configuration
+    PC2     ------> ADC4_IN3
+    PC3     ------> ADC4_IN4
+    PD11    ------> ADC4_IN15
+    PD12    ------> ADC4_IN16
+    PD13    ------> ADC4_IN17
+    PF15    ------> ADC4_IN6
+    PG0     ------> ADC4_IN7
+    PG1     ------> ADC4_IN8
+    */
+    HAL_GPIO_DeInit(WHEEL_VOUT_GPIO_Port, WHEEL_VOUT2_Pin|WHEEL_VOUT1_Pin);
+    HAL_GPIO_DeInit(ANA_ADC4_GPIO_Port, ANA_USB1_VBUS_Pin|ANA_VBAT_MEAS_Pin|ANA_BP_MUX_OUT_Pin);
+    HAL_GPIO_DeInit(ANA_DCIN1_MEAS_GPIO_Port, ANA_DCIN1_MEAS_Pin);
+    HAL_GPIO_DeInit(ANA_HW_ID_GPIO_Port, ANA_THERM_NTC_Pin|ANA_HW_ID_Pin);
+#else
+    /**ADC4 GPIO Configuration
+    PA4     ------> ADC4_IN9
+    PA5     ------> ADC4_IN10
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_4|GPIO_PIN_5);
+#endif
+
+    /* USER CODE BEGIN ADC4_MspDeInit 1 */
+
+    /* USER CODE END ADC4_MspDeInit 1 */
+  }
 }
 
 /* USER CODE END 0 */

@@ -34,7 +34,9 @@ extern "C" {
 #include "stm32u5x9j_discovery_ospi.h"
 #include "gpio_config.h"
 #include "uart_config.h"
+#include "spi_config.h"
 #include "tim_config.h"
+#include "i2c_config.h"
 #include "adc_config.h"
 #include "exti_config.h"
 #include "cmsis_os2.h"
@@ -88,7 +90,7 @@ void MX_PLATFORM_Init(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-#define CF0F_PINMUX_ENABLED      1
+#define CF0F_PINMUX_ENABLED      0
 
 /* MCU_BT_UART2 */
 #define BT_UART2_CTS_Pin         GPIO_PIN_0
@@ -231,7 +233,6 @@ void MX_PLATFORM_Init(void);
 
 /* MCU_RADAR_RST_L: GPIO_Output */
 #define RADAR_RST_Pin            GPIO_PIN_10
-#define RADAR_RST_GPIO_Port      GPIOD
 
 /* ANA_USB1_VBUS_SENSE: ADC4_IN15 */
 #define ANA_USB1_VBUS_Pin        GPIO_PIN_11
@@ -366,7 +367,7 @@ void MX_PLATFORM_Init(void);
 
 /* MCU_RADAR_PP1V2_LDO_EN */
 #define RADAR_PP1V2_LDO_EN_Pin    GPIO_PIN_9
-#define RADAR_PP1V2_LDO_GPIO_Port GPIOG
+#define RADAR_PORTG_GPIO_Port     GPIOG
 
 /* MCU_IO_PG10: GPIO_Analog */
 

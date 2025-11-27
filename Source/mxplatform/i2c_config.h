@@ -1,8 +1,7 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : app_freertos.h
-  * @brief          : Header for main.c file.
+  * @file           : i2c_config.h
+  * @brief          : Header for i2c_config.c file.
   *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
@@ -19,25 +18,28 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __APP_FREE_RTOS_H
-#define __APP_FREE_RTOS_H
+#ifndef __I2C_CONFIG_H
+#define __I2C_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32u5xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
 /* USER CODE END ET */
+
+/* Exported variables --------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
@@ -49,25 +51,16 @@ extern "C" {
 
 /* USER CODE END EM */
 
-
 /* Exported functions prototypes ---------------------------------------------*/
 /* USER CODE BEGIN EFP */
+void MX_I2C_Init(void);
+void MX_AMS_Init(void);
+void AMS_IRQ_Init(void);
+void MX_SENSIRION_Init(void);
 
 /* USER CODE END EFP */
 
-/* Exported Variables --------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-extern osMessageQueueId_t uartTxQueueHandle;
-extern osMessageQueueId_t uartRxQueueHandle;
-extern osMessageQueueId_t spi2QueueHandle;
-extern osMessageQueueId_t adc12QueueHandle;
-
-int sendchar(int ch);
-int getkey(void);
-
-/* USER CODE END ET */
 /* Private defines -----------------------------------------------------------*/
-
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -76,4 +69,4 @@ int getkey(void);
 }
 #endif
 
-#endif /* __APP_FREE_RTOS_H */
+#endif /* __TIM_CONFIG_H */
