@@ -149,8 +149,8 @@ void AMS_IRQ_Init(void)
   * @param None
   * @retval None
   */
-static sensirion_sensor_t sht4x_sensor;  // Temperature + Humidity sensor
-static sensirion_sensor_t sts4x_sensor;   // Temperature only sensor
+sensirion_sensor_t sht4x_sensor;   // Temperature + Humidity sensor
+sensirion_sensor_t sts4x_sensor;   // Temperature only sensor
 
 void MX_SENSIRION_Init(void)
 {
@@ -160,6 +160,7 @@ void MX_SENSIRION_Init(void)
   sensirion_i2c_hal_init();
 
   // Initialize SHT4x (Temperature & Humidity sensor on I2C6)
+  sht4x_sensor.i2c_bus = &hbus_i2c6;
   error = sensirion_sensor_init(&sht4x_sensor, 
             SENSIRION_I2C_ADDR_44, SENSOR_TYPE_SHT4X);
   if (error != 0)
@@ -168,6 +169,7 @@ void MX_SENSIRION_Init(void)
   }
 
   // Initialize STS4x (Temperature sensor on I2C2)
+  sts4x_sensor.i2c_bus = &hbus_i2c2;
   error = sensirion_sensor_init(&sts4x_sensor, 
             SENSIRION_I2C_ADDR_44, SENSOR_TYPE_STS4X);
   if (error != 0)

@@ -50,7 +50,7 @@ typedef enum {
 typedef struct {
     uint8_t i2c_address;
     sensirion_sensor_type_t type;
-    void* i2c_hal_ctx;  // Optional: for different I2C buses
+    void* i2c_bus;  // Pointer to I2C handle (e.g., &hi2c1)
 } sensirion_sensor_t;
 
 /**

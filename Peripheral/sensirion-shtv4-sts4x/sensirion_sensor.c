@@ -43,7 +43,7 @@ int16_t sensirion_sensor_init(sensirion_sensor_t* sensor,
     
     sensor->i2c_address = i2c_address;
     sensor->type = type;
-    sensor->i2c_hal_ctx = NULL;
+    // sensor->i2c_bus = NULL; // Do not overwrite user-provided bus handle
     
     return sensirion_sensor_soft_reset(sensor);
 }
@@ -60,6 +60,7 @@ int16_t sensirion_sensor_measure(sensirion_sensor_t* sensor,
     uint8_t read_bytes = (sensor->type == SENSOR_TYPE_SHT4X) ? 4 : 2;
     
     int16_t error = sensirion_measure_ticks(
+        sensor->i2c_bus,
         sensor->i2c_address,
         precision_commands[precision],
         precision_delays[precision],
@@ -100,6 +101,7 @@ int16_t sensirion_sensor_measure_with_heater(sensirion_sensor_t* sensor,
     uint32_t delay = heater_delays[duration];
     
     int16_t error = sensirion_measure_ticks(
+        sensor->i2c_bus,
         sensor->i2c_address,
         command,
         delay,
@@ -126,7 +128,7 @@ int16_t sensirion_sensor_serial_number(sensirion_sensor_t* sensor,
         return -1;
     }
     
-    return sensirion_read_serial_number(sensor->i2c_address, serial_number);
+    return sensirion_read_serial_number(sensor->i2c_bus, sensor->i2c_address, serial_number);
 }
 
 int16_t sensirion_sensor_soft_reset(sensirion_sensor_t* sensor) {
@@ -134,5 +136,5 @@ int16_t sensirion_sensor_soft_reset(sensirion_sensor_t* sensor) {
         return -1;
     }
     
-    return sensirion_soft_reset(sensor->i2c_address);
+    return sensirion_soft_reset(sensor->i2c_bus, sensor->i2c_address);
 }

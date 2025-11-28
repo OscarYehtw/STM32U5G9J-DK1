@@ -78,6 +78,7 @@ static inline int32_t sensirion_convert_ticks_to_percent_rh(uint16_t ticks) {
 /**
  * Generic measure function for sensors
  * 
+ * @param i2c_bus Pointer to the I2C bus handle
  * @param i2c_address I2C address of the sensor
  * @param command Command byte to send
  * @param delay_us Delay in microseconds after sending command
@@ -85,26 +86,28 @@ static inline int32_t sensirion_convert_ticks_to_percent_rh(uint16_t ticks) {
  * @param read_bytes Number of bytes to read back
  * @return 0 on success, error code otherwise
  */
-int16_t sensirion_measure_ticks(uint8_t i2c_address, uint8_t command, 
+int16_t sensirion_measure_ticks(void* i2c_bus, uint8_t i2c_address, uint8_t command, 
                                 uint32_t delay_us, uint8_t* buffer, 
                                 uint8_t read_bytes);
 
 /**
  * Read serial number from sensor
  * 
+ * @param i2c_bus Pointer to the I2C bus handle
  * @param i2c_address I2C address of the sensor
  * @param serial_number Pointer to store the serial number
  * @return 0 on success, error code otherwise
  */
-int16_t sensirion_read_serial_number(uint8_t i2c_address, uint32_t* serial_number);
+int16_t sensirion_read_serial_number(void* i2c_bus, uint8_t i2c_address, uint32_t* serial_number);
 
 /**
  * Perform soft reset on sensor
  * 
+ * @param i2c_bus Pointer to the I2C bus handle
  * @param i2c_address I2C address of the sensor
  * @return 0 on success, error code otherwise
  */
-int16_t sensirion_soft_reset(uint8_t i2c_address);
+int16_t sensirion_soft_reset(void* i2c_bus, uint8_t i2c_address);
 
 #ifdef __cplusplus
 }

@@ -66,7 +66,7 @@ int8_t sensirion_i2c_check_crc(const uint8_t* data, uint16_t count,
  *
  * @return  NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_general_call_reset(void);
+int16_t sensirion_i2c_general_call_reset(void* i2c_bus);
 
 /**
  * sensirion_i2c_fill_cmd_send_buf() - create the i2c send buffer for a command
@@ -95,7 +95,7 @@ uint16_t sensirion_i2c_fill_cmd_send_buf(uint8_t* buf, uint16_t cmd,
  *
  * @return      NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_read_words(uint8_t address, uint16_t* data_words,
+int16_t sensirion_i2c_read_words(void* i2c_bus, uint8_t address, uint16_t* data_words,
                                  uint16_t num_words);
 
 /**
@@ -114,7 +114,7 @@ int16_t sensirion_i2c_read_words(uint8_t address, uint16_t* data_words,
  *
  * @return      NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_read_words_as_bytes(uint8_t address, uint8_t* data,
+int16_t sensirion_i2c_read_words_as_bytes(void* i2c_bus, uint8_t address, uint8_t* data,
                                           uint16_t num_words);
 
 /**
@@ -124,7 +124,7 @@ int16_t sensirion_i2c_read_words_as_bytes(uint8_t address, uint8_t* data,
  *
  * @return      NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_write_cmd(uint8_t address, uint16_t command);
+int16_t sensirion_i2c_write_cmd(void* i2c_bus, uint8_t address, uint16_t command);
 
 /**
  * sensirion_i2c_write_cmd_with_args() - writes a command with arguments to the
@@ -136,7 +136,7 @@ int16_t sensirion_i2c_write_cmd(uint8_t address, uint16_t command);
  *
  * @return      NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_write_cmd_with_args(uint8_t address, uint16_t command,
+int16_t sensirion_i2c_write_cmd_with_args(void* i2c_bus, uint8_t address, uint16_t command,
                                           const uint16_t* data_words,
                                           uint16_t num_words);
 
@@ -151,7 +151,7 @@ int16_t sensirion_i2c_write_cmd_with_args(uint8_t address, uint16_t command,
  *
  * @return      NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_delayed_read_cmd(uint8_t address, uint16_t cmd,
+int16_t sensirion_i2c_delayed_read_cmd(void* i2c_bus, uint8_t address, uint16_t cmd,
                                        uint32_t delay_us, uint16_t* data_words,
                                        uint16_t num_words);
 /**
@@ -164,7 +164,7 @@ int16_t sensirion_i2c_delayed_read_cmd(uint8_t address, uint16_t cmd,
  *
  * @return      NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_read_cmd(uint8_t address, uint16_t cmd,
+int16_t sensirion_i2c_read_cmd(void* i2c_bus, uint8_t address, uint16_t cmd,
                                uint16_t* data_words, uint16_t num_words);
 
 /**
@@ -323,7 +323,7 @@ uint16_t sensirion_i2c_add_bytes_to_buffer(uint8_t* buffer, uint16_t offset,
  *
  * @return        NO_ERROR on success, error code otherwise
  */
-int16_t sensirion_i2c_write_data(uint8_t address, const uint8_t* data,
+int16_t sensirion_i2c_write_data(void* i2c_bus, uint8_t address, const uint8_t* data,
                                  uint16_t data_length);
 
 /**
@@ -340,7 +340,7 @@ int16_t sensirion_i2c_write_data(uint8_t address, const uint8_t* data,
  *
  * @return            NO_ERROR on success, an error code otherwise
  */
-int16_t sensirion_i2c_read_data_inplace(uint8_t address, uint8_t* buffer,
+int16_t sensirion_i2c_read_data_inplace(void* i2c_bus, uint8_t address, uint8_t* buffer,
                                         uint16_t expected_data_length);
 #ifdef __cplusplus
 }

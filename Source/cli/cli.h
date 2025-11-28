@@ -32,6 +32,10 @@ void cmd_alswrite (char *par);
 void cmd_dialstart (char *par);
 void cmd_fill (char *par);
 void cmd_backlight (char *par);
+void cmd_temp (char *par);
+void cmd_hum (char *par);
+void cmd_heat (char *par);
+void cmd_monitor (char *par);
 void cmd_help (char *par);
 
 /* Local Function Prototypes */

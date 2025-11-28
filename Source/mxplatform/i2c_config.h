@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "sensirion_sensor.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -40,6 +41,8 @@ extern "C" {
 /* USER CODE END ET */
 
 /* Exported variables --------------------------------------------------------*/
+extern sensirion_sensor_t sht4x_sensor;   // Temperature + Humidity sensor
+extern sensirion_sensor_t sts4x_sensor;   // Temperature only sensor
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */

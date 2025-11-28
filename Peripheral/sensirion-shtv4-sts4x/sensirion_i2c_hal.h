@@ -50,23 +50,11 @@ void sensirion_i2c_hal_init(void);
 void sensirion_i2c_hal_free(void);
 
 /**
- * SHT4x specific I2C functions (use I2C6)
- */
-int8_t sht4x_i2c_read(uint8_t address, uint8_t* data, uint8_t count);
-int8_t sht4x_i2c_write(uint8_t address, const uint8_t* data, uint8_t count);
-
-/**
- * STS4x specific I2C functions (use I2C2)
- */
-int8_t sts4x_i2c_read(uint8_t address, uint8_t* data, uint8_t count);
-int8_t sts4x_i2c_write(uint8_t address, const uint8_t* data, uint8_t count);
-
-/**
  * Generic I2C HAL functions (for linking sensirion_i2c.o)
  * Note: Sensor drivers should use sensor-specific functions via macro redirection
  */
-int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count);
-int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data, uint8_t count);
+int8_t sensirion_i2c_hal_read(void* ctx, uint8_t address, uint8_t* data, uint16_t count);
+int8_t sensirion_i2c_hal_write(void* ctx, uint8_t address, const uint8_t* data, uint16_t count);
 
 /**
  * Sleep for a given number of microseconds.

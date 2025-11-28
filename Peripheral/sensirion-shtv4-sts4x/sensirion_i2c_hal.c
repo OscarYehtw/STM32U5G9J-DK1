@@ -44,69 +44,38 @@ extern I2C_HandleTypeDef hbus_i2c2;  /* STS40 on I2C2 */
  * communication.
  */
 void sensirion_i2c_hal_init(void) {
-    if (HAL_I2C_GetState(&hbus_i2c2) == HAL_I2C_STATE_RESET)
-      BSP_I2C2_Init();  /* STS40 on I2C2 */
-
-    if (HAL_I2C_GetState(&hbus_i2c6) == HAL_I2C_STATE_RESET)
-      BSP_I2C6_Init();  /* SHTV4 on I2C6 */
+    BSP_I2C6_Init();  /* SHTV4 on I2C6 */
+    BSP_I2C2_Init();  /* STS40 on I2C2 */
 }
 
 /**
  * Release all resources initialized by sensirion_i2c_hal_init().
  */
 void sensirion_i2c_hal_free(void) {
-    if (HAL_I2C_GetState(&hbus_i2c2) == HAL_I2C_STATE_READY)
-      BSP_I2C2_DeInit();  /* STS40 on I2C2 */
-
-    if (HAL_I2C_GetState(&hbus_i2c6) == HAL_I2C_STATE_READY)
-      BSP_I2C6_DeInit();  /* SHTV4 on I2C6 */
+    BSP_I2C6_DeInit();
+    BSP_I2C2_DeInit();
 }
 
 /**
- * SHT4x specific I2C read (use I2C6)
+ * Generic I2C functions for sensirion_i2c.c
+ * Uses the context pointer to select the correct I2C bus
  */
-int8_t sht4x_i2c_read(uint8_t address, uint8_t* data, uint8_t count) {
-    return (int8_t)HAL_I2C_Master_Receive(&hbus_i2c6, (uint16_t)(address << 1),
+int8_t sensirion_i2c_hal_read(void* ctx, uint8_t address, uint8_t* data, uint16_t count) {
+    I2C_HandleTypeDef* hi2c = (I2C_HandleTypeDef*)ctx;
+    if (hi2c == NULL) {
+        return -1;
+    }
+    return (int8_t)HAL_I2C_Master_Receive(hi2c, (uint16_t)(address << 1),
                                           data, count, 100);
 }
 
-/**
- * SHT4x specific I2C write (use I2C6)
- */
-int8_t sht4x_i2c_write(uint8_t address, const uint8_t* data, uint8_t count) {
-    return (int8_t)HAL_I2C_Master_Transmit(&hbus_i2c6, (uint16_t)(address << 1),
+int8_t sensirion_i2c_hal_write(void* ctx, uint8_t address, const uint8_t* data, uint16_t count) {
+    I2C_HandleTypeDef* hi2c = (I2C_HandleTypeDef*)ctx;
+    if (hi2c == NULL) {
+        return -1;
+    }
+    return (int8_t)HAL_I2C_Master_Transmit(hi2c, (uint16_t)(address << 1),
                                            (uint8_t*)data, count, 100);
-}
-
-/**
- * STS4x specific I2C read (use I2C2)
- */
-int8_t sts4x_i2c_read(uint8_t address, uint8_t* data, uint8_t count) {
-    return (int8_t)HAL_I2C_Master_Receive(&hbus_i2c2, (uint16_t)(address << 1),
-                                          data, count, 100);
-}
-
-/**
- * STS4x specific I2C write (use I2C2)
- */
-int8_t sts4x_i2c_write(uint8_t address, const uint8_t* data, uint8_t count) {
-    return (int8_t)HAL_I2C_Master_Transmit(&hbus_i2c2, (uint16_t)(address << 1),
-                                           (uint8_t*)data, count, 100);
-}
-
-/**
- * Generic I2C functions for sensirion_i2c.c (should not be used directly)
- * These exist only for linking sensirion_i2c.o
- * All sensor drivers use sensor-specific functions via macro redirection
- */
-int8_t sensirion_i2c_hal_read(uint8_t address, uint8_t* data, uint8_t count) {
-    /* This should never be called - sensors use their specific functions */
-    return -1;
-}
-
-int8_t sensirion_i2c_hal_write(uint8_t address, const uint8_t* data, uint8_t count) {
-    /* This should never be called - sensors use their specific functions */
-    return -1;
 }
 
 /**

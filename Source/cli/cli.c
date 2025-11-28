@@ -23,18 +23,26 @@ const char Cli_Help[] =
    "| DIAL                      | Show TMR-ADC values                       |\n"
    "| FILL <rgb888>             | Fill screen with rgb color                |\n"
    "| BL   <brightness>         | set backlight to brightness [0-100%%]      |\n"
+   "| TEMP <sht|sts>            | Read temperature from sensor              |\n"
+   "| HUM                       | Read humidity from sensor                 |\n"
+   "| HEAT <pwr> <dur>          | Activate heater (pwr: HIGH/MED/LOW)       |\n"
+   "| MONITOR                   | Monitor Env Sensors on LCD                |\n"
    "| HELP  or  ?               | displays this help                        |\n"
    "+---------------------------+-------------------------------------------+\n";
 
 const SCMD cmd[] = {
 	{ "I2CDETECT", cmd_i2cdetect },
-	{ "ALSR",      cmd_alsread },
-	{ "ALSW",      cmd_alswrite },
-	{ "DIAL",      cmd_dialstart },
-	{ "FILL",      cmd_fill },
-	{ "BL",        cmd_backlight },
-	{ "HELP",      cmd_help },
-	{ "?",         cmd_help }
+	{ "ALSR",   cmd_alsread },
+	{ "ALSW",   cmd_alswrite },
+	{ "DIAL",   cmd_dialstart },
+	{ "FILL",   cmd_fill },
+	{ "BL",     cmd_backlight },
+	{ "TEMP",   cmd_temp },
+	{ "HUM",    cmd_hum },
+	{ "HEAT",   cmd_heat },
+	{ "MONITOR", cmd_monitor },
+	{ "HELP",   cmd_help },
+	{ "?",      cmd_help }
 };
 
 #define CMD_COUNT   (sizeof (cmd) / sizeof (cmd[0]))
