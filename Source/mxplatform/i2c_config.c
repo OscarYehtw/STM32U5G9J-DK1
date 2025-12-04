@@ -22,6 +22,7 @@
 /* USER CODE BEGIN Includes */
 #include "mxplatform.h"
 #include "ams_device.h"
+#include "tcs3410_hwdef.h"
 #include "sensirion_i2c_hal.h"
 #include "sensirion_sensor.h"
 /* USER CODE END Includes */
@@ -113,6 +114,12 @@ void MX_I2C_Init(void)
   */
 void MX_AMS_Init(void)
 {
+  if (BSP_I2C1_IsReady(SLAVE_ADDR_0, 2) != BSP_ERROR_NONE)
+  {
+      printf("als ams_tcs3410 not found on I2C1!!! \n\r");
+      return;
+  }
+
   if (ams_device_init() != AMS_SUCCESS)
   {
       printf("als ams_tcs3410 init failed!!! \n\r");
@@ -160,21 +167,35 @@ void MX_SENSIRION_Init(void)
   sensirion_i2c_hal_init();
 
   // Initialize SHT4x (Temperature & Humidity sensor on I2C6)
-  sht4x_sensor.i2c_bus = &hbus_i2c6;
-  error = sensirion_sensor_init(&sht4x_sensor, 
-            SENSIRION_I2C_ADDR_44, SENSOR_TYPE_SHT4X);
-  if (error != 0)
+  if (BSP_I2C6_IsReady(SENSIRION_I2C_ADDR_44 << 1, 2) == BSP_ERROR_NONE)
   {
-      printf("SHT4x sensor init failed!!! \n\r");
+      sht4x_sensor.i2c_bus = &hbus_i2c6;
+      error = sensirion_sensor_init(&sht4x_sensor, 
+                SENSIRION_I2C_ADDR_44, SENSOR_TYPE_SHT4X);
+      if (error != 0)
+      {
+          printf("SHT4x sensor init failed. \n\r");
+      }
+  }
+  else
+  {
+      printf("SHT4x sensor not found on I2C6. \n\r");
   }
 
   // Initialize STS4x (Temperature sensor on I2C2)
-  sts4x_sensor.i2c_bus = &hbus_i2c2;
-  error = sensirion_sensor_init(&sts4x_sensor, 
-            SENSIRION_I2C_ADDR_44, SENSOR_TYPE_STS4X);
-  if (error != 0)
+  if (BSP_I2C2_IsReady(SENSIRION_I2C_ADDR_44 << 1, 2) == BSP_ERROR_NONE)
   {
-      printf("STS4x sensor init failed!!! \n\r");
+      sts4x_sensor.i2c_bus = &hbus_i2c2;
+      error = sensirion_sensor_init(&sts4x_sensor, 
+                SENSIRION_I2C_ADDR_44, SENSOR_TYPE_STS4X);
+      if (error != 0)
+      {
+          printf("STS4x sensor init failed. \n\r");
+      }
+  }
+  else
+  {
+      printf("STS4x sensor not found on I2C2. \n\r");
   }
 }
 

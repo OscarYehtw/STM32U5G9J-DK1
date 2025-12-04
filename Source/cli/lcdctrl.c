@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include "mxplatform.h"
 #include "cli.h"
+#include "lm3697.h"
 
 extern TIM_HandleTypeDef htim8;
 
@@ -48,12 +49,20 @@ void cmd_fill (char *par)
 void cmd_backlight (char *par)
 {
   char *pVal;
+#if defined(BRIGHTNESS_USE_LM3597) && (BRIGHTNESS_USE_LM3597 == 1)
+  int brightness;
+#else
   int percent;
+#endif
 
   // No argument ? show usage
   if (par == NULL || *par == 0) {
       printf("Usage: BL <brightness>\n");
+#if defined(BRIGHTNESS_USE_LM3597) && (BRIGHTNESS_USE_LM3597 == 1)
+      printf("Brightness range: 0 ~ 255\n");
+#else
       printf("Brightness range: 0 ~ 100\n");
+#endif
       return;
   }
 
@@ -65,11 +74,20 @@ void cmd_backlight (char *par)
   }
 
   // Convert to integer
+#if defined(BRIGHTNESS_USE_LM3597) && (BRIGHTNESS_USE_LM3597 == 1)
+  if (sscanf(pVal, "%d", &brightness) != 1) {
+#else
   if (sscanf(pVal, "%d", &percent) != 1) {
-      printf("Invalid brightness value.\n");
+#endif
+	  printf("Invalid brightness value.\n");
       return;
   }
 
+#if defined(BRIGHTNESS_USE_LM3597) && (BRIGHTNESS_USE_LM3597 == 1)
+  printf("Using LM3697 to control backlight brightness.\n");
+  BL_Driver_SetBrightness_8bit(brightness);
+  return;
+#else
   // Range clip
   if (percent < 0) percent = 0;
   if (percent > 100) percent = 100;
@@ -81,4 +99,5 @@ void cmd_backlight (char *par)
   __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, duty);
 
   printf("Backlight = %d%% (duty=%lu)\n", percent, (unsigned long)duty);
+#endif
 }

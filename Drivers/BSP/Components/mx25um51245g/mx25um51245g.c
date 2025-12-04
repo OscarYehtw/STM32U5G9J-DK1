@@ -611,7 +611,9 @@ int32_t MX25UM51245G_EnableSTRMemoryMappedMode(XSPI_HandleTypeDef *Ctx, MX25UM51
   }
 
   /* Configure the memory mapped mode */
-  s_mem_mapped_cfg.TimeOutActivation = HAL_XSPI_TIMEOUT_COUNTER_DISABLE;
+  //s_mem_mapped_cfg.TimeOutActivation = HAL_XSPI_TIMEOUT_COUNTER_DISABLE;
+  s_mem_mapped_cfg.TimeOutActivation  = HAL_XSPI_TIMEOUT_COUNTER_ENABLE;
+  s_mem_mapped_cfg.TimeoutPeriodClock = 0x40;
 
   if (HAL_XSPI_MemoryMapped(Ctx, &s_mem_mapped_cfg) != HAL_OK)
   {

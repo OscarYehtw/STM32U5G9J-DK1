@@ -32,6 +32,7 @@ extern "C" {
 #include "stm32u5x9j_discovery.h"
 #include "stm32u5x9j_discovery_hspi.h"
 #include "stm32u5x9j_discovery_ospi.h"
+#include "gd25lq128e.h"
 #include "gpio_config.h"
 #include "uart_config.h"
 #include "spi_config.h"
@@ -149,8 +150,8 @@ void MX_PLATFORM_Init(void);
 /* MCU_IO_PB10: GPIO_Analog */
 
 /* MCU_DATA_FLASH_SPI_CS_L:  OCTOSPIM_ P1_NCS*/
-#define SPI_CS_Pin               GPIO_PIN_11
-#define SPI_CS_GPIO_Port         GPIOB
+#define DATA_FLASH_SPI_CS_Pin    GPIO_PIN_11
+#define DATA_FLASH_CS_GPIO_Port  GPIOB
 
 /* MCU_DBG_GPIO1: GPIO_Output */
 #define DBG_GPIO1_Pin            GPIO_PIN_12
@@ -322,8 +323,8 @@ void MX_PLATFORM_Init(void);
 /* MCU_DATA_FLASH_SPI: OCTOSPIM_ P1_IO */
 #define DATA_FLASH_SPI_D3_Pin     GPIO_PIN_6
 #define DATA_FLASH_SPI_D2_Pin     GPIO_PIN_7
-#define DATA_FLASH_SPI_D1_Pin     GPIO_PIN_8
-#define DATA_FLASH_SPI_D0_Pin     GPIO_PIN_9
+#define DATA_FLASH_SPI_D1_Pin     GPIO_PIN_9
+#define DATA_FLASH_SPI_D0_Pin     GPIO_PIN_8
 #define DATA_FLASH_SPI_CLK_Pin    GPIO_PIN_10
 #define DATA_FLASH_SPI_GPIO_Port  GPIOF
 

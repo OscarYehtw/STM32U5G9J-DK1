@@ -60,6 +60,21 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/lcdctrl.c</locationURI>
 		</link>
 		<link>
+			<name>CLI/monitor.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/monitor.c</locationURI>
+		</link>
+		<link>
+			<name>CLI/spi_flash.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/spi_flash.c</locationURI>
+		</link>
+		<link>
+			<name>CLI/tmp_hum.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/tmp_hum.c</locationURI>
+		</link>
+		<link>
 			<name>CLI/tmr_adc.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/tmr_adc.c</locationURI>
@@ -102,7 +117,7 @@
 		<link>
 			<name>MxPlatform/spi_config.c</name>
 			<type>1</type>
-			<location>PARENT-1-PROJECT_LOC/Source/mxplatform/spi_config.c</location>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/spi_config.c</locationURI>
 		</link>
 		<link>
 			<name>MxPlatform/tim_config.c</name>
@@ -303,6 +318,16 @@
 			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_ll_dlyb.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_ll_dlyb.c</locationURI>
+		</link>
+		<link>
+			<name>Peripheral/gd25lq128e/gd25lq128e.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Peripheral/gd25lq128e/gd25lq128e.c</locationURI>
+		</link>
+		<link>
+			<name>Peripheral/gd25lq128e/gd25lq128e_xip.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Peripheral/gd25lq128e/gd25lq128e_xip.c</locationURI>
 		</link>
 		<link>
 			<name>Peripheral/sensirion-shtv4-sts4x/sensirion_common.c</name>

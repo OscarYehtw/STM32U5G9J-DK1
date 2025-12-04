@@ -8,6 +8,8 @@
 #ifndef LM3697_H
 #define LM3697_H
 
+#define BRIGHTNESS_USE_LM3597 0
+
 // LM3697 7-bit I2C Slave Address
 #define LM3697_I2C_ADDRESS_7BIT      0x3C
 
@@ -32,5 +34,11 @@
 
 #define LM3697_MAX_BRIGHTNESS                         0xFF
 #define LM3697_MIN_BRIGHTNESS                         0x00
+
+#define MCU_DISP_BL_EN_Port                           GPIOE
+#define MCU_DISP_BL_EN_Pin                            GPIO_PIN_5
+
+HAL_StatusTypeDef BL_Driver_SetBrightness_8bit(int brightness);
+HAL_StatusTypeDef BL_Driver_Init(void);
 
 #endif /* LM3697_H */

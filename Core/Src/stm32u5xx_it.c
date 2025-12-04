@@ -174,6 +174,21 @@ void SPI2_IRQHandler(void)
 }
 
 /**
+  * @brief  This function handles OctoSPI interrupt request.
+  * @param  None
+  * @retval None
+  */
+void OCTOSPI1_IRQHandler(void)
+{
+#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
+  HAL_XSPI_IRQHandler(&hospi[0]);
+#else
+  HAL_XSPI_IRQHandler(&hospi[0]);
+  //HAL_XSPI_IRQHandler(&hospi_nor[0]);
+#endif
+}
+
+/**
   * @brief This function handles EXTI Line4 interrupt.
   */
 void EXTI0_IRQHandler(void)

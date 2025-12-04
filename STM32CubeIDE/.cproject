@@ -93,11 +93,13 @@
 									<listOptionValue builtIn="false" value="../../Middlewares/ST/touchgfx_components/gpu2d/TouchGFXNema/include"/>
 									<listOptionValue builtIn="false" value="../../Source/cli"/>
 									<listOptionValue builtIn="false" value="../../Drivers/BSP/Components/Common"/>
+									<listOptionValue builtIn="false" value="../../Drivers/BSP/Components/lm3697"/>
 									<listOptionValue builtIn="false" value="../../Utilities/lcd"/>
 									<listOptionValue builtIn="false" value="../../Utilities/Fonts"/>
 									<listOptionValue builtIn="false" value="../../Peripheral/tcs3410"/>
 									<listOptionValue builtIn="false" value="../../Peripheral/sensirion-shtv4-sts4x"/>
 									<listOptionValue builtIn="false" value="../../Source/mxplatform"/>
+									<listOptionValue builtIn="false" value="../../Peripheral/gd25lq128e"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1115130998" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -171,7 +173,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Application/User/gui|Application/User/generated|Application/User/TouchGFX" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Peripheral/gd25lq128e/gd25lq128e_xip.c|Application/User/gui|Application/User/generated|Application/User/TouchGFX" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -332,7 +334,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Application/User/gui|Application/User/generated|Application/User/TouchGFX" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Peripheral/gd25lq128e/gd25lq128e_xip.c|Application/User/gui|Application/User/generated|Application/User/TouchGFX" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -413,12 +413,31 @@ void SystemClock_Config(void)
 void PeriphCommonClock_Config(void)
 {
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+  RCC_PLL2InitTypeDef RCC_PLL2InitTypeDef = {0};
 
   /** Initializes the common periph clock
   */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_DSI;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_DSI|RCC_PERIPHCLK_OSPI;
   PeriphClkInit.DsiClockSelection = RCC_DSICLKSOURCE_PLL3;
   PeriphClkInit.LtdcClockSelection = RCC_LTDCCLKSOURCE_PLL3;
+  PeriphClkInit.OspiClockSelection = RCC_OSPICLKSOURCE_PLL2;
+
+  /*         PLL2_VCO Input = HSE_VALUE/PLL2M = 4 Mhz
+   *         PLL2_VCO Output = PLL2_VCO Input * PLL2N = 180 Mhz
+   *         PLLOSPICLK = PLL2_VCO Output/PLL2R = 180 Mhz
+   * ---->   OSPI presacler = 1 so OSPI frequency = 90 Mhz
+   */
+  RCC_PLL2InitTypeDef.PLL2ClockOut = RCC_PLL2_DIVQ;
+  RCC_PLL2InitTypeDef.PLL2Source = RCC_PLLSOURCE_HSE;
+  RCC_PLL2InitTypeDef.PLL2M = 4;
+  RCC_PLL2InitTypeDef.PLL2N = 45;
+  RCC_PLL2InitTypeDef.PLL2P = 1;
+  RCC_PLL2InitTypeDef.PLL2Q = 1;
+  RCC_PLL2InitTypeDef.PLL2R = 1;
+  RCC_PLL2InitTypeDef.PLL2RGE = RCC_PLLVCIRANGE_0;
+  RCC_PLL2InitTypeDef.PLL2FRACN = 0;
+  PeriphClkInit.PLL2= RCC_PLL2InitTypeDef;
+
   PeriphClkInit.PLL3.PLL3Source = RCC_PLLSOURCE_HSE;
   PeriphClkInit.PLL3.PLL3M = 4;
   PeriphClkInit.PLL3.PLL3N = 125;
@@ -912,8 +931,10 @@ static void MX_OCTOSPI1_Init(void)
   memset(&sOSPI_NOR_Info, 0, sizeof(sOSPI_NOR_Info));
   memset(&sOSPI_NOR_Init, 0, sizeof(sOSPI_NOR_Init));
 
-  sOSPI_NOR_Init.InterfaceMode = BSP_OSPI_NOR_OPI_MODE;
-  sOSPI_NOR_Init.TransferRate  = BSP_OSPI_NOR_DTR_TRANSFER;
+  //sOSPI_NOR_Init.InterfaceMode = BSP_OSPI_NOR_OPI_MODE;
+  //sOSPI_NOR_Init.TransferRate  = BSP_OSPI_NOR_DTR_TRANSFER;
+  sOSPI_NOR_Init.InterfaceMode = BSP_OSPI_NOR_SPI_MODE;
+  sOSPI_NOR_Init.TransferRate  = BSP_OSPI_NOR_STR_TRANSFER;
 
   status = BSP_OSPI_NOR_Init(0, &sOSPI_NOR_Init);
 
@@ -926,14 +947,61 @@ static void MX_OCTOSPI1_Init(void)
 
   BSP_OSPI_NOR_GetInfo(0, &sOSPI_NOR_Info);
 
+#if 0
+  printf("Mode: %x, Rate: %x\r\n", Ospi_Nor_Ctx[0].InterfaceMode, Ospi_Nor_Ctx[0].TransferRate);
+
+  {
+    uint8_t norid[3] = {0};
+    BSP_OSPI_NOR_ReadID(0, norid);
+    printf("OSPI NOR ID: %02X %02X %02X\r\n", norid[0], norid[1], norid[2]);
+  }
+#endif
+
+#if 0
   if (BSP_OSPI_NOR_EnableMemoryMappedMode(0) != BSP_ERROR_NONE)
   {
     printf("\r\nOSPI NOR Mem-Mapped Cfg : Failed");
     printf("\r\nOSPI NOR Test Aborted");
     printf("\r\n");
   }
+#endif
   /* USER CODE END OCTOSPI1_Init 2 */
 
+#if 0
+  {
+    __IO uint8_t *mem_addr;
+    uint32_t address = 0;
+    uint16_t index;
+    uint8_t  aTxBuffer[] = " ****Memory-mapped OSPI communication****   ****Memory-mapped OSPI communication****   ****Memory-mapped OSPI communication****   ****Memory-mapped OSPI communication****   ****Memory-mapped OSPI communication****  ****Memory-mapped OSPI communication**** ";
+    #define BUFSIZE                       (COUNTOF(aTxBuffer) - 1)
+
+    /* Writing Sequence ----------------------------------------------- */
+    mem_addr = (uint8_t *)(OCTOSPI1_BASE + address);
+    for (index = 0; index < BUFSIZE; index++)
+    {
+       *mem_addr = aTxBuffer[index];
+       mem_addr++;
+    }
+
+    /* In memory-mapped mode, not possible to check if the memory is ready
+       after the programming. So a delay corresponding to max page programming
+       time is added */
+    HAL_Delay(10);
+
+    printf("\r\n");
+    /* Reading Sequence ----------------------------------------------- */
+    mem_addr = (uint8_t *)(OCTOSPI1_BASE + address);
+    for (index = 0; index < BUFSIZE ; index++)
+    {
+       if (*mem_addr != aTxBuffer[index])
+       {
+         printf("OSPI NOR Memory-mapped mode failed at %d expected %02X read %02X \r\n", index, aTxBuffer[index], *mem_addr);
+       }
+       //printf("%c", *mem_addr);
+       mem_addr++;
+    }
+  }
+#endif
 }
 
 /**
@@ -1113,6 +1181,7 @@ void MX_PLATFORM_Init(void)
   MX_GPDMA1_Init();
   MX_CRC_Init();
   MX_SPI2_Init();
+  MX_GD25LQ182E_Init();
   MX_TIM1_Init();
   MX_TIM3_Init();
   MX_TIM8_Init();
@@ -1123,8 +1192,8 @@ void MX_PLATFORM_Init(void)
   MX_LTDC_Init();
   MX_LCD_Init();
 #if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 0)
-  MX_OCTOSPI1_Init();
-  MX_HSPI1_Init();
+  //MX_OCTOSPI1_Init();
+  //MX_HSPI1_Init();
 #endif
   MX_DCACHE1_Init();
   MX_DCACHE2_Init();
