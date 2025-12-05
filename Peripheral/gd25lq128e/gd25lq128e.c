@@ -267,8 +267,7 @@ int32_t GD25LQ128E_ReadSTR(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode,
   * @retval Memory status
   */
 int32_t GD25LQ128E_PageProgram(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode,
-                                GD25LQ128E_AddressSize_t AddressSize, uint8_t *pData, uint32_t WriteAddr,
-                                uint32_t Size)
+                                uint8_t *pData, uint32_t WriteAddr, uint32_t Size)
 {
   XSPI_RegularCmdTypeDef s_command = {0};
 
@@ -318,7 +317,7 @@ int32_t GD25LQ128E_PageProgram(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t M
   * @retval Memory status
   */
 int32_t GD25LQ128E_BlockErase(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode,
-                              GD25LQ128E_AddressSize_t AddressSize, uint32_t BlockAddress, GD25LQ128E_Erase_t BlockSize)
+                              uint32_t BlockAddress, GD25LQ128E_Erase_t BlockSize)
 {
   XSPI_RegularCmdTypeDef s_command = {0};
 
@@ -333,7 +332,7 @@ int32_t GD25LQ128E_BlockErase(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mo
                                   : GD25LQ128E_SUBSECTOR_ERASE_4K_CMD;
   s_command.AddressMode        = HAL_XSPI_ADDRESS_1_LINE; /* Instruction and address lines are usually 1-line for erase */
   s_command.AddressDTRMode     = HAL_XSPI_ADDRESS_DTR_DISABLE;
-  s_command.AddressWidth       = (AddressSize == GD25LQ128E_3BYTES_SIZE) ? HAL_XSPI_ADDRESS_24_BITS : HAL_XSPI_ADDRESS_32_BITS;
+  s_command.AddressWidth       = HAL_XSPI_ADDRESS_24_BITS;
   s_command.Address            = BlockAddress;
   s_command.AlternateBytesMode = HAL_XSPI_ALT_BYTES_NONE;
   s_command.DataMode           = HAL_XSPI_DATA_NONE;
@@ -859,6 +858,88 @@ int32_t GD25LQ128E_EnterPowerDown(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_
 {
 
     return GD25LQ128E_OK;
+}
+
+/**
+  * @brief  Writes an amount of data to the OSPI memory.
+  * @param  Instance  OSPI instance
+  * @param  pData     Pointer to data to be written
+  * @param  WriteAddr Write start address
+  * @param  Size      Size of data to write
+  * @retval BSP status
+  */
+int32_t GD25LQ128E_Write(uint32_t Instance, uint8_t *pData, uint32_t WriteAddr, uint32_t Size)
+{
+  int32_t ret = BSP_ERROR_NONE;
+  uint32_t end_addr;
+  uint32_t current_size;
+  uint32_t current_addr;
+  uint32_t data_addr;
+
+  /* Check if the instance is supported */
+  if (Instance >= OSPI_NOR_INSTANCES_NUMBER)
+  {
+    ret = BSP_ERROR_WRONG_PARAM;
+  }
+  else
+  {
+    /* Calculation of the size between the write address and the end of the page */
+    current_size = GD25LQ128E_PAGE_SIZE - (WriteAddr % GD25LQ128E_PAGE_SIZE);
+
+    /* Check if the size of the data is less than the remaining place in the page */
+    if (current_size > Size)
+    {
+      current_size = Size;
+    }
+
+    /* Initialize the address variables */
+    current_addr = WriteAddr;
+    end_addr = WriteAddr + Size;
+    data_addr = (uint32_t)pData;
+
+    /* Perform the write page by page */
+    do
+    {
+      /* Check if Flash busy ? */
+      if (GD25LQ128E_AutoPollingMemReady(&hospi[Instance], Ospi_Ctx[Instance].InterfaceMode) != GD25LQ128E_OK)
+      {
+        ret = BSP_ERROR_COMPONENT_FAILURE;
+      }/* Enable write operations */
+      else if (GD25LQ128E_WriteEnable(&hospi[Instance], Ospi_Ctx[Instance].InterfaceMode) != GD25LQ128E_OK)
+      {
+        ret = BSP_ERROR_COMPONENT_FAILURE;
+      }
+      else
+      {
+        /* Issue page program command */
+        if (GD25LQ128E_PageProgram(&hospi[Instance], Ospi_Ctx[Instance].InterfaceMode,
+                                     (uint8_t *)data_addr, current_addr, current_size) != GD25LQ128E_OK)
+        {
+          ret = BSP_ERROR_COMPONENT_FAILURE;
+        }
+
+        if (ret == BSP_ERROR_NONE)
+        {
+          /* Configure automatic polling mode to wait for end of program */
+          if (GD25LQ128E_AutoPollingMemReady(&hospi[Instance], Ospi_Ctx[Instance].InterfaceMode) != GD25LQ128E_OK)
+          {
+            ret = BSP_ERROR_COMPONENT_FAILURE;
+          }
+          else
+          {
+            /* Update the address and size variables for next page programming */
+            current_addr += current_size;
+            data_addr += current_size;
+            current_size = ((current_addr + GD25LQ128E_PAGE_SIZE) > end_addr) ? (end_addr - current_addr) : \
+                           GD25LQ128E_PAGE_SIZE;
+          }
+        }
+      }
+    } while ((current_addr < end_addr) && (ret == BSP_ERROR_NONE));
+  }
+
+  /* Return BSP status */
+  return ret;
 }
 
 /**

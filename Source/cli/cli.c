@@ -28,6 +28,7 @@ const char Cli_Help[] =
    "| HEAT <pwr> <dur>          | Activate heater (pwr: HIGH/MED/LOW)       |\n"
    "| MONITOR                   | Monitor Env Sensors on LCD                |\n"
    "| FLASHR <addr> <len>       | Read <len> bytes from OSPI flash at <addr>|\n"
+   "| FLASHW <addr>             | Write 256 bytes to OSPI flash at <addr>   |\n"
    "| HELP  or  ?               | displays this help                        |\n"
    "+---------------------------+-------------------------------------------+\n";
 
@@ -43,6 +44,7 @@ const SCMD cmd[] = {
 	{ "HEAT",      cmd_heat },
 	{ "MONITOR",   cmd_monitor },
    { "FLASHR",    cmd_flashr },
+   { "FLASHW",    cmd_flashw },
 	{ "HELP",      cmd_help },
 	{ "?",         cmd_help }
 };

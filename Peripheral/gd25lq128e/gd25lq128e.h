@@ -218,14 +218,15 @@ int32_t GD25LQ128E_ReadSTR(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode,
                             GD25LQ128E_AddressSize_t AddressSize, uint8_t *pData, uint32_t ReadAddr, uint32_t Size);
 
 int32_t GD25LQ128E_PageProgram(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode,
-                                GD25LQ128E_AddressSize_t AddressSize, uint8_t *pData, uint32_t WriteAddr,
-                                uint32_t Size);
+                                uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
 
 /* Erase Commands ***************************************************************/
 int32_t GD25LQ128E_BlockErase(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode,
-                              GD25LQ128E_AddressSize_t AddressSize, uint32_t BlockAddress, GD25LQ128E_Erase_t BlockSize);
+                              uint32_t BlockAddress, GD25LQ128E_Erase_t BlockSize);
 
 int32_t GD25LQ128E_ChipErase(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode);
+
+int32_t GD25LQ128E_Write(uint32_t Instance, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
 
 /* Register Commands ************************************************************/
 int32_t GD25LQ128E_WriteEnable(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode);
@@ -234,8 +235,6 @@ int32_t GD25LQ128E_AutoPollingMemReady(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Inter
 int32_t GD25LQ128E_ReadStatusRegister(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode, uint8_t *Value);
 int32_t GD25LQ128E_WriteStatusRegister(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode, uint8_t Value);
 int32_t GD25LQ128E_ReadCfgRegister(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode, uint8_t *Value);
-int32_t GD25LQ128E_Enter4ByteAddressMode(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode);
-int32_t GD25LQ128E_Exit4ByteAddressMode(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode);
 int32_t GD25LQ128E_EnableQuadMode(XSPI_HandleTypeDef *Ctx, GD25LQ128E_Interface_t Mode);
 
 /* ID Commands ******************************************************************/

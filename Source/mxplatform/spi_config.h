@@ -34,42 +34,6 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
-/* Exported variables --------------------------------------------------------*/
-extern XSPI_HandleTypeDef   hospi[OSPI_NOR_INSTANCES_NUMBER];
-extern SPI_HandleTypeDef    hspi2;
-
-/* Buffer used for transmission */
-extern uint8_t spiTxBuf[];
-
-/* Buffer used for reception */
-extern uint8_t spiRxBuf[];
-extern __IO uint8_t wTransferState;
-
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-
-/* USER CODE END EC */
-
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
-#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
-
-/* USER CODE END EM */
-
-/* Exported functions prototypes ---------------------------------------------*/
-/* USER CODE BEGIN EFP */
-int32_t OSPI_NOR_EnableMemoryMappedMode(uint32_t Instance);
-int32_t OSPI_NOR_DisableMemoryMappedMode(uint32_t Instance);
-void MX_GD25LQ182E_Init(void);
-void MX_SPI2_Init(void);
-
-/* USER CODE END EFP */
-
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 enum
@@ -120,6 +84,43 @@ typedef struct
 #define GD25_OSPI_NOR_BLOCK_64K      GD25LQ128E_SECTOR_64K
 
 /* USER CODE END Private defines */
+
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
+
+/* USER CODE END ET */
+
+/* Exported variables --------------------------------------------------------*/
+extern XSPI_HandleTypeDef   hospi[OSPI_NOR_INSTANCES_NUMBER];
+extern GD25_OSPI_NOR_Ctx_t  Ospi_Ctx[OSPI_NOR_INSTANCES_NUMBER];
+extern SPI_HandleTypeDef    hspi2;
+
+/* Buffer used for transmission */
+extern uint8_t spiTxBuf[];
+
+/* Buffer used for reception */
+extern uint8_t spiRxBuf[];
+extern __IO uint8_t wTransferState;
+
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
+
+/* USER CODE END EC */
+
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
+#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
+
+/* USER CODE END EM */
+
+/* Exported functions prototypes ---------------------------------------------*/
+/* USER CODE BEGIN EFP */
+int32_t OSPI_NOR_EnableMemoryMappedMode(uint32_t Instance);
+int32_t OSPI_NOR_DisableMemoryMappedMode(uint32_t Instance);
+void MX_GD25LQ182E_Init(void);
+void MX_SPI2_Init(void);
+
+/* USER CODE END EFP */
 
 #ifdef __cplusplus
 }

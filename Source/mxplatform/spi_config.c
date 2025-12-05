@@ -447,6 +447,7 @@ static int32_t OSPI_NOR_Init(uint32_t Instance, GD25_OSPI_NOR_Init_t *Init)
       (void)GD25LQ128E_GetFlashInfo(&pInfo);
 
       /* Fill config structure */
+      //HSE_VALUE(16MHz)/PLL2M(4) = 4Mhz -> 4MHz * PLL2N(45) = 180MHz -> PLLOSPICLK/presacler(180MHz/2) = 90MHz
       ospi_init.ClockPrescaler = 1;
       ospi_init.MemorySize     = (uint32_t)POSITION_VAL((uint32_t)pInfo.FlashSize);
       ospi_init.SampleShifting = HAL_XSPI_SAMPLE_SHIFT_NONE;
@@ -567,7 +568,7 @@ int32_t OSPI_NOR_EnableMemoryMappedMode(uint32_t Instance)
     }
     else /* Update OSPI context if all operations are well done */
     {
-      Ospi_Nor_Ctx[Instance].IsInitialized = OSPI_ACCESS_MMP;
+      Ospi_Ctx[Instance].IsInitialized = OSPI_ACCESS_MMP;
     }
   }
 
