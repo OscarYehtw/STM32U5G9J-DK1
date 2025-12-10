@@ -59,6 +59,7 @@
 /* USER CODE BEGIN Variables */
 osMessageQueueId_t uartTxQueueHandle;
 osMessageQueueId_t uartRxQueueHandle;
+osMessageQueueId_t uartRx3QueueHandle;
 osMessageQueueId_t spi2QueueHandle;
 osMessageQueueId_t adc12QueueHandle;
 
@@ -189,6 +190,8 @@ void MX_FREERTOS_Init(void) {
   /* Receive an amount of data in interrupt mode */
   uartRxQueueHandle = osMessageQueueNew(UART_RX_QUEUE_LEN, sizeof(uint8_t), NULL);
 
+  uartRx3QueueHandle = osMessageQueueNew(UART_RX_QUEUE_LEN, sizeof(uint8_t), NULL);
+
   /* Receive an SPI2 converted data in interrupt mode */
   spi2QueueHandle = osMessageQueueNew(SPI2_QUEUE_LEN, sizeof(uint8_t), NULL);
 
@@ -303,6 +306,33 @@ void SPI2_Task(void *argument)
       }
       osDelay(50);
   }
+#if 0
+  uint8_t ch;
+
+  HAL_UART_Receive_IT(&huart3, &rx3Byte, 1);
+  HAL_UART_Transmit_IT(&huart3, &tx3Byte, 1);
+
+  for (;;) {
+
+      if (osMessageQueueGet(uartRx3QueueHandle, &ch, NULL, osWaitForever) == osOK) {
+          printf("UART3: %x \n\r", ch);
+          //HAL_UART_Receive_IT(&huart3, &tx3Byte, 1);
+      }
+      printf("SPI2_Task \n\r");
+
+      while (tx3Busy) {
+           osDelay(1);
+      }
+      tx3Busy = 1;
+      tx3Byte++;
+      printf("tx3Byte: %x \n\r", tx3Byte);
+      fflush(stdout);   // Force output to be sent immediately
+      HAL_UART_Transmit_IT(&huart3, &tx3Byte, 1);
+
+      osDelay(1000);
+  }
+#endif
+
 }
 
 void ADC12_Task(void *argument)

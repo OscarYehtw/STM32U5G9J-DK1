@@ -100,6 +100,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/i2c_config.c</locationURI>
 		</link>
 		<link>
+			<name>MxPlatform/lcd_config.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/lcd_config.c</locationURI>
+		</link>
+		<link>
 			<name>MxPlatform/linked_list.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/linked_list.c</locationURI>

@@ -38,6 +38,7 @@ extern "C" {
 #include "spi_config.h"
 #include "tim_config.h"
 #include "i2c_config.h"
+#include "lcd_config.h"
 #include "adc_config.h"
 #include "exti_config.h"
 #include "cmsis_os2.h"

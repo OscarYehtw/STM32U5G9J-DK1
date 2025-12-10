@@ -42,11 +42,16 @@ extern "C" {
 /* Exported variables --------------------------------------------------------*/
 extern UART_HandleTypeDef  huart1;
 extern UART_HandleTypeDef  huart2;
+extern UART_HandleTypeDef  huart3;
 extern UART_HandleTypeDef  huart5;
 
 extern volatile uint8_t txBusy;
 extern uint8_t txByte;
 extern uint8_t rxByte;
+
+extern volatile uint8_t tx3Busy;
+extern uint8_t tx3Byte;
+extern uint8_t rx3Byte;
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
@@ -63,6 +68,7 @@ extern uint8_t rxByte;
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 void MX_UART5_UART_Init(void);
+void MX_USART3_UART_Init(void);
 
 /* USER CODE END EFP */
 
