@@ -64,6 +64,32 @@ void MX_JPEG_Init(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
+#define HSYNC_WIDTH        10
+#define VSYNC_WIDTH        2
+#define HBP                20
+#define VBP                2
+#define HFP                10
+#define VFP                4
+#define ACTIVE_WIDTH       480
+#define ACTIVE_HEIGHT      480
+
+#define HSYNC              (HSYNC_WIDTH - 1)
+#define VSYNC              (VSYNC_WIDTH - 1)
+
+#define ACC_VBP            (HSYNC_WIDTH + HBP - 1)
+#define ACC_VFP            (VSYNC_WIDTH + VBP - 1)
+
+#define ACC_ACTIVE_WIDTH   (HSYNC_WIDTH + HBP + ACTIVE_WIDTH - 1)
+#define ACC_ACTIVE_HEIGHT  (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT - 1)
+
+#define TOTAL_WIDTH        (HSYNC_WIDTH + HBP + ACTIVE_WIDTH + HFP - 1)
+#define TOTAL_HEIGHT       (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT + VFP - 1)
+
+#define LCD_WIDTH          480
+#define LCD_HEIGHT         481
+#define IMAGE_HEIGHT       240
+#define IMAGE_WIDTH        320
+#define LCD_FRAME_BUFFER   0x200D0000
 
 /* USER CODE END Private defines */
 

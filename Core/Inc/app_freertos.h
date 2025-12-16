@@ -62,6 +62,7 @@ extern osMessageQueueId_t uartRxQueueHandle;
 extern osMessageQueueId_t uartRx3QueueHandle;
 extern osMessageQueueId_t spi2QueueHandle;
 extern osMessageQueueId_t adc12QueueHandle;
+extern osMessageQueueId_t extiQueueHandle;
 
 int sendchar(int ch);
 int getkey(void);

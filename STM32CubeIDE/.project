@@ -45,6 +45,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/als_rw.c</locationURI>
 		</link>
 		<link>
+			<name>CLI/ams_cli.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/ams_cli.c</locationURI>
+		</link>
+		<link>
+			<name>CLI/ams_cli_als.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/ams_cli_als.c</locationURI>
+		</link>
+		<link>
 			<name>CLI/cli.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/cli.c</locationURI>

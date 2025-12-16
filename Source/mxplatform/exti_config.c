@@ -40,6 +40,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+uint32_t TriggeredPin;
 
 /* USER CODE END PV */
 
@@ -59,6 +60,7 @@
 /* USER CODE END EV */
 
 /* External function --------------------------------------------------------*/
+void ams_sensor_irq_handler(uint32_t pin);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
@@ -193,6 +195,14 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
   if (GPIO_Pin == PMIC_UX_BUTTON_Pin)
   {
     printf("PMIC_MCU_UX_BUTTON_L: Interrupt Triggered!\r\n");
+  }
+#else
+  if (GPIO_Pin == AMS_INT_Pin)
+  {
+    TriggeredPin = AMS_INT_Pin;
+    //osMessageQueuePut(extiQueueHandle, &TriggeredPin, 0, 0);
+    ams_sensor_irq_handler(TriggeredPin);
+    //printf("AMS_INT_Pin_L: Interrupt Triggered!\r\n");
   }
 #endif
 

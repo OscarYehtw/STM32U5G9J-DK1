@@ -243,7 +243,7 @@ ams_errno_t ams_device_setup(void *cfg)
 
 void ams_device_get_version(void)
 {
-    //NRF_LOG_RAW_INFO("Device Version: %s\n", device.version);
+    printf("Device Version: %s\n", device.version);
     return;
 }
 
@@ -315,7 +315,7 @@ size_t ams_registers_get(char *buf, int bufsiz)
     }
     cnt += snprintf(buf + cnt, bufsiz - cnt, "\n     -------------------------------------------------\n");
 
-    //NRF_LOG_RAW_INFO("i2c_addr = 0x%02X\n", SLAVE_ADDR_0);
+    printf("i2c_addr = 0x%02X\n", SLAVE_ADDR_0);
 
     /* Dump the registers */
     for (; i < MAX_REGS; i += 16)

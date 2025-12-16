@@ -45,6 +45,7 @@
 #define UART_RX_QUEUE_LEN   64
 #define ADC12_QUEUE_LEN     16
 #define SPI2_QUEUE_LEN      16
+#define EXTI_QUEUE_LEN      16
 
 /* USER CODE END PD */
 
@@ -62,6 +63,7 @@ osMessageQueueId_t uartRxQueueHandle;
 osMessageQueueId_t uartRx3QueueHandle;
 osMessageQueueId_t spi2QueueHandle;
 osMessageQueueId_t adc12QueueHandle;
+osMessageQueueId_t extiQueueHandle;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -99,6 +101,13 @@ const osThreadAttr_t ADC12_Task_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 128 * 4,
 };
+/* Definitions for AMS_Task */
+osThreadId_t AMS_TaskHandle;
+const osThreadAttr_t AMS_Task_attributes = {
+  .name = "AMS_Task",
+  .priority = (osPriority_t) osPriorityBelowNormal,
+  .stack_size = 128 * 4,
+};
 /* Definitions for CLI_Task */
 osThreadId_t CLI_TaskHandle;
 const osThreadAttr_t CLI_Task_attributes = {
@@ -112,11 +121,13 @@ const osThreadAttr_t CLI_Task_attributes = {
 //extern portBASE_TYPE IdleTaskHook(void* p);
 /* USER CODE END FunctionPrototypes */
 
+void ams_sensor_irq_handler(uint32_t pin);
 void StartDefaultTask(void *argument);
 void TouchGFX_Task(void *argument);
 void UART_TxTask(void *argument);
 void SPI2_Task(void *argument);
 void ADC12_Task(void *argument);
+void AMS_Task(void *argument);
 void CLI_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -181,6 +192,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of ADC12_Task */
   ADC12_TaskHandle = osThreadNew(ADC12_Task, NULL, &ADC12_Task_attributes);
 
+  /* creation of AMS_Task */
+  AMS_TaskHandle = osThreadNew(AMS_Task, NULL, &AMS_Task_attributes);
+
   /* creation of GUI_Task */
   CLI_TaskHandle = osThreadNew(CLI_Task, NULL, &CLI_Task_attributes);
 
@@ -197,6 +211,9 @@ void MX_FREERTOS_Init(void) {
 
   /* Receive an ADC1 converted data in interrupt mode */
   adc12QueueHandle = osMessageQueueNew(ADC12_QUEUE_LEN, sizeof(uint16_t), NULL);
+
+  /* Receive an EXTI converted data in interrupt mode */
+  extiQueueHandle = osMessageQueueNew(EXTI_QUEUE_LEN, sizeof(uint32_t), NULL);
 
   HAL_UART_Receive_IT(&huart1, &rxByte, 1);
 
@@ -349,6 +366,24 @@ void ADC12_Task(void *argument)
           HAL_ADC_Start_IT(&hadc1);
       }
       osDelay(50);
+  }
+}
+
+void AMS_Task(void *argument)
+{
+  uint32_t pin;
+
+  for (;;) {
+     if (osMessageQueueGet(extiQueueHandle, &pin, NULL, osWaitForever) == osOK) {
+       // Process the received EXTI data
+       if (pin == AMS_INT_Pin) {
+         ams_sensor_irq_handler(pin);
+         printf("AMS_Task - EXTI Pin: AMS_INT_Pin triggered\n\r");
+       } else {
+         printf("AMS_Task - EXTI Pin: Unknown Pin %ld triggered\n\r", pin);
+       }
+     }
+     osDelay(1);
   }
 }
 

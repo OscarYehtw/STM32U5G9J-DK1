@@ -29,19 +29,20 @@
 #include <stdbool.h>
 #include <string.h>
 #include <math.h>
+#include "stm32u5xx_hal.h"
 #include "ams_errno.h"
 #include "tcs3410_hwdef.h"
 #include "tcs3410.h"
 #include "tcs3410_irq.h"
-//#include "tcs3410_utils.h"
-//#include "tcs3410_fifo.h"
-//#include "tcs3410_als.h"
+#include "tcs3410_utils.h"
+#include "tcs3410_fifo.h"
+#include "tcs3410_als.h"
 #include "master_i2c.h"
 #include "ams_device.h"
 #include "ams_platform.h"
 
 static char const * const VERSION = "1.0";
-bool irq_log_enable = true;
+bool irq_log_enable = false;
 
 /*
  * These are the registers that can be modified - 
@@ -346,7 +347,7 @@ static void sensor_init_shadow_regs(void)
     for (idx = BASE_REGISTER; idx < MAX_REGS; idx += NUM_REGISTERS_READ)
     {
         sensor_read(idx, &shadow_regs[idx], NUM_REGISTERS_READ);
-        //nrf_delay_ms(200);
+        HAL_Delay(200);
     }
 
     return;
@@ -401,7 +402,7 @@ void sensor_soft_reset(void)
     /* But PON enables OSC ??? */
     sensor_write(REG_ENABLE, sh, DEVICE_PON);
     sensor_modify(REG_CONTROL, sh, CONTROL_SOFT_RESET_MASK, CONTROL_SOFT_RESET_MASK);
-    //nrf_delay_ms(200);
+    HAL_Delay(200);
 
     return;
 }
@@ -657,8 +658,7 @@ static ams_errno_t sensor_config_fifo(ams_sensor_config_t *cfg)
     /* Determine if fifo_reset is needed */
     if (cfg->fifo_reset)
     {
-        //ret_val = sensor_fifo_reset();
-        ret_val = 0;
+        ret_val = sensor_fifo_reset();
     }
 
     /* Return system to original state */
@@ -825,10 +825,10 @@ ams_errno_t sensor_enable(ams_feature_t feature, ams_feature_enable_t enable)
     }
 
     /* if a valid feature is passed and disabled, clear the fifo for the next time */
-    //if (valid_feature && (enable == AMS_FEATURE_DISABLE))
-    //{
-    //    sensor_fifo_reset();
-    //}
+    if (valid_feature && (enable == AMS_FEATURE_DISABLE))
+    {
+        sensor_fifo_reset();
+    }
     return(ret);
 }
 
@@ -975,7 +975,7 @@ uint16_t sensor_get_sample_time(void)
  */
 void ams_sensor_irq_handler(__attribute__((unused)) uint32_t pin)
 {
-    //sensor_process_irq(sh);
+	sensor_process_irq(sh);
     
     return;
 }

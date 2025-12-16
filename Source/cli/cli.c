@@ -20,6 +20,27 @@ const char Cli_Help[] =
    "| I2CDETECT  <bus>          | Scan I2C bus and list detected addresses  |\n"
    "| ALSR <reg> <bytes>        | Read <bytes> from sensor register <reg>   |\n"
    "| ALSW <reg> <data >        | Write <data> to sensor register <reg>     |\n"
+   "| enable  <als|flckr|all>   | Enable AMS measurement function           |\n"
+   "| disable <als|flckr|all>   | Disable AMS measurement function          |\n"
+   "| sai <clear|enable|disable>| Sleep-After-Interrupt control             |\n"
+   "| pon <on|off>              | Power-On control for AMS device           |\n"
+   "| config <sample_time>      | Configure AMS device                      |\n"
+   "|        <mod_trigger>      |                                           |\n"
+   "|        <wait_time>        |                                           |\n"
+   "|        <agc_mode>         |                                           |\n"
+   "|        <agc_nr_samples>   |                                           |\n"
+   "| als <als_nr_samples>      | Total measurement time for ALS atime      |\n"
+   "| fd <fd_nr_samples>        | Samples + 1 measured in one sequencer step|\n"
+   "| fifo <reset> <threshold>  | Configure AMS FIFO (reset = 0/1,          |\n"
+   "|                           |                     threshold = 0~ 047)   |\n"
+   "| setup                     | Show current device configuration         |\n"
+   "| id                        | Read device ID / revision                 |\n"
+   "| dump                      | Dumps all registers                       |\n"
+   "| up                        | Check if device is operational            |\n"
+   "| status <als|flckr|fifo|   | Show historical measurement data          |\n"
+   "|         freq|lux|cct>     |                                           |\n"
+   "| version                   | Show version of current device driver     |\n"
+   "| irq <on|off>              | Turn on/off IRQ logs                      |\n"
    "| DIAL                      | Show TMR-ADC values                       |\n"
    "| FILL <rgb888>             | Fill screen with rgb color                |\n"
    "| BL   <brightness>         | set backlight to brightness [0-100%%]      |\n"
@@ -36,6 +57,21 @@ const SCMD cmd[] = {
 	{ "I2CDETECT", cmd_i2cdetect },
 	{ "ALSR",      cmd_alsread },
 	{ "ALSW",      cmd_alswrite },
+   { "ENABLE",    cmd_enable },
+   { "DISABLE",   cmd_disable },
+   { "SAI",       cmd_sai },
+   { "PON",       cmd_pon },
+   { "CONFIG",    cmd_config },
+   { "ALS",       cmd_config_als },
+   { "FD",        cmd_config_fd },
+   { "FIFO",      cmd_config_fifo },
+   { "SETUP",     cmd_setup },
+   { "ID",        cmd_id },
+   { "DUMP",      cmd_dump },
+   { "UP",        cmd_isUP },
+   { "STATUS",    cmd_status },
+   { "VERSION",   cmd_version },
+   { "IRQ",       cmd_irq },
 	{ "DIAL",      cmd_dialstart },
 	{ "FILL",      cmd_fill },
 	{ "BL",        cmd_backlight },

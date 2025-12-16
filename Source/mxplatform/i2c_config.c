@@ -117,7 +117,7 @@ void MX_AMS_Init(void)
   if (BSP_I2C1_IsReady(SLAVE_ADDR_0, 2) != BSP_ERROR_NONE)
   {
       printf("als ams_tcs3410 not found on I2C1!!! \n\r");
-      return;
+      //return;
   }
 
   if (ams_device_init() != AMS_SUCCESS)
@@ -133,7 +133,7 @@ void MX_AMS_Init(void)
   */
 void AMS_IRQ_Init(void)
 {
-#if 0
+#if 1
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */

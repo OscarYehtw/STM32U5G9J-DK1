@@ -24,29 +24,54 @@
  *****************************************************************************
  */
 
-#ifndef __TCS3410_FIFO_H__
-#define __TCS3410_FIFO_H__
+#ifndef __AMS_CLI_H__
+#define __AMS_CLI_H__
 
-#define MAX_FIFO_LEN       (512) /* physical FIFO on device */
-#define MAX_I2C_READ_LEN   (128) /* maps to linux SMBUS -> I2CSMBUS_BLOCK_MAX */
-#define MAX_FIFO_DATA_LEN (1024) /* length of RAM to store device fifo */
-#define ALS_DATA_SZ         (36) /* 3 steps 3 modules 9 bytes data, 3 bytes of status for each step*/
-
-#define END_MARKER_SZ        (3)
-#define FLCKR_GAIN_SZ        (2) /* number of bytes in the fifo to represent the modulator gains */
-
-#define FD_GAIN0_1_OFFSET    (2)
-#define FD_GAIN2_OFFSET      (1)
+/* Define CLI prompt */
+#define AMS_CLI_PROMPT        "tcs3410{als,fd}$  "
 
 
-/* 3 zeros written at the end of the FIFO data before the gains are written */
-#define FD_END_MARKER_0      (5)
-#define FD_END_MARKER_1      (6)
-#define FD_END_MARKER_2      (7)
+#define AMS_CLI_ALS_FEATURE      "als"
+#define AMS_CLI_FLCKR_FEATURE    "flckr"
+#define AMS_CLI_ALL_FEATURE       "all"
 
-ams_errno_t sensor_read_fifo(uint8_t *shadow_regs, volatile ams_current_state_t *pcurr_state);
-ams_errno_t sensor_fifo_reset(void);
-ams_errno_t sensor_process_fifo(uint8_t *shadow_regs, volatile ams_current_state_t *pcurr_state);
+#define AMS_CLI_SAI_ENABLE          "enable"
+#define AMS_CLI_SAI_DISABLE         "disable"
+#define AMS_CLI_SAI_CLEAR           "clear"
 
-#endif /* __TCS3410_FIFO_H__ */
+#define AMS_CLI_STATUS_ALS           "als"
+#define AMS_CLI_STATUS_FLCKR         "flckr"
+#define AMS_CLI_STATUS_FIFO          "fifo"
 
+#define AMS_CLI_STATUS_FREQ         "freq"
+#define AMS_CLI_STATUS_LUX          "lux"
+#define AMS_CLI_STATUS_CCT          "cct"
+#define AMS_CLI_STATUS_UV           "uv"  /* uv index */
+
+
+#define AMS_CLI_ON                  "on"
+#define AMS_CLI_OFF                 "off"
+
+#define AMS_CLI_BUFFER_SIZE       (20)
+
+typedef struct _limits
+{
+    uint16_t min;
+    uint16_t max;
+}config_param_limits_t;
+
+typedef enum
+{
+    PARAM_SAMPLE_TIME    ,
+    PARAM_MOD_TRIGGER    ,
+    PARAM_WAIT_TIME      ,
+    PARAM_AGC_MODE       ,
+    PARAM_AGC_NR_SAMPLES ,
+    PARAM_FIFO_RESET     ,
+    PARAM_FIFO_THRESHOLD ,
+    PARAM_ALS_NR_SAMPLES ,
+    PARAM_FD_NR_SAMPLES  ,
+} config_parameter_types_t;
+
+
+#endif  /* __AMS_CLI_H__*/
