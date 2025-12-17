@@ -112,6 +112,40 @@ static const float mod_trigger_timing_ms[] =
     -1.0     , /* vsync - not used */
 };
 
+// =====================================================
+// WB/C thresholds (from TCS3410 Excel)
+// =====================================================
+#define WB_RATIO_LO_MED   (2.876)
+#define WB_RATIO_MED_HI   (4.38)
+
+// =====================================================
+// Lux coefficients (from Excel)
+// Lux = MAX(0,
+//       DGF_n * (C*Ccoef + R*Rcoef + G*Gcoef + B*Bcoef + WB*WBcoef)
+//       / (Atime * Again))
+// =====================================================
+static const double lux_coeffs[][N_MAX] =
+{
+                     /* N_LO       N_MED       N_HI */
+    [CLEAR_COEFF] = { -9.962,     3.261,      2.978 },
+    [RED_COEFF]   = {  4.670,     1.958,      0.344 },
+    [GREEN_COEFF] = { 10.589,    -0.136,     -0.549 },
+    [BLUE_COEFF]  = {  0.869,     1.205,      2.468 },
+    [WB_COEFF]    = {  3.381,    -0.553,     -0.287 },
+    [DGF]         = {  1.0,       1.0,        1.0   },
+};
+
+// =====================================================
+// CCT coefficients (from Excel)
+// CCT = CoefA_n * (B'/R') + CTOffset_n
+// =====================================================
+static const double cct_coeffs[][N_MAX] =
+{
+                    /* N_LO     N_MED     N_HI */
+    [COEFA]      = { 5493.0,    43.0,     941.0 },
+    [CTOFFSET]   = { 1333.0,  6395.0,   2284.0 },
+};
+
 static bool cmd_config_limit_check(ams_config_feature_t cfg_type, ams_sensor_config_t *cfg)
 {
     bool ret_val = true;
@@ -978,4 +1012,166 @@ void cmd_irq(char *par)
     {
         printf("Command Failed: irq\r\n");
     }
+}
+
+void calculate_lux_cct_manual(double atime,
+                              double again,
+                              double C,
+                              double R,
+                              double G,
+                              double B,
+                              double WB,
+                              double lm_lux)
+{
+    double ir_comp, lux, cct;
+    uint8_t n = 0;  // Coefficient index (0:N_LO, 1:N_MED, 2:N_HI)
+    double r_prime, b_prime;
+    double lux_err = 0.0;
+    double wb_c_ratio = 0.0;
+
+    // -------------------------------------------------
+    // Calculate WB/C ratio and select n according to Excel rules
+    // Excel:
+    //   WB/C < 2.876        → n = 1 (LO)
+    //   WB/C < 4.38         → n = 2 (MED)
+    //   else                → n = 3 (HI)
+    // -------------------------------------------------
+    if (C == 0.0) {
+        wb_c_ratio = 0.0;
+    } else {
+        wb_c_ratio = WB / C;
+    }
+
+    if (wb_c_ratio < WB_RATIO_LO_MED)
+    {
+        n = N_LO;
+    }
+    else if (wb_c_ratio < WB_RATIO_MED_HI)
+    {
+        n = N_MED;
+    }
+    else
+    {
+        n = N_HI;
+    }
+
+    // -------------------------------------------------
+    // Calculate LUX (Excel formula)
+    // Lux = MAX(0,
+    //       DGF_n * (C*Ccoef + R*Rcoef + G*Gcoef + B*Bcoef + WB*WBcoef)
+    //       / (Atime * Again))
+    // -------------------------------------------------
+    double sum_weighted_counts =
+          (lux_coeffs[CLEAR_COEFF][n] * C)
+        + (lux_coeffs[RED_COEFF][n]   * R)
+        + (lux_coeffs[GREEN_COEFF][n] * G)
+        + (lux_coeffs[BLUE_COEFF][n]  * B)
+        + (lux_coeffs[WB_COEFF][n]    * WB);
+
+    double div_factor = atime * again;
+
+    if (div_factor == 0.0) {
+        lux = 0.0;
+    } else {
+        lux = lux_coeffs[DGF][n] * sum_weighted_counts / div_factor;
+    }
+
+    if (lux < 0.0)
+    {
+        lux = 0.0;
+    }
+
+    // -------------------------------------------------
+    // Calculate CCT (with IR compensation, Excel / ams standard)
+    // -------------------------------------------------
+    ir_comp = (R + G + B - C) / 2.0;
+
+    r_prime = R - ir_comp;
+    if (r_prime == 0.0)
+    {
+        r_prime = 1.0; // 防止除以 0
+    }
+
+    b_prime = B - ir_comp;
+
+    cct = (cct_coeffs[COEFA][n] * (b_prime / r_prime))
+        +  cct_coeffs[CTOFFSET][n];
+
+    if (cct < 0.0)
+    {
+        cct = 0.0;
+    }
+
+    // -------------------------------------------------
+    // Calculate Lux Error (LuxErr)
+    // -------------------------------------------------
+    if (lm_lux > 0.0) {
+        lux_err = (lux - lm_lux) / lm_lux;
+    } else {
+        lux_err = 0.0;
+    }
+
+    // -------------------------------------------------
+    // 5. Output results (keep your original format)
+    // -------------------------------------------------
+    printf("\n--- Manual LUX/CCT Calculation Results (WB/C Excel Logic) ---\r\n");
+    printf("Input: ATIME=%.2f, AGAIN=%.2f\r\n", atime, again);
+    printf("Input Counts (C, R, G, B, WB):\r\n C:%.2f, R:%.2f, G:%.2f, B:%.2f, WB:%.2f\r\n",
+           C, R, G, B, WB);
+    printf("Reference LM Lux: %.2f\r\n", lm_lux);
+    printf("--------------------------------------------\r\n");
+    printf("WB/C Ratio: %.6f (Coeff Index n=%u)\r\n", wb_c_ratio, n);
+    printf("Calculated Lux: %.4f\r\n", lux);
+    printf("Lux Error (LuxErr): %.2f%%\r\n", lux_err * 100.0);
+    printf("Calculated CCT: %.0f\r\n", cct);
+    printf("--------------------------------------------\r\n");
+}
+
+void cmd_callux(char *par)
+{
+    char *next;
+    char *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8 = NULL;
+    char *endptr;
+    double atime, again, C, R, G, B, WB, lm_lux = 0.0;
+
+    if (par == NULL || *par == 0)
+    {
+        printf("Usage: CAL_LUX <atime> <again> <C> <R> <G> <B> <WB> [LM_LUX]\r\n");
+        printf("Note: <C>-<WB> are normalized average counts.\r\n");
+        return;
+    }
+
+    /* Parse all 7 mandatory parameters and 1 optional parameter */
+    p1 = get_entry(par, &next);        // ATIME
+    p2 = get_entry(next, &next);       // AGAIN
+    p3 = get_entry(next, &next);       // C
+    p4 = get_entry(next, &next);       // R
+    p5 = get_entry(next, &next);       // G
+    p6 = get_entry(next, &next);       // B
+    p7 = get_entry(next, &next);       // WB
+    p8 = get_entry(next, &next);       // LM_LUX (Optional)
+
+    if (!p1 || !p2 || !p3 || !p4 || !p5 || !p6 || !p7)
+    {
+        printf("Incorrect parameters. 7 parameters are mandatory.\r\n");
+        printf("Usage: CAL_LUX <atime> <again> <C> <R> <G> <B> <WB> [LM_LUX]\r\n");
+        return;
+    }
+
+    // Convert strings to double using strtod
+    atime = strtod(p1, &endptr);
+    again = strtod(p2, &endptr);
+    C     = strtod(p3, &endptr);
+    R     = strtod(p4, &endptr);
+    G     = strtod(p5, &endptr);
+    B     = strtod(p6, &endptr);
+    WB    = strtod(p7, &endptr);
+
+    if (p8)
+    {
+        lm_lux = strtod(p8, &endptr);
+    }
+    
+    // Call the core calculation function
+    calculate_lux_cct_manual(atime, again, C, R, G, B, WB, lm_lux);
 }

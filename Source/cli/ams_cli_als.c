@@ -311,7 +311,89 @@ static void als_calc_lux(ams_device_status_t *stat, uint8_t log)
     stat->als.cct = cct;
     return;
 }
- 
+
+#if 0
+void calculate_lux_cct_manual(double atime, double again, double C, double R, double G, double B, double WB, double lm_lux)
+{
+    double ir_comp, ir_comp_ratio, lux, cct;
+    uint8_t n = 0; // 係數索引 (0:N_LO, 1:N_MED, 2:N_HI)
+    double r_prime, b_prime;
+    double lux_err = 0.0;
+    char *endptr; // For strtod error checking
+
+    // 1. 計算 IR 補償比 (ir_comp_ratio) 並確定係數索引 n
+    ir_comp = (R + G + B - C) / 2.0;
+
+    if (C == 0.0) {
+        ir_comp_ratio = 0.0;
+    } else {
+        ir_comp_ratio = ir_comp / C;
+    }
+
+    if (ir_comp_ratio < IR_COMP_RATIO_LO)
+    {
+        n = N_LO;
+    }
+    else if ((ir_comp_ratio >= IR_COMP_RATIO_LO) && (ir_comp_ratio < IR_COMP_RATIO_HI))
+    {
+        n = N_MED;
+    }
+    else
+    {
+        n = N_HI;
+    }
+
+    // 2. 計算 LUX
+    double sum_weighted_counts = (lux_coeffs[RED_COEFF][n] * R) +
+                                 (lux_coeffs[GREEN_COEFF][n] * G) +
+                                 (lux_coeffs[BLUE_COEFF][n] * B) +
+                                 (lux_coeffs[WB_COEFF][n] * WB) +
+                                 (lux_coeffs[CLEAR_COEFF][n] * C);
+
+    double div_factor = atime * again;
+
+    if (div_factor == 0.0) {
+        lux = 0.0;
+    } else {
+        lux = lux_coeffs[DGF][n] * sum_weighted_counts / div_factor;
+    }
+
+    if (lux < 0.0)
+    {
+        lux = 0.0;
+    }
+
+    // 3. 計算 CCT
+    r_prime = R - ir_comp;
+    if (r_prime == 0.0)
+    {
+        r_prime = 1.0; // 防除以零
+    }
+    b_prime = B - ir_comp;
+
+    cct = (cct_coeffs[COEFA][n] * (b_prime / r_prime)) + cct_coeffs[CTOFFSET][n];
+
+    // 4. 計算 Lux Error (LuxErr)
+    if (lm_lux > 0.0) {
+        lux_err = (lux - lm_lux) / lm_lux;
+    } else {
+        lux_err = 0.0;
+    }
+
+    // 5. 輸出結果
+    printf("\n--- Manual LUX/CCT Calculation Results ---\r\n");
+    printf("Input: ATIME=%.2f, AGAIN=%.2f\r\n", atime, again);
+    printf("Input Counts (C, R, G, B, WB):\r\n C:%.2f, R:%.2f, G:%.2f, B:%.2f, WB:%.2f\r\n", C, R, G, B, WB);
+    printf("Reference LM Lux: %.2f\r\n", lm_lux);
+    printf("--------------------------------------------\r\n");
+    printf("IR Comp Ratio: %.6f (Coeff Index n=%u)\r\n", ir_comp_ratio, n);
+    printf("Calculated Lux: %.4f\r\n", lux);
+    printf("Lux Error (LuxErr): %.6f\r\n", lux_err);
+    printf("Calculated CCT: %.0f\r\n", cct);
+    printf("--------------------------------------------\r\n");
+}
+#endif
+
 /* 
  *  Public APIs
  */

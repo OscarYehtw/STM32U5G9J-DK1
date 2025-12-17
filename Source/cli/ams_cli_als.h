@@ -28,6 +28,7 @@
 #ifndef __AMS_CLI_ALS_H__
 #define __AMS_CLI_ALS_H__
 
+void calculate_lux_cct_manual(double atime, double again, double C, double R, double G, double B, double WB, double lm_lux);
 void cmd_status_als(ams_device_status_t *stat);
 void cmd_status_lux(ams_device_status_t *stat);
 void cmd_status_cct(ams_device_status_t *stat);

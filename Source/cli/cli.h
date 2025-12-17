@@ -44,6 +44,7 @@ void cmd_isUP (char *par);
 void cmd_status (char *par);
 void cmd_version (char *par);
 void cmd_irq (char *par);
+void cmd_callux (char *par);
 void cmd_dialstart (char *par);
 void cmd_fill (char *par);
 void cmd_backlight (char *par);

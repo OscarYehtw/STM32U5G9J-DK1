@@ -41,6 +41,9 @@ const char Cli_Help[] =
    "|         freq|lux|cct>     |                                           |\n"
    "| version                   | Show version of current device driver     |\n"
    "| irq <on|off>              | Turn on/off IRQ logs                      |\n"
+   "| CAL_LUX <atime> <again>   | Manual Lux/CCT calculation                |\n"
+   "|         <C> <R> <G> <B>   |                                           |\n"
+   "|         <WB> [LM_LUX]     |                                           |\n"
    "| DIAL                      | Show TMR-ADC values                       |\n"
    "| FILL <rgb888>             | Fill screen with rgb color                |\n"
    "| BL   <brightness>         | set backlight to brightness [0-100%%]      |\n"
@@ -72,6 +75,7 @@ const SCMD cmd[] = {
    { "STATUS",    cmd_status },
    { "VERSION",   cmd_version },
    { "IRQ",       cmd_irq },
+   { "CAL_LUX",   cmd_callux },
 	{ "DIAL",      cmd_dialstart },
 	{ "FILL",      cmd_fill },
 	{ "BL",        cmd_backlight },
