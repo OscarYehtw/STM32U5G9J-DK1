@@ -10,6 +10,7 @@
 #include <stdio.h>                    /* standard I/O .h-file                */
 #include <string.h>                   /* string and memory functions         */
 #include <ctype.h>                    /* character functions                 */
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include "mxplatform.h"
@@ -53,6 +54,7 @@ const char Cli_Help[] =
    "| MONITOR                   | Monitor Env Sensors on LCD                |\n"
    "| FLASHR <addr> <len>       | Read <len> bytes from OSPI flash at <addr>|\n"
    "| FLASHW <addr>             | Write 256 bytes to OSPI flash at <addr>   |\n"
+   "| FBTEST <0|1>              | 0:FB read-only, 1:FB write with color inc |\n"
    "| HELP  or  ?               | displays this help                        |\n"
    "+---------------------------+-------------------------------------------+\n";
 
@@ -85,6 +87,7 @@ const SCMD cmd[] = {
 	{ "MONITOR",   cmd_monitor },
    { "FLASHR",    cmd_flashr },
    { "FLASHW",    cmd_flashw },
+   { "FBTEST",    cmd_fbtest },
 	{ "HELP",      cmd_help },
 	{ "?",         cmd_help }
 };
@@ -92,6 +95,91 @@ const SCMD cmd[] = {
 #define CMD_COUNT   (sizeof (cmd) / sizeof (cmd[0]))
 
 char in_line[160];
+
+/*----------------------------------------------------------------------------
+ *  FBTEST <mode>
+ *  mode = 0 : Read frame buffer only
+ *  mode = 1 : Write frame buffer with color increment
+ *---------------------------------------------------------------------------*/
+void cmd_fbtest(char *par)
+{
+    uint32_t mode;
+    char     *endptr;
+
+    uint32_t Startaddress;
+    uint32_t Xaddress;
+    uint32_t tickstart;
+    uint32_t elapsed;
+
+    uint8_t R = 0x00;
+    uint8_t G = 0x00;
+    uint8_t B = 0x00;
+    uint32_t Color;
+    volatile uint32_t dummy;   // ?? compiler ???
+
+    const uint32_t WIDTH  = 480;
+    const uint32_t HEIGHT = 480;
+
+    /* Parameter check */
+    if (par == NULL || *par == 0)
+    {
+        printf("Usage: FBTEST <0|1>\r\n");
+        printf("  0: Read frame buffer only\r\n");
+        printf("  1: Write frame buffer with color increment\r\n");
+        return;
+    }
+
+    mode = strtoul(par, &endptr, 0);
+    if ((mode != 0) && (mode != 1))
+    {
+        printf("Invalid mode: %lu\r\n", mode);
+        return;
+    }
+
+    printf("FBTEST: %s, 480x480, loop 60 times...\r\n",
+           (mode == 0) ? "Read-only" : "Write with color increment");
+
+    /* Frame buffer base address */
+    Startaddress = hltdc.LayerCfg[0].FBStartAdress;
+
+    /* Start timing */
+    tickstart = HAL_GetTick();
+
+    for (uint32_t loop = 0; loop < 60; loop++)
+    {
+        Xaddress = Startaddress;
+
+        for (uint32_t y = 0; y < HEIGHT; y++)
+        {
+            for (uint32_t x = 0; x < WIDTH; x++)
+            {
+               if (mode == 1)
+                {
+                   /* Write with color increment */
+                   Color = (0xFF << 24) | (R << 16) | (G << 8) | B;
+                   *(__IO uint32_t *)(Xaddress) = Color;
+
+                   R += 4;
+                   G += 4;
+                   B += 4;
+                }
+                else
+                {
+                   /* Read only */
+                   dummy = *(__IO uint32_t *)(Xaddress);
+                }
+
+                Xaddress += 4;
+            }
+        }
+    }
+
+    (void)dummy;
+    
+    elapsed = HAL_GetTick() - tickstart;
+
+    printf("FBTEST done. Time = %lu ms\r\n", elapsed);
+}
 
 /*----------------------------------------------------------------------------
  *        Display Command Syntax help

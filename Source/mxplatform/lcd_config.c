@@ -249,6 +249,18 @@ uint32_t SetPanelConfig_ST7701S(void)
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff0), 0xFF, cmd_ff0) != HAL_OK) return 3;
   HAL_Delay(5);
 
+  /* Set Pixel Format to 24bit RGB888 */
+  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x3A, 0x77) != HAL_OK) return 4;
+
+  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x36, 0x00) != HAL_OK) return 5;
+
+  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x35, 0x00) != HAL_OK) return 6;
+
+  /* Display ON */
+  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x29, 0x00) != HAL_OK) return 7;
+  HAL_Delay(120);
+
+#if 0
   /* C0 Display Line Setting ((0x63 + 1) * 8) = 800 */
   uint8_t c0_param[] = {0x63,0x00};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(c0_param), 0xC0, c0_param) != HAL_OK) return 4;
@@ -389,6 +401,7 @@ uint32_t SetPanelConfig_ST7701S(void)
   /* Display ON */
   if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x29, 0x00) != HAL_OK) return 34;
   HAL_Delay(120);
+#endif
 
   return 0;
 }
@@ -612,6 +625,7 @@ void MX_DSIHOST_DSI_Init(void)
   VidCfg.HSPolarity = DSI_HSYNC_ACTIVE_HIGH;
   VidCfg.VSPolarity = DSI_VSYNC_ACTIVE_HIGH;
   VidCfg.DEPolarity = DSI_DATA_ENABLE_ACTIVE_HIGH;
+#if 1
   VidCfg.HorizontalSyncActive = 6;
   VidCfg.HorizontalBackPorch = 3;
   VidCfg.HorizontalLine = 1452;
@@ -619,6 +633,15 @@ void MX_DSIHOST_DSI_Init(void)
   VidCfg.VerticalBackPorch = 12;
   VidCfg.VerticalFrontPorch = 50;
   VidCfg.VerticalActive = 481;
+#else
+  VidCfg.HorizontalSyncActive = 6;
+  VidCfg.HorizontalBackPorch = 3;
+  VidCfg.HorizontalLine = 1452;
+  VidCfg.VerticalSyncActive = 1;
+  VidCfg.VerticalBackPorch = 12;
+  VidCfg.VerticalFrontPorch = 50;
+  VidCfg.VerticalActive = 481;
+#endif
   VidCfg.LPCommandEnable = DSI_LP_COMMAND_DISABLE;
   VidCfg.LPLargestPacketSize = 0;
   VidCfg.LPVACTLargestPacketSize = 0;
@@ -665,6 +688,7 @@ void MX_LTDC_Init(void)
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
+#if 1
   hltdc.Init.HorizontalSync = 1;
   hltdc.Init.VerticalSync = 0;
   hltdc.Init.AccumulatedHBP = 2;
@@ -673,6 +697,16 @@ void MX_LTDC_Init(void)
   hltdc.Init.AccumulatedActiveH = 493;
   hltdc.Init.TotalWidth = 483;
   hltdc.Init.TotalHeigh = 543;
+#else
+  hltdc.Init.HorizontalSync = HSYNC;
+  hltdc.Init.VerticalSync = VSYNC;
+  hltdc.Init.AccumulatedHBP = ACC_HBP;
+  hltdc.Init.AccumulatedVBP = ACC_VBP;
+  hltdc.Init.AccumulatedActiveW = ACC_ACTIVE_WIDTH;
+  hltdc.Init.AccumulatedActiveH = ACC_ACTIVE_HEIGHT;
+  hltdc.Init.TotalWidth = TOTAL_WIDTH;
+  hltdc.Init.TotalHeigh = TOTAL_HEIGHT;
+#endif
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
   hltdc.Init.Backcolor.Red = 0;

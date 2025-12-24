@@ -65,19 +65,19 @@ void MX_JPEG_Init(void);
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 #define HSYNC_WIDTH        10
-#define VSYNC_WIDTH        2
-#define HBP                20
-#define VBP                2
-#define HFP                10
-#define VFP                4
+#define HBP                100
+#define HFP                75
+#define VSYNC_WIDTH        3
+#define VBP                150
+#define VFP                120
 #define ACTIVE_WIDTH       480
 #define ACTIVE_HEIGHT      480
 
 #define HSYNC              (HSYNC_WIDTH - 1)
 #define VSYNC              (VSYNC_WIDTH - 1)
 
-#define ACC_VBP            (HSYNC_WIDTH + HBP - 1)
-#define ACC_VFP            (VSYNC_WIDTH + VBP - 1)
+#define ACC_HBP            (HSYNC_WIDTH + HBP - 1)
+#define ACC_VBP            (VSYNC_WIDTH + VBP - 1)
 
 #define ACC_ACTIVE_WIDTH   (HSYNC_WIDTH + HBP + ACTIVE_WIDTH - 1)
 #define ACC_ACTIVE_HEIGHT  (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT - 1)

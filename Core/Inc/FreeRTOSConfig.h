@@ -163,6 +163,10 @@ header file. */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
 #define traceTASK_SWITCHED_OUT() xTaskCallApplicationTaskHook( pxCurrentTCB, (void*)1 )
 #define traceTASK_SWITCHED_IN() xTaskCallApplicationTaskHook( pxCurrentTCB, (void*)0 )
+
+/* Enable using CY_HAL for rtos-abstraction */
+#define CY_USING_HAL
+
 /* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */

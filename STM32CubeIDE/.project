@@ -130,6 +130,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/mxplatformmsp.c</locationURI>
 		</link>
 		<link>
+			<name>MxPlatform/sdio_config.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/sdio_config.c</locationURI>
+		</link>
+		<link>
 			<name>MxPlatform/spi_config.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Source/mxplatform/spi_config.c</locationURI>
@@ -295,6 +300,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_rcc_ex.c</locationURI>
 		</link>
 		<link>
+			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_sd.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_sd.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_sd_ex.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_sd_ex.c</locationURI>
+		</link>
+		<link>
 			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_hal_spi.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_hal_spi.c</locationURI>
@@ -333,6 +348,56 @@
 			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_ll_dlyb.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_ll_dlyb.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32U5xx_HAL_Driver/stm32u5xx_ll_sdmmc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Drivers/STM32U5xx_HAL_Driver/Src/stm32u5xx_ll_sdmmc.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/core</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/core</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/netif</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/netif</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lwip-network-interface-integration/cy_ethernetif.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/lwip-network-interface-integration/source/cy_ethernetif.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lwip-network-interface-integration/cy_lwip_dhcp_server.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/lwip-network-interface-integration/source/cy_lwip_dhcp_server.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lwip-network-interface-integration/cy_network_mw_core.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/lwip-network-interface-integration/source/cy_network_mw_core.c</locationURI>	
+		</link>
+		<link>
+			<name>Middlewares/wcm/cy_wcm.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/wifi-connection-manager/source/cy_wcm.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/whd-bsp-integration/cy_network_buffer_lwip.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/whd-bsp-integration/COMPONENT_LWIP/cy_network_buffer_lwip.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/whd-bsp-integration/cybsp_wifi.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/whd-bsp-integration/cybsp_wifi.c</locationURI>
+			</link>
+		<link>
+			<name>Middlewares/wifi-host-driver/src</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/wifi-host-driver/COMPONENT_WIFI5/src</locationURI>
 		</link>
 		<link>
 			<name>Peripheral/gd25lq128e/gd25lq128e.c</name>
@@ -1403,6 +1468,116 @@
 			<name>Drivers/BSP/STM32U5x9J-DK/stm32u5x9j_discovery_ts.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Drivers/BSP/STM32U5x9J-DK/stm32u5x9j_discovery_ts.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/api_lib.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/api_lib.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/api_msg.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/api_msg.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/err.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/err.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/if_api.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/if_api.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/netbuf.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/netbuf.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/netdb.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/netdb.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/netifapi.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/netifapi.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/sockets.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/sockets.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/LwIP/api/tcpip.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/LwIP/src/api/tcpip.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/lwip-freertos-integration/arch/sys_arch.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/lwip-freertos-integration/arch/sys_arch.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/abstraction-rtos/cy_worker_thread.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/abstraction-rtos/source/cy_worker_thread.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/abstraction-rtos/cyabs_freertos_common.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/abstraction-rtos/source/COMPONENT_FREERTOS/cyabs_freertos_common.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/abstraction-rtos/cyabs_freertos_helpers.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/abstraction-rtos/source/COMPONENT_FREERTOS/cyabs_freertos_helpers.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/abstraction-rtos/cyabs_rtos_dsram.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/abstraction-rtos/source/COMPONENT_FREERTOS/cyabs_rtos_dsram.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/abstraction-rtos/cyabs_rtos_freertos.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/abstraction-rtos/source/COMPONENT_FREERTOS/cyabs_rtos_freertos.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/common/cyhal_system.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/common/Src/cyhal_system.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/common/wifi_bt_if.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/common/Src/wifi_bt_if.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/targets/stm32_cyhal_gpio.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/targets/TARGET_STM32/Src/stm32_cyhal_gpio.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/pal/targets/stm32_cyhal_sdio.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/pal/targets/TARGET_STM32/Src/stm32_cyhal_sdio.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/wifi-host-driver/clm/4343WA1_clm_blob.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/wifi-host-driver/COMPONENT_WIFI5/resources/clm/COMPONENT_4343W/4343WA1_clm_blob.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/wifi-host-driver/firmware/4343WA1_bin.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/wifi-host-driver/COMPONENT_WIFI5/resources/firmware/COMPONENT_4343W/4343WA1_bin.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/wifi-host-driver/resource/whd_resources.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/wifi-host-driver/COMPONENT_WIFI5/resources/resource_imp/whd_resources.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/TouchGFX/App/app_touchgfx.c</name>

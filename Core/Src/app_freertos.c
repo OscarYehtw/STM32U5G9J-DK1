@@ -115,6 +115,13 @@ const osThreadAttr_t CLI_Task_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
   .stack_size = 1024 * 16,
 };
+/* Definitions for WiFi_Task */
+osThreadId_t WiFi_TaskHandle;
+const osThreadAttr_t WiFi_Task_attributes = {
+  .name = "WiFi_Task",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 2048 * 4,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -129,6 +136,7 @@ void SPI2_Task(void *argument);
 void ADC12_Task(void *argument);
 void AMS_Task(void *argument);
 void CLI_Task(void *argument);
+void WiFi_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -197,6 +205,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of GUI_Task */
   CLI_TaskHandle = osThreadNew(CLI_Task, NULL, &CLI_Task_attributes);
+
+  /* creation of WiFi_Task */
+  WiFi_TaskHandle = osThreadNew(WiFi_Task, NULL, &WiFi_Task_attributes);
 
   /* Transmit an UART data in interrupt mode */
   uartTxQueueHandle = osMessageQueueNew(UART_TX_QUEUE_LEN, sizeof(uint8_t), NULL);

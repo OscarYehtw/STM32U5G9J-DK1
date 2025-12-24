@@ -54,6 +54,7 @@ void cmd_heat (char *par);
 void cmd_monitor (char *par);
 void cmd_flashr (char *par);
 void cmd_flashw (char *par);
+void cmd_fbtest (char *par);
 void cmd_help (char *par);
 
 /* Local Function Prototypes */

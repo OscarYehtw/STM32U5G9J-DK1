@@ -41,6 +41,7 @@ extern "C" {
 #include "lcd_config.h"
 #include "adc_config.h"
 #include "exti_config.h"
+#include "sdio_config.h"
 #include "cmsis_os2.h"
 #include "FreeRTOS.h"
 #include "task.h"
