@@ -41,9 +41,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_TX_QUEUE_LEN   4096
+#define UART_TX_QUEUE_LEN   4096 * 2
 #define UART_RX_QUEUE_LEN   64
 #define ADC12_QUEUE_LEN     16
+#define ADC4_QUEUE_LEN      16
 #define SPI2_QUEUE_LEN      16
 #define EXTI_QUEUE_LEN      16
 
@@ -63,6 +64,7 @@ osMessageQueueId_t uartRxQueueHandle;
 osMessageQueueId_t uartRx3QueueHandle;
 osMessageQueueId_t spi2QueueHandle;
 osMessageQueueId_t adc12QueueHandle;
+osMessageQueueId_t adc4QueueHandle;
 osMessageQueueId_t extiQueueHandle;
 
 /* USER CODE END Variables */
@@ -101,6 +103,13 @@ const osThreadAttr_t ADC12_Task_attributes = {
   .priority = (osPriority_t) osPriorityBelowNormal,
   .stack_size = 128 * 4,
 };
+/* Definitions for ADC4_Task */
+osThreadId_t ADC4_TaskHandle;
+const osThreadAttr_t ADC4_Task_attributes = {
+  .name = "ADC4_Task",
+  .priority = (osPriority_t) osPriorityBelowNormal,
+  .stack_size = 128 * 4,
+};
 /* Definitions for AMS_Task */
 osThreadId_t AMS_TaskHandle;
 const osThreadAttr_t AMS_Task_attributes = {
@@ -134,6 +143,7 @@ void TouchGFX_Task(void *argument);
 void UART_TxTask(void *argument);
 void SPI2_Task(void *argument);
 void ADC12_Task(void *argument);
+void ADC4_Task(void *argument);
 void AMS_Task(void *argument);
 void CLI_Task(void *argument);
 void WiFi_Task(void *argument);
@@ -200,8 +210,11 @@ void MX_FREERTOS_Init(void) {
   /* creation of ADC12_Task */
   ADC12_TaskHandle = osThreadNew(ADC12_Task, NULL, &ADC12_Task_attributes);
 
+  /* creation of ADC4_Task */
+  ADC4_TaskHandle = osThreadNew(ADC4_Task, NULL, &ADC4_Task_attributes);
+
   /* creation of AMS_Task */
-  AMS_TaskHandle = osThreadNew(AMS_Task, NULL, &AMS_Task_attributes);
+  //AMS_TaskHandle = osThreadNew(AMS_Task, NULL, &AMS_Task_attributes);
 
   /* creation of GUI_Task */
   CLI_TaskHandle = osThreadNew(CLI_Task, NULL, &CLI_Task_attributes);
@@ -365,16 +378,43 @@ void SPI2_Task(void *argument)
 
 void ADC12_Task(void *argument)
 {
-  uint16_t mVolt;
+  //uint16_t mVolt;
 
   /* Start ADC group regular conversion */
   HAL_ADC_Start_IT(&hadc1);
 
   for (;;) {
+      #if 0
       if (osMessageQueueGet(adc12QueueHandle, &mVolt, NULL, osWaitForever) == osOK) {
           //printf("ADC12_Task - mVolt: %d mV\n\r", mVolt);
           /* Start ADC group regular conversion */
           HAL_ADC_Start_IT(&hadc1);
+      }
+      #endif
+      if (osMessageQueueGet(adc12QueueHandle, adc_val, NULL, osWaitForever) == osOK)
+      {
+          //uint16_t ch12_mV = adc_val[0];
+          //uint16_t ch14_mV = adc_val[1];
+          //printf("ADC12_Task - mVolt: %d mV\n\r", ch12_mV);
+          //printf("ADC12_Task - CH14 mVolt: %d mV\n\r", ch14_mV);
+          HAL_ADC_Start_IT(&hadc1);
+      }
+      osDelay(50);
+  }
+}
+
+void ADC4_Task(void *argument)
+{
+  uint16_t mVolt;
+
+  /* Start ADC group regular conversion */
+  HAL_ADC_Start_IT(&hadc4);
+
+  for (;;) {
+      if (osMessageQueueGet(adc4QueueHandle, &mVolt, NULL, osWaitForever) == osOK)
+      {
+          printf("ADC4_Task - CH14 mVolt: %d mV\n\r", mVolt);
+          HAL_ADC_Start_IT(&hadc4);
       }
       osDelay(50);
   }

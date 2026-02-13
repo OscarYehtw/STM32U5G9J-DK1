@@ -8,10 +8,9 @@
 #ifndef LM3697_H
 #define LM3697_H
 
-#define BRIGHTNESS_USE_LM3597 0
-
 // LM3697 7-bit I2C Slave Address
-#define LM3697_I2C_ADDRESS_7BIT      0x3C
+//#define LM3697_I2C_ADDRESS_7BIT      0x3C
+#define LM3697_I2C_ADDRESS_7BIT      0x36
 
 // Convert to 8-bit address (write mode)
 #define LM3697_I2C_ADDRESS_8BIT      (LM3697_I2C_ADDRESS_7BIT << 1)

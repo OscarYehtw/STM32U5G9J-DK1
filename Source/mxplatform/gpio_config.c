@@ -241,8 +241,14 @@ void OUTPUT_PINMUX_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(DISP_PORTE_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PE.6 MCU_BT_HOST_WAKE */
+  GPIO_InitStruct.Pin  = BT_HOST_WAKE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(BT_HOST_WAKE_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, DISP_RST_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, DISP_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PE.11 MCU_DISP_RST_L */
   GPIO_InitStruct.Pin  = DISP_RST_Pin;
@@ -251,10 +257,19 @@ void OUTPUT_PINMUX_Init(void)
   HAL_GPIO_Init(DISP_PORTE_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, DISP_IO_SW_EN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(PP3300_DISP_GPIO_Port, PP3300_DISP_IO_SW_EN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PB.10 MCU_PP3300_DISP_IO_SW_EN */
+  GPIO_InitStruct.Pin  = PP3300_DISP_IO_SW_EN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(PP3300_DISP_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, PP1800_DISP_IO_SW_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PE.12 MCU_PP1800_DISP_IO_SW_EN */
-  GPIO_InitStruct.Pin  = DISP_IO_SW_EN_Pin;
+  GPIO_InitStruct.Pin  = PP1800_DISP_IO_SW_EN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(DISP_PORTE_GPIO_Port, &GPIO_InitStruct);
@@ -285,6 +300,24 @@ void OUTPUT_PINMUX_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SAPS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PF.02 GPIO_EXTI2 INT WKUP8 */
+  GPIO_InitStruct.Pin  = WIFI_HOST_WAKE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(WIFI_HOST_WAKE_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PF.11 PWR_MON_HVAC_MCU_ALERT_L */
+  GPIO_InitStruct.Pin  = PWR_MON_HVAC_ALERT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(MON_HVAC_ALERT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PF.12 PWR_MON_SYS_MCU_ALERT_L */
+  GPIO_InitStruct.Pin  = PWR_MON_SYS_ALERT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(MON_SYS_ALERT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(WIFI_DEV_WAKE_GPIO_Port, WIFI_DEV_WAKE_Pin, GPIO_PIN_SET);
@@ -333,6 +366,7 @@ void OUTPUT_PINMUX_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_AMBER_EN_GPIO_Port, LED_AMBER_EN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_AMBER_EN_GPIO_Port, LED_AMBER_EN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : PI.4 MCU_LED_AMBER_EN_L */
   GPIO_InitStruct.Pin  = LED_AMBER_EN_Pin;
@@ -431,41 +465,13 @@ void MX_GPIO_Init(void)
   INPUT_PINMUX_Init();
   OUTPUT_PINMUX_Init();
   WAKEUP_PIN_Enable();
-#endif
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LED_GREEN_Pin|LED_RED_Pin, GPIO_PIN_RESET);
-
+#else
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DSI_PWR_ON_GPIO_Port, DSI_PWR_ON_Pin, GPIO_PIN_RESET);
 
-#if 0
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, VSYNC_FREQ_Pin|RENDER_TIME_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, MCU_ACTIVE_Pin|FRAME_RATE_Pin, GPIO_PIN_RESET);
-#endif
-
-  /*Configure GPIO pin Output Level */
-  /* Comms enable. Drive this pin to logic 0 to disable the I2C comms. 
-                   Drive this pin to logic 1 to enable I2C comms.*/
-  HAL_GPIO_WritePin(TOF_LPN_GPIO_Port, TOF_LPN_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : LED_GREEN_Pin LED_RED_Pin */
-  GPIO_InitStruct.Pin = LED_GREEN_Pin|LED_RED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-#if 0
-  /*Configure GPIO pins : LCD_RESET_Pin VSYNC_FREQ_Pin RENDER_TIME_Pin */
-  GPIO_InitStruct.Pin = LCD_RESET_Pin|VSYNC_FREQ_Pin|RENDER_TIME_Pin;
-#endif
   /*Configure GPIO pins : LCD_RESET_Pin */
   GPIO_InitStruct.Pin = LCD_RESET_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -480,6 +486,30 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(DSI_PWR_ON_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, LED_GREEN_Pin|LED_RED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, VSYNC_FREQ_Pin|RENDER_TIME_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOF, MCU_ACTIVE_Pin|FRAME_RATE_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  /* Comms enable. Drive this pin to logic 0 to disable the I2C comms. 
+                   Drive this pin to logic 1 to enable I2C comms.*/
+  HAL_GPIO_WritePin(TOF_LPN_GPIO_Port, TOF_LPN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LED_GREEN_Pin LED_RED_Pin */
+  GPIO_InitStruct.Pin = LED_GREEN_Pin|LED_RED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LCD_RESET_Pin VSYNC_FREQ_Pin RENDER_TIME_Pin */
+  GPIO_InitStruct.Pin = LCD_RESET_Pin|VSYNC_FREQ_Pin|RENDER_TIME_Pin;
+
   /*Configure GPIO pin : USER_BUTTON_Pin */
   GPIO_InitStruct.Pin = USER_BUTTON_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -492,14 +522,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(DSI_TOUCH_INT_GPIO_Port, &GPIO_InitStruct);
 
-#if 0
   /*Configure GPIO pins : MCU_ACTIVE_Pin FRAME_RATE_Pin */
   GPIO_InitStruct.Pin = MCU_ACTIVE_Pin|FRAME_RATE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-#endif
 
   /*Configure GPIO pins : TOF LPN */
   GPIO_InitStruct.Pin = TOF_LPN_Pin;
@@ -511,6 +539,7 @@ void MX_GPIO_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI8_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ(EXTI8_IRQn);
+#endif
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

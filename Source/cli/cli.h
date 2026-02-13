@@ -27,8 +27,14 @@ typedef struct scmd {
 
 /* Command Functions */
 void cmd_i2cdetect (char *par);
+void cmd_i2cread (char *par);
+void cmd_i2cwrite (char *par);
+void cmd_spiread(char *par);
+void cmd_spiwrite(char *par);
 void cmd_alsread (char *par);
 void cmd_alswrite (char *par);
+void cmd_ioexpr (char *par);
+void cmd_ioexpw (char *par);
 void cmd_enable (char *par);
 void cmd_disable (char *par);
 void cmd_sai (char *par);
@@ -46,6 +52,12 @@ void cmd_version (char *par);
 void cmd_irq (char *par);
 void cmd_callux (char *par);
 void cmd_dialstart (char *par);
+void cmd_gpio_mode(char *par);
+void cmd_gpio(char *par);
+void cmd_gpio_read(char *par);
+void cmd_gpio_list(char *par);
+void cmd_adc1 (char *par);
+void cmd_adc4 (char *par);
 void cmd_fill (char *par);
 void cmd_backlight (char *par);
 void cmd_temp (char *par);

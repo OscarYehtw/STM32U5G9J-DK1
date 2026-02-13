@@ -673,7 +673,6 @@ void MX_GD25LQ182E_Init(void)
   */
 void MX_SPI2_Init(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   /* USER CODE BEGIN SPI2_Init 0 */
 
   /* USER CODE END SPI2_Init 0 */
@@ -720,7 +719,6 @@ void MX_SPI2_Init(void)
   /* USER CODE BEGIN SPI2_Init 2 */
 
   /* USER CODE END SPI2_Init 2 */
-#endif
 
 }
 
@@ -740,8 +738,8 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 
     /* USER CODE END SPI2_MspInit 0 */
 
-  /** Initializes the peripherals clock
-  */
+    /** Initializes the peripherals clock
+    */
     PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_SPI2;
     PeriphClkInit.Spi2ClockSelection = RCC_SPI2CLKSOURCE_SYSCLK;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
@@ -765,6 +763,18 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
     HAL_GPIO_Init(RADAR_SPI2_GPIO_Port, &GPIO_InitStruct);
+
+    #if 0
+    /* Configure CS (PI0) as Output Push Pull for Soft NSS */
+    GPIO_InitStruct.Pin = RADAR_SPI2_CS_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+    HAL_GPIO_Init(RADAR_SPI2_GPIO_Port, &GPIO_InitStruct);
+
+    /* Set CS High initially */
+    HAL_GPIO_WritePin(RADAR_SPI2_GPIO_Port, RADAR_SPI2_CS_Pin, GPIO_PIN_SET);
+    #endif
 
     /* SPI2 interrupt Init */
     HAL_NVIC_SetPriority(SPI2_IRQn, 0, 0);

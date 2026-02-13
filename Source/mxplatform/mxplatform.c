@@ -613,14 +613,12 @@ void MX_PLATFORM_Init(void)
   MX_GPU2D_Init();
   MX_DSIHOST_DSI_Init();
   MX_LTDC_Init();
+  MX_I2C_Init();
   MX_LCD_Init();
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 0)
   //MX_OCTOSPI1_Init();
   //MX_HSPI1_Init();
-#endif
   MX_DCACHE1_Init();
   MX_DCACHE2_Init();
-  MX_I2C_Init();
   MX_ADC1_Init();
   MX_ADC4_Init();
   MX_JPEG_Init();

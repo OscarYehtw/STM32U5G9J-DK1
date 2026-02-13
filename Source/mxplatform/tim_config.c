@@ -72,7 +72,6 @@ TIM_HandleTypeDef    htim8;
   */
 void MX_TIM1_Init(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
     TIM_ClockConfigTypeDef sClockSourceConfig = {0};
     TIM_MasterConfigTypeDef sMasterConfig = {0};
     TIM_OC_InitTypeDef sConfigOC = {0};
@@ -125,7 +124,6 @@ void MX_TIM1_Init(void)
 
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
     HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
-#endif
 
 }
 
@@ -136,7 +134,6 @@ void MX_TIM1_Init(void)
   */
 void MX_TIM3_Init(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
@@ -192,7 +189,6 @@ void MX_TIM3_Init(void)
 
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 50);
-#endif
 
 }
 
@@ -315,7 +311,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     PC6     ------> TIM3_CH1
     */
     GPIO_InitStruct.Pin  = HVAC_PWR_LOAD_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
@@ -330,7 +326,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     /* USER CODE BEGIN TIM8_MspPostInit 0 */
 
     /* USER CODE END TIM8_MspPostInit 0 */
-
+    #if 0
     __HAL_RCC_GPIOI_CLK_ENABLE();
     /**TIM8 GPIO Configuration
     PI6     ------> TIM8_CH2
@@ -341,7 +337,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
     HAL_GPIO_Init(DSI_BL_CTRL_GPIO_Port, &GPIO_InitStruct);
-
+    #endif
     /* USER CODE BEGIN TIM8_MspPostInit 1 */
 
     /* USER CODE END TIM8_MspPostInit 1 */

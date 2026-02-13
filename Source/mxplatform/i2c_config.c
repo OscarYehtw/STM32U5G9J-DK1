@@ -26,6 +26,7 @@
 #include "sensirion_i2c_hal.h"
 #include "sensirion_sensor.h"
 /* USER CODE END Includes */
+int i2c_block_write(I2C_HandleTypeDef *hi2c, uint8_t addr, uint8_t reg, uint8_t *data, int size);
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
@@ -73,6 +74,8 @@
   */
 void MX_I2C_Init(void)
 {
+  uint8_t data[6];
+
   /* USER CODE BEGIN I2C_Init 0 */
   if (BSP_I2C1_Init() != BSP_ERROR_NONE)
   {
@@ -84,26 +87,34 @@ void MX_I2C_Init(void)
     printf("BSP_I2C2_Init failed!!! \n\r");
   }
 
+  #if 0
   if (BSP_I2C3_Init() != BSP_ERROR_NONE)
   {
     printf("BSP_I2C3_Init failed!!! \n\r");
   }
+  #endif
 
   if (BSP_I2C4_Init() != BSP_ERROR_NONE)
   {
     printf("BSP_I2C4_Init failed!!! \n\r");
   }
 
+  #if 0
   if (BSP_I2C5_Init() != BSP_ERROR_NONE)
   {
     printf("BSP_I2C5_Init failed!!! \n\r");
   }
+  #endif
 
   if (BSP_I2C6_Init() != BSP_ERROR_NONE)
   {
     printf("BSP_I2C6_Init failed!!! \n\r");
   }
   /* USER CODE END I2C_Init 0 */
+
+  data[0] = 0;
+  i2c_block_write(&hbus_i2c6, 0x20, 0x03, data, 1);
+  i2c_block_write(&hbus_i2c6, 0x20, 0x07, data, 1);
 
 }
 
@@ -114,9 +125,9 @@ void MX_I2C_Init(void)
   */
 void MX_AMS_Init(void)
 {
-  if (BSP_I2C1_IsReady(SLAVE_ADDR_0, 2) != BSP_ERROR_NONE)
+  if (BSP_I2C2_IsReady(SLAVE_ADDR_0, 2) != BSP_ERROR_NONE)
   {
-      printf("als ams_tcs3410 not found on I2C1!!! \n\r");
+      printf("als ams_tcs3410 not found on I2C2!!! \n\r");
       //return;
   }
 
@@ -133,7 +144,7 @@ void MX_AMS_Init(void)
   */
 void AMS_IRQ_Init(void)
 {
-#if 1
+#if 0
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */

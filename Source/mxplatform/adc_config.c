@@ -33,7 +33,8 @@
 /* Definitions of environment analog values */
   /* Value of analog reference voltage (Vref+), connected to analog voltage   */
   /* supply Vdda (unit: mV).                                                  */
-  #define VDDA_APPLI                       (3300UL)
+  //#define VDDA_APPLI                       (3300UL)
+  #define VDDA_APPLI                       (1800UL)
 
   /* Init variable out of expected ADC conversion data range */
   #define VAR_CONVERTED_DATA_INIT_VALUE    (__LL_ADC_DIGITAL_SCALE(ADC1, LL_ADC_RESOLUTION_12B) + 1)
@@ -62,6 +63,15 @@ __IO uint16_t aADC1ConvertedData = VAR_CONVERTED_DATA_INIT_VALUE; /* ADC group r
 
 /* Variables for ADC conversion data computation to physical values */
 uint16_t aADC1ConvertedData_mVolt = 0;  /* Value of voltage calculated from ADC conversion data (unit: mV) */
+
+uint16_t adc_raw[2];
+uint16_t adc_mV[2];
+uint16_t adc_val[2];
+volatile uint8_t adc_rank = 0;
+
+uint16_t adc4_raw[8];
+uint16_t adc4_mV[8];
+volatile uint8_t adc4_rank = 0;
 
 /* Variable containing ADC conversions data */
 uint32_t   aADC4ConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
@@ -94,7 +104,6 @@ uint32_t   aADC4ConvertedData[ADC_CONVERTED_DATA_BUFFER_SIZE];
   */
 void MX_ADC1_Init(void)
 {
-//#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   /* USER CODE BEGIN ADC1_Init 0 */
 
   /* USER CODE END ADC1_Init 0 */
@@ -111,11 +120,11 @@ void MX_ADC1_Init(void)
   hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.GainCompensation = 0;
-  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 2;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
@@ -131,6 +140,8 @@ void MX_ADC1_Init(void)
   }
 
   /** Configure Regular Channel
+   * PA7 --> ADC1_IN12, ANA_PMIC_VREF_1V2
+   * PC5 --> ADC1_IN14, DISP_MCU_NTC_READOUT
   */
   sConfig.Channel = ADC_CHANNEL_12;
   sConfig.Rank = ADC_REGULAR_RANK_1;
@@ -142,6 +153,14 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
+  sConfig.Channel = ADC_CHANNEL_14;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
   /* USER CODE BEGIN ADC1_Init 2 */
   /* Perform ADC calibration */
   if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
@@ -151,7 +170,6 @@ void MX_ADC1_Init(void)
   }
 
   /* USER CODE END ADC1_Init 2 */
-//#endif
 
 }
 
@@ -359,13 +377,20 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC12_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     /**ADC1 GPIO Configuration
     PA7     ------> ADC1_IN12
+    PC5     ------> ADC1_IN14
     */
     GPIO_InitStruct.Pin = PMIC_VREF_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(PMIC_VREF_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = DISP_NTC_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(DISP_NTC_GPIO_Port, &GPIO_InitStruct);
 
     /* ADC1 interrupt Init */
     HAL_NVIC_SetPriority(ADC1_2_IRQn, 0, 0);
@@ -426,8 +451,14 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(ANA_HW_ID_GPIO_Port, &GPIO_InitStruct);
+
+    /* ADC1 interrupt Init */
+    //HAL_NVIC_SetPriority(ADC4_IRQn, 0, 0);
+    //HAL_NVIC_EnableIRQ(ADC4_IRQn);
 #else
     __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
     /**ADC4 GPIO Configuration
     PA4     ------> ADC4_IN9
     PA5     ------> ADC4_IN10
@@ -436,6 +467,16 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = ANA_DCIN1_MEAS_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ANA_DCIN1_MEAS_GPIO_Port, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = ANA_THERM_NTC_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(ANA_THERM_NTC_GPIO_Port, &GPIO_InitStruct);
 #endif
 
     /* USER CODE BEGIN ADC4_MspInit 1 */
@@ -464,8 +505,10 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 
     /**ADC1 GPIO Configuration
     PA7     ------> ADC1_IN12
+    PC5     ------> ADC1_IN14
     */
     HAL_GPIO_DeInit(PMIC_VREF_GPIO_Port, PMIC_VREF_Pin);
+    HAL_GPIO_DeInit(DISP_NTC_GPIO_Port, DISP_NTC_Pin);
 
     /* USER CODE BEGIN ADC4_MspDeInit 1 */
 
@@ -522,6 +565,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
   if (hadc->Instance == ADC1) {
+      #if 0
       /* Retrieve ADC conversion data */
       aADC1ConvertedData = HAL_ADC_GetValue(hadc);
 
@@ -532,6 +576,55 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
       /* Update status variable of ADC unitary conversion                     */
       aAdc1ConvStatus = 1;
       osMessageQueuePut(adc12QueueHandle, &aADC1ConvertedData_mVolt, 0, 0);
+      #endif
+
+      #if 0
+      /* Read Rank1 */
+      adc_raw[0] = HAL_ADC_GetValue(hadc);
+
+      /* Read Rank2 */
+      adc_raw[1] = HAL_ADC_GetValue(hadc);
+
+      adc_mV[0] = __LL_ADC_CALC_DATA_TO_VOLTAGE(
+                      ADC1, VDDA_APPLI, adc_raw[0], LL_ADC_RESOLUTION_12B);
+
+      adc_mV[1] = __LL_ADC_CALC_DATA_TO_VOLTAGE(
+                      ADC1, VDDA_APPLI, adc_raw[1], LL_ADC_RESOLUTION_12B);
+
+      osMessageQueuePut(adc12QueueHandle, adc_mV, 0, 0);
+      #endif
+      uint16_t raw = HAL_ADC_GetValue(hadc);
+
+      adc_raw[adc_rank] = raw;
+      adc_mV[adc_rank] =
+          __LL_ADC_CALC_DATA_TO_VOLTAGE(
+              ADC1, VDDA_APPLI, raw, LL_ADC_RESOLUTION_12B);
+
+      adc_rank++;
+
+      /* 2 channels done */
+      if (adc_rank >= 2)
+      {
+          adc_rank = 0;
+          /* example: send both channels */
+      }
+      osMessageQueuePut(adc12QueueHandle, adc_mV, 0, 0);
+
+  }
+
+  if (hadc->Instance == ADC4) {
+      uint16_t raw4 = HAL_ADC_GetValue(hadc);
+
+      adc4_raw[adc4_rank] = raw4;
+      adc4_mV[adc4_rank] = __LL_ADC_CALC_DATA_TO_VOLTAGE(ADC4, VDDA_APPLI, raw4, LL_ADC_RESOLUTION_12B);
+      //adc4_rank++;
+
+      //if (adc4_rank >= 3)
+      //{
+      //    adc4_rank = 0;
+      //}
+      osMessageQueuePut(adc4QueueHandle, adc4_mV, 0, 0);
+      //printf("ADC4[%d]: %d mv\n\r", adc4_rank, adc4_mV[adc4_rank]);
   }
 
 }

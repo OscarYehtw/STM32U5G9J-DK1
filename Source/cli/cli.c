@@ -18,11 +18,19 @@
 
 const char Cli_Help[] = 
    "+ COMMAND ------------------+ FUNCTION ---------------------------------+\n"
-   "| I2CDETECT  <bus>          | Scan I2C bus and list detected addresses  |\n"
-   "| ALSR <reg> <bytes>        | Read <bytes> from sensor register <reg>   |\n"
-   "| ALSW <reg> <data >        | Write <data> to sensor register <reg>     |\n"
-   "| enable  <als|flckr|all>   | Enable AMS measurement function           |\n"
-   "| disable <als|flckr|all>   | Disable AMS measurement function          |\n"
+   "| I2CDETECT <bus>           | Scan I2C bus and list detected addresses  |\n"
+   "| I2CREAD   <bus> <addr>    | Read register(s) from I2C device          |\n"
+   "|           <reg> [len]     |                                           |\n"
+   "| I2CWRITE  <bus> <addr>    | Write register(s) to I2C device           |\n"
+   "|  <reg> <data0> [data1 ...]|                                           |\n"
+   "| SPIREAD   <reg> [len]     | Read register(s) from SPI2 device         |\n"
+   "| SPIWRITE  <reg> <data...> | Write register(s) to SPI2 device          |\n"
+   "| ALSR      <reg> <bytes>   | Read <bytes> from sensor register <reg>   |\n"
+   "| ALSW      <reg> <data >   | Write <data> to sensor register <reg>     |\n"
+   "| IOEXR     <reg> <bytes>   | Read <bytes> from IO Expander <reg>       |\n"
+   "| IOEXW     <reg> <data >   | Write <data> to IO Expander <reg>         |\n"
+   "| enable    <als|flckr|all> | Enable AMS measurement function           |\n"
+   "| disable   <als|flckr|all> | Disable AMS measurement function          |\n"
    "| sai <clear|enable|disable>| Sleep-After-Interrupt control             |\n"
    "| pon <on|off>              | Power-On control for AMS device           |\n"
    "| config <sample_time>      | Configure AMS device                      |\n"
@@ -46,6 +54,14 @@ const char Cli_Help[] =
    "|         <C> <R> <G> <B>   |                                           |\n"
    "|         <WB> [LM_LUX]     |                                           |\n"
    "| DIAL                      | Show TMR-ADC values                       |\n"
+   "| GPIOMODE <port> <pin>     | Set GPIO pin mode                         |\n"
+   "|        <in|out|af|analog> |                                           |\n"
+   "| GPIOSET <port> <pin>      | Set GPIO pin level                        |\n"
+   "|      <high|low|toggle>    |                                           |\n"
+   "| GPIOREAD <port> <pin>     | Read GPIO pin level                       |\n"
+   "| GPIOLIST                  | List all GPIO pin levels                  |\n"
+   "| ADC1                      | Show ADC1 IN12, IN14 values               |\n"
+   "| ADC4                      | Show ADC4 IN3,4,6,7,8,15,16,17 values     |\n"
    "| FILL <rgb888>             | Fill screen with rgb color                |\n"
    "| BL   <brightness>         | set backlight to brightness [0-100%%]      |\n"
    "| TEMP <sht|sts>            | Read temperature from sensor              |\n"
@@ -59,37 +75,49 @@ const char Cli_Help[] =
    "+---------------------------+-------------------------------------------+\n";
 
 const SCMD cmd[] = {
-	{ "I2CDETECT", cmd_i2cdetect },
-	{ "ALSR",      cmd_alsread },
-	{ "ALSW",      cmd_alswrite },
-   { "ENABLE",    cmd_enable },
-   { "DISABLE",   cmd_disable },
-   { "SAI",       cmd_sai },
-   { "PON",       cmd_pon },
-   { "CONFIG",    cmd_config },
-   { "ALS",       cmd_config_als },
-   { "FD",        cmd_config_fd },
-   { "FIFO",      cmd_config_fifo },
-   { "SETUP",     cmd_setup },
-   { "ID",        cmd_id },
-   { "DUMP",      cmd_dump },
-   { "UP",        cmd_isUP },
-   { "STATUS",    cmd_status },
-   { "VERSION",   cmd_version },
-   { "IRQ",       cmd_irq },
-   { "CAL_LUX",   cmd_callux },
-	{ "DIAL",      cmd_dialstart },
-	{ "FILL",      cmd_fill },
-	{ "BL",        cmd_backlight },
-	{ "TEMP",      cmd_temp },
-	{ "HUM",       cmd_hum },
-	{ "HEAT",      cmd_heat },
-	{ "MONITOR",   cmd_monitor },
-   { "FLASHR",    cmd_flashr },
-   { "FLASHW",    cmd_flashw },
-   { "FBTEST",    cmd_fbtest },
-	{ "HELP",      cmd_help },
-	{ "?",         cmd_help }
+    { "I2CDETECT", cmd_i2cdetect },
+    { "I2CREAD",   cmd_i2cread   },
+    { "I2CWRITE",  cmd_i2cwrite  },
+    { "SPIREAD",   cmd_spiread  },
+    { "SPIWRITE",  cmd_spiwrite },
+    { "ALSR",      cmd_alsread },
+    { "ALSW",      cmd_alswrite },
+    { "IOEXR",     cmd_ioexpr },
+    { "IOEXW",     cmd_ioexpw },
+    { "ENABLE",    cmd_enable },
+    { "DISABLE",   cmd_disable },
+    { "SAI",       cmd_sai },
+    { "PON",       cmd_pon },
+    { "CONFIG",    cmd_config },
+    { "ALS",       cmd_config_als },
+    { "FD",        cmd_config_fd },
+    { "FIFO",      cmd_config_fifo },
+    { "SETUP",     cmd_setup },
+    { "ID",        cmd_id },
+    { "DUMP",      cmd_dump },
+    { "UP",        cmd_isUP },
+    { "STATUS",    cmd_status },
+    { "VERSION",   cmd_version },
+    { "IRQ",       cmd_irq },
+    { "CAL_LUX",   cmd_callux },
+    { "DIAL",      cmd_dialstart },
+    { "GPIOMODE",  cmd_gpio_mode },
+    { "GPIOSET",   cmd_gpio },
+    { "GPIOREAD",  cmd_gpio_read },
+    { "GPIOLIST",  cmd_gpio_list },
+    { "ADC1",      cmd_adc1 },
+    { "ADC4",      cmd_adc4 },
+    { "FILL",      cmd_fill },
+    { "BL",        cmd_backlight },
+    { "TEMP",      cmd_temp },
+    { "HUM",       cmd_hum },
+    { "HEAT",      cmd_heat },
+    { "MONITOR",   cmd_monitor },
+    { "FLASHR",    cmd_flashr },
+    { "FLASHW",    cmd_flashw },
+    { "FBTEST",    cmd_fbtest },
+    { "HELP",      cmd_help },
+    { "?",         cmd_help }
 };
 
 #define CMD_COUNT   (sizeof (cmd) / sizeof (cmd[0]))

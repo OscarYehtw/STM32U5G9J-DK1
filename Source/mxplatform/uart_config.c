@@ -114,6 +114,7 @@ void MX_USART1_UART_Init(void)
   {
     Error_Handler();
   }
+
   /* USER CODE BEGIN USART1_Init 2 */
 
   /* USER CODE END USART1_Init 2 */
@@ -127,7 +128,6 @@ void MX_USART1_UART_Init(void)
   */
 void MX_USART2_UART_Init(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   /* USER CODE BEGIN USART2_Init 0 */
 
   /* USER CODE END USART2_Init 0 */
@@ -165,7 +165,6 @@ void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-#endif
 }
 
 /**
@@ -220,7 +219,6 @@ void MX_USART3_UART_Init(void)
   */
 void MX_UART5_UART_Init(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   /* USER CODE BEGIN UART5_Init 0 */
 
   /* USER CODE END UART5_Init 0 */
@@ -258,7 +256,6 @@ void MX_UART5_UART_Init(void)
   /* USER CODE BEGIN UART5_Init 2 */
 
   /* USER CODE END UART5_Init 2 */
-#endif
 }
 
 /* USER CODE END 0 */

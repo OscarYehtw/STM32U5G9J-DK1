@@ -60,7 +60,6 @@ uint32_t TriggeredPin;
 /* USER CODE END EV */
 
 /* External function --------------------------------------------------------*/
-void ams_sensor_irq_handler(uint32_t pin);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
@@ -71,7 +70,6 @@ void ams_sensor_irq_handler(uint32_t pin);
   */
 void EXTI_IRQHandler_Config(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   GPIO_InitTypeDef   GPIO_InitStructure;
 
   /* Enable GPIOC clock */
@@ -159,7 +157,6 @@ void EXTI_IRQHandler_Config(void)
   /* Enable and set line 0 Interrupt to the lowest priority */
   HAL_NVIC_SetPriority(EXTI0_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-#endif
 
 }
 
@@ -175,7 +172,6 @@ void EXTI_IRQHandler_Config(void)
   */
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   if (GPIO_Pin == SSR_INT_Pin)
   {
     printf("SSR_Y_MCU_INT_L: Interrupt Triggered!\r\n");
@@ -196,14 +192,5 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
   {
     printf("PMIC_MCU_UX_BUTTON_L: Interrupt Triggered!\r\n");
   }
-#else
-  if (GPIO_Pin == AMS_INT_Pin)
-  {
-    TriggeredPin = AMS_INT_Pin;
-    //osMessageQueuePut(extiQueueHandle, &TriggeredPin, 0, 0);
-    ams_sensor_irq_handler(TriggeredPin);
-    //printf("AMS_INT_Pin_L: Interrupt Triggered!\r\n");
-  }
-#endif
 
 }

@@ -21,6 +21,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "mxplatform.h"
+#include "lm3697.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,13 +95,6 @@ void LCD_Set_Default_Clock(void)
   DSIPHYInitPeriph.DsiClockSelection    = RCC_DSICLKSOURCE_DSIPHY;
 
   HAL_RCCEx_PeriphCLKConfig(&DSIPHYInitPeriph);
-
-#if 0
-  /* LCD Reset */
-  HAL_Delay(11);
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, GPIO_PIN_SET);
-  HAL_Delay(150);
-#endif
 
 }
 
@@ -240,29 +234,21 @@ uint32_t SetPanelConfig_ST7701S(void)
   if (HAL_DSI_Start(&hdsi) != HAL_OK) return 1;
   HAL_Delay(120);
 
-  /* Sleep Out */
-  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x11, 0x00) != HAL_OK) return 2;
-  HAL_Delay(120);
-
   /* CMD2 Page 0, 0xFF: System Function Command Table2 */
-  uint8_t cmd_ff0[] = {0x77,0x01,0x00,0x00,0x10};
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff0), 0xFF, cmd_ff0) != HAL_OK) return 3;
+  uint8_t cmd_ff0[] = {0x77,0x01,0x00,0x00,0x13};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff0), 0xFF, cmd_ff0) != HAL_OK) return 1;
   HAL_Delay(5);
 
-  /* Set Pixel Format to 24bit RGB888 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x3A, 0x77) != HAL_OK) return 4;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xEF, 0x08) != HAL_OK) return 2;
+  HAL_Delay(5);
 
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x36, 0x00) != HAL_OK) return 5;
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff1[] = {0x77,0x01,0x00,0x00,0x10};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff1), 0xFF, cmd_ff1) != HAL_OK) return 3;
+  HAL_Delay(5);
 
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x35, 0x00) != HAL_OK) return 6;
-
-  /* Display ON */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x29, 0x00) != HAL_OK) return 7;
-  HAL_Delay(120);
-
-#if 0
-  /* C0 Display Line Setting ((0x63 + 1) * 8) = 800 */
-  uint8_t c0_param[] = {0x63,0x00};
+  /* C0 Display Line Setting ((0x3B + 1) * 8) = 800 */
+  uint8_t c0_param[] = {0x3B,0x00};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(c0_param), 0xC0, c0_param) != HAL_OK) return 4;
   HAL_Delay(5);
 
@@ -272,136 +258,212 @@ uint32_t SetPanelConfig_ST7701S(void)
   HAL_Delay(5);
 
   /* C2 Inversion + Frame rate, 0x31: 0x11: 2 Dot, 0x10: 1 Dot, 0x17: Column, 0x08: Default */
-  uint8_t c2_param[] = {0x31,0x08};
+  uint8_t c2_param[] = {0x37,0x02};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(c2_param), 0xC2, c2_param) != HAL_OK) return 6;
+  HAL_Delay(5);
 
-  /* CC NVM Program Active */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xCC, 0x10) != HAL_OK) return 7;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xC7, 0x04) != HAL_OK) return 7;
+  HAL_Delay(5);
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xCC, 0x10) != HAL_OK) return 8;
   HAL_Delay(5);
 
   /* B0 Positive Gamma */
   uint8_t gamma_p[] = {
-      0x00,0x0E,0x55,0x0B,0x0E,0x05,0x04,0x09,
-      0x09,0x20,0x06,0x14,0x12,0xA3,0x29,0x18
+      //0x00,0x0F,0x16,0x0D,0x11,0x06,0x05,0x08,0x07,0x21,0x05,0x12,0x10,0x2A,0x30,0x1B,
+      0xC0,0xC8,0xD4,0x0C,0x0F,0x06,0x03,0x09,0x08,0x1F,0x05,0x13,0x0F,0xE9,0xF1,0x5C
   };
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(gamma_p), 0xB0, gamma_p) != HAL_OK) return 8;
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(gamma_p), 0xB0, gamma_p) != HAL_OK) return 9;
   HAL_Delay(5);
 
   /* B1 Negative Gamma */
   uint8_t gamma_n[] = {
-      0x00,0x0E,0x55,0x0B,0x0E,0x04,0x04,0x08,
-      0x08,0x20,0x06,0x14,0x12,0xA2,0x28,0x18
+      //0x00,0x0F,0x16,0x0E,0x10,0x05,0x04,0x07,0x07,0x1F,0x05,0x12,0x10,0x28,0x2E,0x1B
+      0xC0,0x11,0x93,0x0E,0x11,0x05,0x01,0x06,0x06,0x1E,0x04,0x52,0x12,0xE7,0xAF,0x5A
   };
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(gamma_n), 0xB1, gamma_n) != HAL_OK) return 9;
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(gamma_n), 0xB1, gamma_n) != HAL_OK) return 10;
   HAL_Delay(5);
 
-  /* CMD2 Page 1 */
-  uint8_t cmd_ff1[] = {0x77,0x01,0x00,0x00,0x11};
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff1), 0xFF, cmd_ff1) != HAL_OK) return 10;
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff2[] = {0x77,0x01,0x00,0x00,0x11};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff2), 0xFF, cmd_ff2) != HAL_OK) return 11;
   HAL_Delay(5);
 
-  /* B0 Vop Amplitude, 0x81: GVDD=5.15V */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB0, 0x81) != HAL_OK) return 11;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB0, 0x5D) != HAL_OK) return 12;
+  HAL_Delay(5);
 
-  /* B1 VCOM setting, 0x4F: 1.1125 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB1, 0x4F) != HAL_OK) return 12;
+  //if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB1, 0x37) != HAL_OK) return 13;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB1, 0x3A) != HAL_OK) return 13;
+  HAL_Delay(5);
 
-  /* B2 VGH = 15V */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB2, 0x07) != HAL_OK) return 13;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB2, 0x83) != HAL_OK) return 14;
+  HAL_Delay(5);
 
-  /* B3 Gate EQ */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB3, 0x80) != HAL_OK) return 14;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB3, 0x80) != HAL_OK) return 15;
+  HAL_Delay(5);
 
-  /* B5 VGL = -9.51V */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB5, 0x47) != HAL_OK) return 15;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB5, 0x4A) != HAL_OK) return 16;
+  HAL_Delay(5);
 
-  /* B7 Power Control 1 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB7, 0x85) != HAL_OK) return 16;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB7, 0x85) != HAL_OK) return 17;
+  HAL_Delay(5);
 
-  /* B8 AVDD/AVCL, 0x21: 6.6, -4.6 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB8, 0x21) != HAL_OK) return 17;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB8, 0x20) != HAL_OK) return 18;
+  HAL_Delay(5);
 
-  /* B9 Power Control 2 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xB9, 0x10) != HAL_OK) return 18;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xC1, 0x78) != HAL_OK) return 19;
+  HAL_Delay(5);
 
-  /* C1 Source pre-driver timing */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xC1, 0x78) != HAL_OK) return 19;
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xC2, 0x78) != HAL_OK) return 20;
+  HAL_Delay(5);
 
-  /* C2 Source EQ2 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xC2, 0x78) != HAL_OK) return 20;
-
-  /* D0 MIPI Setting 1 */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xD0, 0x88) != HAL_OK) return 21;
-
-  HAL_Delay(100);
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xD0, 0x88) != HAL_OK) return 21;
+  HAL_Delay(5);
 
   /* E0 Sunlight Enhancement */
   uint8_t e0_param[] = {0x00,0x00,0x02};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e0_param), 0xE0, e0_param) != HAL_OK) return 22;
+  HAL_Delay(5);
 
   /* E1 Noise Reduce */
-  uint8_t e1_param[] = {0x08,0x00,0x0A,0x00,0x07,0x00,0x09,0x00,0x00,0x33,0x33};
+  uint8_t e1_param[] = {0x08,0xA0,0x06,0xA0,0x07,0xA0,0x05,0xA0,0x00,0x44,0x44};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e1_param), 0xE1, e1_param) != HAL_OK) return 23;
+  HAL_Delay(5);
 
   /* E2 Sharpness */
-  uint8_t e2_param[12] = {0};
+  uint8_t e2_param[] = {0x11,0x11,0x44,0x44,0xF4,0xA0,0xF4,0xA0,0xF4,0xA0,0xF4,0xA0,0x00};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e2_param), 0xE2, e2_param) != HAL_OK) return 24;
+  HAL_Delay(5);
 
   /* E3 Color Calibration Control */
-  uint8_t e3_param[] = {0x00,0x00,0x33,0x33};
+  uint8_t e3_param[] = {0x00,0x00,0x11,0x11};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e3_param), 0xE3, e3_param) != HAL_OK) return 25;
+  HAL_Delay(5);
 
   /* E4 Skin Tone Preservation Control */
   uint8_t e4_param[] = {0x44,0x44};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e4_param), 0xE4, e4_param) != HAL_OK) return 26;
+  HAL_Delay(5);
 
   /* E5 GIP Setting*/
   uint8_t e5_param[] = {
-      0x0E,0x2D,0xA0,0xA0,0x10,0x2D,0xA0,0xA0,
-      0x0A,0x2D,0xA0,0xA0,0x0C,0x2D,0xA0,0xA0
+      0x10,0xF8,0xA0,0xA0,0x0E,0xF6,0xA0,0xA0,0x0C,0xF4,0xA0,0xA0,0x0A,0xF2,0xA0,0xA0
   };
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e5_param), 0xE5, e5_param) != HAL_OK) return 27;
+  HAL_Delay(5);
 
   /* E6 GIP2 */
-  uint8_t e6_param[] = {0x00,0x00,0x33,0x33};
+  uint8_t e6_param[] = {0x00,0x00,0x11,0x11};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e6_param), 0xE6, e6_param) != HAL_OK) return 28;
+  HAL_Delay(5);
 
   /* E7 GIP3 */
   uint8_t e7_param[] = {0x44,0x44};
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e7_param), 0xE7, e7_param) != HAL_OK) return 29;
+  HAL_Delay(5);
 
   /* E8 GIP Setting */
   uint8_t e8_param[] = {
-      0x0D,0x2D,0xA0,0xA0,0x0F,0x2D,0xA0,0xA0,
-      0x09,0x2D,0xA0,0xA0,0x0B,0x2D,0xA0,0xA0
+      0x0F,0xF7,0xA0,0xA0,0x0D,0xF5,0xA0,0xA0,0x0B,0xF3,0xA0,0xA0,0x09,0xF1,0xA0,0xA0
   };
   if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e8_param), 0xE8, e8_param) != HAL_OK) return 30;
   HAL_Delay(5);
 
+  /* E9 */
+  uint8_t e9_param[] = {
+      0x26,0x00
+  };
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e9_param), 0xE9, e9_param) != HAL_OK) return 31;
+  HAL_Delay(5);
+
   /* EB GIP Setting */
   uint8_t eb_param[] = {
-      0x02,0x01,0xE4,0xE4,0x44,0x00,0x40
+      0x00,0x00,0x4E,0x4E,0x00,0x00,0x00
   };
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(eb_param), 0xEB, eb_param) != HAL_OK) return 31;
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(eb_param), 0xEB, eb_param) != HAL_OK) return 32;
   HAL_Delay(5);
 
   /* EC GIP Setting */
-  uint8_t ec_param[] = {0x02,0x01};
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(ec_param), 0xEC, ec_param) != HAL_OK) return 32;
+  uint8_t ec_param[] = {0x00,0x00};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(ec_param), 0xEC, ec_param) != HAL_OK) return 33;
   HAL_Delay(5);
 
   /* ED GIP Setting */
   uint8_t ed_param[] = {
-      0xAB,0x89,0x76,0x54,0x01,0xFF,0xFF,0xFF, 
-      0xFF,0xFF,0xFF,0x10,0x45,0x67,0x98,0xBA
+      0xFF,0xFB,0xAF,0xCF,0x45,0x67,0x10,0xFF,0xFF,0x01,0x76,0x54,0xFC,0xFA,0xBF,0xFF
   };
-  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(ed_param), 0xED, ed_param) != HAL_OK) return 33;
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(ed_param), 0xED, ed_param) != HAL_OK) return 34;
   HAL_Delay(5);
 
-  /* Display ON */
-  if(HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x29, 0x00) != HAL_OK) return 34;
+  /* EF */
+  uint8_t ef_param[] = {
+      0x08,0x08,0x08,0x45,0x3F,0x54
+  };
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(ef_param), 0xEF, ef_param) != HAL_OK) return 35;
+  HAL_Delay(5);
+
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff3[] = {0x77,0x01,0x00,0x00,0x13};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff3), 0xFF, cmd_ff3) != HAL_OK) return 36;
+  HAL_Delay(5);
+
+  /* E8 GIP Setting */
+  uint8_t e8_param1[] = {
+      0x00,0x0E
+  };
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e8_param1), 0xE8, e8_param1) != HAL_OK) return 37;
+  HAL_Delay(5);
+
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff4[] = {0x77,0x01,0x00,0x00,0x00};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff4), 0xFF, cmd_ff4) != HAL_OK) return 38;
+  HAL_Delay(5);
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x11, 0x00) != HAL_OK) return 39;
   HAL_Delay(120);
-#endif
+
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff5[] = {0x77,0x01,0x00,0x00,0x13};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff5), 0xFF, cmd_ff5) != HAL_OK) return 40;
+  HAL_Delay(5);
+
+  /* E8 GIP Setting */
+  uint8_t e8_param2[] = {
+      0x00,0x0C
+  };
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e8_param2), 0xE8, e8_param2) != HAL_OK) return 41;
+  HAL_Delay(20);
+
+  /* E8 GIP Setting */
+  uint8_t e8_param3[] = {
+      0x00,0x00
+  };
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(e8_param3), 0xE8, e8_param3) != HAL_OK) return 42;
+  HAL_Delay(20);
+
+  #if 0
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff7[] = {0x77,0x01,0x00,0x00,0x12};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff7), 0xFF, cmd_ff7) != HAL_OK) return 50;
+  HAL_Delay(5);
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xD1, 0x81) != HAL_OK) return 51;
+  HAL_Delay(5);
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0xD2, 0x06) != HAL_OK) return 52;
+  HAL_Delay(5);
+  #endif
+
+  /* CMD2 Page 0, 0xFF: System Function Command Table2 */
+  uint8_t cmd_ff6[] = {0x77,0x01,0x00,0x00,0x00};
+  if(HAL_DSI_LongWrite(&hdsi, 0, DSI_DCS_LONG_PKT_WRITE, sizeof(cmd_ff6), 0xFF, cmd_ff6) != HAL_OK) return 43;
+  HAL_Delay(5);
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P0, 0x29, 0x00) != HAL_OK) return 44;
+  HAL_Delay(5);
+
+  if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x36, 0x00) != HAL_OK) return 45;
+  HAL_Delay(50);
 
   return 0;
 }
@@ -625,22 +687,24 @@ void MX_DSIHOST_DSI_Init(void)
   VidCfg.HSPolarity = DSI_HSYNC_ACTIVE_HIGH;
   VidCfg.VSPolarity = DSI_VSYNC_ACTIVE_HIGH;
   VidCfg.DEPolarity = DSI_DATA_ENABLE_ACTIVE_HIGH;
+
 #if 1
   VidCfg.HorizontalSyncActive = 6;
-  VidCfg.HorizontalBackPorch = 3;
-  VidCfg.HorizontalLine = 1452;
-  VidCfg.VerticalSyncActive = 1;
-  VidCfg.VerticalBackPorch = 12;
-  VidCfg.VerticalFrontPorch = 50;
-  VidCfg.VerticalActive = 481;
+  VidCfg.HorizontalBackPorch = 15;
+  VidCfg.HorizontalLine = 1503;
+  VidCfg.VerticalSyncActive = 2;
+  VidCfg.VerticalBackPorch =20;
+  VidCfg.VerticalFrontPorch =40;
+  VidCfg.VerticalActive = 482;
 #else
-  VidCfg.HorizontalSyncActive = 6;
-  VidCfg.HorizontalBackPorch = 3;
-  VidCfg.HorizontalLine = 1452;
-  VidCfg.VerticalSyncActive = 1;
-  VidCfg.VerticalBackPorch = 12;
-  VidCfg.VerticalFrontPorch = 50;
-  VidCfg.VerticalActive = 481;
+  VidCfg.PacketSize = ACTIVE_WIDTH;
+  VidCfg.HorizontalSyncActive = HSYNC_WIDTH;
+  VidCfg.HorizontalBackPorch  = HBP;
+  VidCfg.HorizontalLine = HSYNC_WIDTH + HBP + ACTIVE_WIDTH + HFP;
+  VidCfg.VerticalSyncActive  = VSYNC_WIDTH;
+  VidCfg.VerticalBackPorch   = VBP;
+  VidCfg.VerticalFrontPorch  = VFP;
+  VidCfg.VerticalActive      = ACTIVE_HEIGHT;
 #endif
   VidCfg.LPCommandEnable = DSI_LP_COMMAND_DISABLE;
   VidCfg.LPLargestPacketSize = 0;
@@ -688,24 +752,25 @@ void MX_LTDC_Init(void)
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AH;
   hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AL;
   hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
+
 #if 1
   hltdc.Init.HorizontalSync = 1;
-  hltdc.Init.VerticalSync = 0;
-  hltdc.Init.AccumulatedHBP = 2;
-  hltdc.Init.AccumulatedVBP = 12;
-  hltdc.Init.AccumulatedActiveW = 482;
-  hltdc.Init.AccumulatedActiveH = 493;
-  hltdc.Init.TotalWidth = 483;
-  hltdc.Init.TotalHeigh = 543;
+  hltdc.Init.VerticalSync = 1;
+  hltdc.Init.AccumulatedHBP = 14;
+  hltdc.Init.AccumulatedVBP = 20;
+  hltdc.Init.AccumulatedActiveW = 494;
+  hltdc.Init.AccumulatedActiveH = 499;
+  hltdc.Init.TotalWidth = 500;
+  hltdc.Init.TotalHeigh = 539;
 #else
-  hltdc.Init.HorizontalSync = HSYNC;
-  hltdc.Init.VerticalSync = VSYNC;
-  hltdc.Init.AccumulatedHBP = ACC_HBP;
-  hltdc.Init.AccumulatedVBP = ACC_VBP;
-  hltdc.Init.AccumulatedActiveW = ACC_ACTIVE_WIDTH;
-  hltdc.Init.AccumulatedActiveH = ACC_ACTIVE_HEIGHT;
-  hltdc.Init.TotalWidth = TOTAL_WIDTH;
-  hltdc.Init.TotalHeigh = TOTAL_HEIGHT;
+  hltdc.Init.HorizontalSync = LTDC_HSYNC;
+  hltdc.Init.VerticalSync   = LTDC_VSYNC;
+  hltdc.Init.AccumulatedHBP = LTDC_ACC_HBP;
+  hltdc.Init.AccumulatedVBP = LTDC_ACC_VBP;
+  hltdc.Init.AccumulatedActiveW = LTDC_ACC_ACTIVE_W;
+  hltdc.Init.AccumulatedActiveH = LTDC_ACC_ACTIVE_H;
+  hltdc.Init.TotalWidth  = LTDC_TOTAL_W;
+  hltdc.Init.TotalHeigh  = LTDC_TOTAL_H;
 #endif
   hltdc.Init.Backcolor.Blue = 0;
   hltdc.Init.Backcolor.Green = 0;
@@ -746,18 +811,24 @@ void MX_LTDC_Init(void)
   */
 void MX_LCD_Init(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
-  if(SetPanelConfig_ST7701S() != 0)
-#else
-  if(SetPanelConfig() != 0)
-#endif
+  uint32_t result = 0;
+
+  HAL_GPIO_WritePin(PP3300_DISP_GPIO_Port, PP3300_DISP_IO_SW_EN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, PP1800_DISP_IO_SW_EN_Pin, GPIO_PIN_SET);
+  HAL_Delay(10);
+  HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, DISP_RST_Pin, GPIO_PIN_SET);
+  HAL_Delay(200);
+
+  result = SetPanelConfig_ST7701S();
+
+  if(result != 0)
   {
+    printf("MX_LCD_Init failed: %ld \n\r", result);
     Error_Handler();
+    printf("MX_LCD_Init success: %ld \n\r", result);
   }
 
   /* Prepare area to display on LCD */
-  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_2);
-  __HAL_TIM_SET_COMPARE(&htim8, TIM_CHANNEL_2, 50);
 
   /* Set UTIL_LCD functions */
   LCD_Driver.DrawBitmap  = 0;
@@ -783,9 +854,13 @@ void MX_LCD_Init(void)
 
   /* Display title */
   UTIL_LCD_FillRect(0, 70, LCD_WIDTH, 40, UTIL_LCD_COLOR_BLUE);
-  UTIL_LCD_DisplayStringAt(0, 80, (uint8_t *) "Google CF0F Example", CENTER_MODE);
+  UTIL_LCD_DisplayStringAt(0, 80, (uint8_t *) "Nest Thermostat", CENTER_MODE);
   //UTIL_LCD_DisplayStringAt(0, 100, (uint8_t *) " example ", CENTER_MODE);
+  ImageIndex = 0;
   CopyBuffer((uint32_t *)Images[ImageIndex++], (uint32_t *)LCD_FRAME_BUFFER, 67, 140, IMAGE_WIDTH, IMAGE_HEIGHT);
+
+  BL_Driver_SetBrightness_8bit(0xFF);
+  
 }
 
 /**
@@ -1144,7 +1219,6 @@ void HAL_LTDC_MspDeInit(LTDC_HandleTypeDef* hltdc)
   }
 
 }
-
 
 /******************************************************************************/
 /*   USER IRQ HANDLER TREATMENT                                               */

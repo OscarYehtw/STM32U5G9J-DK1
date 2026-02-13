@@ -64,6 +64,7 @@ void LTDC_IRQHandler(void);
 void LTDC_ER_IRQHandler(void);
 void JPEG_IRQHandler(void);
 void ADC1_2_IRQHandler(void);
+void ADC4_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

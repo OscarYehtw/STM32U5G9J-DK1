@@ -60,6 +60,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/cli.c</locationURI>
 		</link>
 		<link>
+			<name>CLI/gpio.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/gpio.c</locationURI>
+		</link>
+		<link>
 			<name>CLI/i2c_detect.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Source/cli/i2c_detect.c</locationURI>
@@ -377,7 +382,7 @@
 		<link>
 			<name>Middlewares/lwip-network-interface-integration/cy_network_mw_core.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/lwip-network-interface-integration/source/cy_network_mw_core.c</locationURI>	
+			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/lwip-network-interface-integration/source/cy_network_mw_core.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/wcm/cy_wcm.c</name>
@@ -393,7 +398,7 @@
 			<name>Middlewares/whd-bsp-integration/cybsp_wifi.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/whd-bsp-integration/cybsp_wifi.c</locationURI>
-			</link>
+		</link>
 		<link>
 			<name>Middlewares/wifi-host-driver/src</name>
 			<type>2</type>

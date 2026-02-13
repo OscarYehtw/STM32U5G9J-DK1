@@ -13,6 +13,125 @@
 #include "mxplatform.h"
 #include "cli.h"
 
+extern SPI_HandleTypeDef hspi2;
+
+void CS_Select(void) {
+    HAL_GPIO_WritePin(RADAR_SPI2_GPIO_Port, RADAR_SPI2_CS_Pin, GPIO_PIN_RESET);
+}
+
+void CS_Deselect(void) {
+    HAL_GPIO_WritePin(RADAR_SPI2_GPIO_Port, RADAR_SPI2_CS_Pin, GPIO_PIN_SET);
+}
+
+/*----------------------------------------------------------------------------
+ *        cmd_spiread  — Read Flash via SPI
+ *---------------------------------------------------------------------------*/
+void cmd_spiread(char *par)
+{
+    char *tok;
+    uint32_t reg, len = 1;
+    uint8_t tx[256];
+    uint8_t rx[256];
+
+    if (par == NULL) {
+        printf("Usage: SPIREAD <reg> [len]\r\n");
+        return;
+    }
+
+    /* reg */
+    tok = strtok(par, " ");
+    if (!tok) return;
+    reg = strtoul(tok, NULL, 0);
+
+    /* len (optional) */
+    tok = strtok(NULL, " ");
+    if (tok)
+        len = strtoul(tok, NULL, 0);
+
+    if (len == 0 || len > sizeof(rx)-1) {
+        printf("Invalid length\r\n");
+        return;
+    }
+
+    /* Prepare TX buffer
+       First byte = reg | 0x80 (read bit if required)
+       Following bytes = dummy
+    */
+    tx[0] = reg | 0x80;
+    memset(&tx[1], 0xFF, len);
+
+    CS_Select();
+
+    if (HAL_SPI_TransmitReceive(&hspi2,
+                                tx,
+                                rx,
+                                len + 1,
+                                1000) != HAL_OK)
+    {
+        printf("SPI read failed\r\n");
+        return;
+    }
+
+    CS_Deselect();
+
+    printf("SPI READ reg=0x%02lX : ", reg);
+
+    for (uint32_t i = 1; i <= len; i++)
+        printf("%02X ", rx[i]);
+
+    printf("\r\n");
+}
+
+/*----------------------------------------------------------------------------
+ *        cmd_spiwrite  — write Flash via SPI
+ *---------------------------------------------------------------------------*/
+void cmd_spiwrite(char *par)
+{
+    char *tok;
+    uint32_t reg;
+    uint8_t tx[256];
+    uint32_t len = 0;
+
+    if (par == NULL) {
+        printf("Usage: SPIWRITE <reg> <data...>\r\n");
+        return;
+    }
+
+    /* reg */
+    tok = strtok(par, " ");
+    if (!tok) return;
+    reg = strtoul(tok, NULL, 0);
+
+    tx[0] = reg & 0x7F;   // write bit cleared
+    len = 1;
+
+    /* data */
+    while ((tok = strtok(NULL, " ")) != NULL) {
+        if (len >= sizeof(tx)) {
+            printf("Too many data bytes\r\n");
+            return;
+        }
+        tx[len++] = strtoul(tok, NULL, 0);
+    }
+
+    if (len == 1) {
+        printf("No data specified\r\n");
+        return;
+    }
+
+    if (HAL_SPI_Transmit(&hspi2,
+                         tx,
+                         len,
+                         1000) != HAL_OK)
+    {
+        printf("SPI write failed\r\n");
+        return;
+    }
+
+    printf("SPI WRITE reg=0x%02lX len=%lu OK\r\n",
+           reg, len - 1);
+}
+
 /*----------------------------------------------------------------------------
  *        cmd_flashr  — Read Flash via OSPI
  *---------------------------------------------------------------------------*/

@@ -40,7 +40,7 @@ static HAL_StatusTypeDef LM3697_I2C_WriteReg(uint8_t RegAddress, uint8_t Value)
                                                      100); // Set 100ms timeout
 
     if (status != HAL_OK) {
-        printf("LM3697 I2C Write Failed (Status: 0x%02X, Reg: 0x%02X)\n", status, RegAddress);
+        printf("LM3697 I2C Write Failed (Status: 0x%02X, Reg: 0x%02X)\n\r", status, RegAddress);
     }
     return status;
 }
@@ -63,7 +63,7 @@ HAL_StatusTypeDef BL_Driver_SetBrightness_8bit(int brightness)
 	if (brightness > LM3697_MAX_BRIGHTNESS) brightness = LM3697_MAX_BRIGHTNESS;
 	if (brightness < LM3697_MIN_BRIGHTNESS) brightness = LM3697_MIN_BRIGHTNESS;
 
-	printf("brightness sets to %d\n", brightness);
+	printf("brightness sets to %d\n\r", brightness);
 	//LSB do not use in 8 bit mode.
 	status = LM3697_I2C_WriteReg(LM3697_CTRL_A_Brightness_LSB, LM3697_MIN_BRIGHTNESS);
 	status = LM3697_I2C_WriteReg(LM3697_CTRL_A_Brightness_MSB, brightness);
@@ -83,7 +83,7 @@ HAL_StatusTypeDef BL_Driver_Init(void)
     // Set backlight drive IC enable.
     // HAL_GPIO_WritePin(MCU_DISP_BL_EN_Port, MCU_DISP_BL_EN_Pin, GPIO_PIN_SET);
 
-    printf("LM3697 initial starting...\n");
+    printf("LM3697 initial starting...\n\r");
     // Use Control Bank A to set CH1 and CH2.
     if ((status = LM3697_I2C_WriteReg(LM3697_HVLED_Current_Sink_Output, LM3697_USE_Bank_A_CH1_CH2)) != HAL_OK)
         return status;
@@ -104,7 +104,7 @@ HAL_StatusTypeDef BL_Driver_Init(void)
         return status;
 
     if (status == HAL_OK) {
-        printf("LM3697 Backlight Driver initialization successful.\n");
+        printf("LM3697 Backlight Driver initialization successful.\n\r");
         backlight_init = 1;
     }
 

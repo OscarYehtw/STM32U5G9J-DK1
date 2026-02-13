@@ -3199,7 +3199,7 @@ static void I2C6_MspInit(I2C_HandleTypeDef *hI2c)
 
   /* Configure I2C Tx as alternate function */
   gpio_init_structure.Pin     = BUS_I2C6_SCL_PIN;
-  gpio_init_structure.Mode    = GPIO_MODE_AF_PP;
+  gpio_init_structure.Mode    = GPIO_MODE_AF_OD;
   gpio_init_structure.Pull    = GPIO_PULLUP;
   gpio_init_structure.Speed             = GPIO_SPEED_FREQ_HIGH;
   gpio_init_structure.Alternate         = BUS_I2C6_SCL_AF;
@@ -3207,7 +3207,7 @@ static void I2C6_MspInit(I2C_HandleTypeDef *hI2c)
 
   /* Configure I2C Rx as alternate function */
   gpio_init_structure.Pin     = BUS_I2C6_SDA_PIN;
-  gpio_init_structure.Mode    = GPIO_MODE_AF_PP;
+  gpio_init_structure.Mode    = GPIO_MODE_AF_OD;
   gpio_init_structure.Pull    = GPIO_PULLUP;
   gpio_init_structure.Speed             = GPIO_SPEED_FREQ_HIGH;
   gpio_init_structure.Alternate         = BUS_I2C6_SDA_AF;
@@ -3616,7 +3616,7 @@ static void I2C2_MspInit(I2C_HandleTypeDef *hI2c)
 
   /* Configure I2C Tx as alternate function */
   gpio_init_structure.Pin     = BUS_I2C2_SCL_PIN;
-  gpio_init_structure.Mode    = GPIO_MODE_AF_PP;
+  gpio_init_structure.Mode    = GPIO_MODE_AF_OD;
   gpio_init_structure.Pull    = GPIO_PULLUP;
   gpio_init_structure.Speed             = GPIO_SPEED_FREQ_HIGH;
   gpio_init_structure.Alternate         = BUS_I2C2_SCL_AF;
@@ -3624,7 +3624,7 @@ static void I2C2_MspInit(I2C_HandleTypeDef *hI2c)
 
   /* Configure I2C Rx as alternate function */
   gpio_init_structure.Pin     = BUS_I2C2_SDA_PIN;
-  gpio_init_structure.Mode    = GPIO_MODE_AF_PP;
+  gpio_init_structure.Mode    = GPIO_MODE_AF_OD;
   gpio_init_structure.Pull    = GPIO_PULLUP;
   gpio_init_structure.Speed             = GPIO_SPEED_FREQ_HIGH;
   gpio_init_structure.Alternate         = BUS_I2C2_SDA_AF;

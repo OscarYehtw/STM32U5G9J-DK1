@@ -76,12 +76,20 @@ typedef struct
 #define BUS_I2C6_RELEASE_RESET()               __HAL_RCC_I2C6_RELEASE_RESET()
 
 /* Definition for I2C6 Pins */
+//#define BUS_I2C6_SCL_PIN                       GPIO_PIN_1
+//#define BUS_I2C6_SCL_GPIO_PORT                 GPIOD
+//#define BUS_I2C6_SCL_AF                        GPIO_AF2_I2C6
+
+//#define BUS_I2C6_SDA_PIN                       GPIO_PIN_0
+//#define BUS_I2C6_SDA_GPIO_PORT                 GPIOD
+//#define BUS_I2C6_SDA_AF                        GPIO_AF2_I2C6
+
 #define BUS_I2C6_SCL_PIN                       GPIO_PIN_1
-#define BUS_I2C6_SCL_GPIO_PORT                 GPIOD
+#define BUS_I2C6_SCL_GPIO_PORT                 GPIOF
 #define BUS_I2C6_SCL_AF                        GPIO_AF2_I2C6
 
 #define BUS_I2C6_SDA_PIN                       GPIO_PIN_0
-#define BUS_I2C6_SDA_GPIO_PORT                 GPIOD
+#define BUS_I2C6_SDA_GPIO_PORT                 GPIOF
 #define BUS_I2C6_SDA_AF                        GPIO_AF2_I2C6
 
 #ifndef BUS_I2C6_FREQUENCY
@@ -150,22 +158,36 @@ typedef struct
 #define BUS_I2C2_CLK_ENABLE()                  __HAL_RCC_I2C2_CLK_ENABLE()
 #define BUS_I2C2_CLK_DISABLE()                 __HAL_RCC_I2C2_CLK_DISABLE()
 
-#define BUS_I2C2_SCL_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOF_CLK_ENABLE()
-#define BUS_I2C2_SCL_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOF_CLK_DISABLE()
+//#define BUS_I2C2_SCL_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOF_CLK_ENABLE()
+//#define BUS_I2C2_SCL_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOF_CLK_DISABLE()
 
-#define BUS_I2C2_SDA_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOF_CLK_ENABLE()
-#define BUS_I2C2_SDA_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOF_CLK_DISABLE()
+//#define BUS_I2C2_SDA_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOF_CLK_ENABLE()
+//#define BUS_I2C2_SDA_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOF_CLK_DISABLE()
+
+#define BUS_I2C2_SCL_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define BUS_I2C2_SCL_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define BUS_I2C2_SDA_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define BUS_I2C2_SDA_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
 
 #define BUS_I2C2_FORCE_RESET()                 __HAL_RCC_I2C2_FORCE_RESET()
 #define BUS_I2C2_RELEASE_RESET()               __HAL_RCC_I2C2_RELEASE_RESET()
 
 /* Definition for I2C2 Pins */
-#define BUS_I2C2_SCL_PIN                       GPIO_PIN_1
-#define BUS_I2C2_SCL_GPIO_PORT                 GPIOF
+//#define BUS_I2C2_SCL_PIN                       GPIO_PIN_1
+//#define BUS_I2C2_SCL_GPIO_PORT                 GPIOF
+//#define BUS_I2C2_SCL_AF                        GPIO_AF4_I2C2
+
+//#define BUS_I2C2_SDA_PIN                       GPIO_PIN_0
+//#define BUS_I2C2_SDA_GPIO_PORT                 GPIOF
+//#define BUS_I2C2_SDA_AF                        GPIO_AF4_I2C2
+
+#define BUS_I2C2_SCL_PIN                       GPIO_PIN_13
+#define BUS_I2C2_SCL_GPIO_PORT                 GPIOB
 #define BUS_I2C2_SCL_AF                        GPIO_AF4_I2C2
 
-#define BUS_I2C2_SDA_PIN                       GPIO_PIN_0
-#define BUS_I2C2_SDA_GPIO_PORT                 GPIOF
+#define BUS_I2C2_SDA_PIN                       GPIO_PIN_14
+#define BUS_I2C2_SDA_GPIO_PORT                 GPIOB
 #define BUS_I2C2_SDA_AF                        GPIO_AF4_I2C2
 
 #ifndef BUS_I2C2_FREQUENCY

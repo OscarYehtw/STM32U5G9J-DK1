@@ -70,6 +70,12 @@ void MX_ADC4_Init(void);
 #define ADC_CONVERTED_DATA_BUFFER_SIZE   ((uint32_t)  8)   /* Size of array aADC4ConvertedData[] */
 
 /* USER CODE END Private defines */
+extern uint16_t adc_raw[];
+extern uint16_t adc_mV[];
+extern uint16_t adc_val[];
+
+extern uint16_t adc4_raw[];
+extern uint16_t adc4_mV[];
 
 #ifdef __cplusplus
 }

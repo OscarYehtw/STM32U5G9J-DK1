@@ -204,3 +204,91 @@ void cmd_dialstart (char *par)
   }
 
 }
+
+/*----------------------------------------------------------------------------
+ *        cmd_adc1  --  Display ADC1 conversion results
+ *---------------------------------------------------------------------------*/
+void cmd_adc1 (char *par)
+{
+  (void)par;
+
+  while (1)
+  {
+      printf("\n");
+      printf("PMIC VREF = %04ld (%.2f V)\n", (long unsigned int)adc_raw[0], adc_mV[0] / 1000.0f);
+      printf("DISP NTC  = %04ld (%.2f V)\n", (long unsigned int)adc_raw[1], adc_mV[1] / 1000.0f);
+      printf("\n");
+
+      int ch = (int) READ_REG(huart1.Instance->RDR);
+      if (ch == ESC)  // ESC key
+      {
+          printf("\nExit ADC1 monitor.\n");
+          break;
+      }
+      osDelay(500);
+  }
+
+}
+
+/*----------------------------------------------------------------------------
+ *        cmd_adc4  --  Display ADC4 conversion results
+ *---------------------------------------------------------------------------*/
+void cmd_adc4 (char *par)
+{
+  (void)par;
+  const float VREF    = 1.8f;
+  const float ADC_MAX = 4095.0f;
+  uint32_t adc6 = 0, adc7 = 0, adc9 = 0, adc10 = 0;
+  uint32_t tmr_v1 = 0, tmr_v2 = 0, vbus = 0, vbat = 0, bp_mux=0, dcin1=0, therm_ntc=0, hw_id=0;
+
+  while (1)
+  {
+      taskENTER_CRITICAL();
+      tmr_v2    = aADC4ConvertedData[0];
+      tmr_v1    = aADC4ConvertedData[1];
+      dcin1     = aADC4ConvertedData[2];
+      therm_ntc = aADC4ConvertedData[3];
+      hw_id     = aADC4ConvertedData[4];
+      vbus      = aADC4ConvertedData[5];
+      vbat      = aADC4ConvertedData[6];
+      bp_mux    = aADC4ConvertedData[7];
+
+      //bp_mux    = aADC4ConvertedData[2];
+      //adc6  = aADC4ConvertedData[0];
+      //adc7  = aADC4ConvertedData[1];
+      //adc9  = aADC4ConvertedData[2];
+      //adc10 = aADC4ConvertedData[3];
+      taskEXIT_CRITICAL();
+
+      //printf("TMR V1 = %04ld (%.2f V)", (long unsigned int)tmr_v1,    (tmr_v1 * VREF / ADC_MAX));
+      //printf("TMR V2 = %04ld (%.2f V)", (long unsigned int)tmr_v2,    (tmr_v2 * VREF / ADC_MAX));
+      //printf("BP_MUX = %04ld (%.2f V)", (long unsigned int)bp_mux,    (bp_mux * VREF / ADC_MAX));
+
+      printf("\n");
+      //printf("TMR V1 = %04ld (%.2f V)\n", (long unsigned int)adc4_raw[0], adc4_mV[0] / 1000.0f);
+      //printf("TMR V2 = %04ld (%.2f V)\n", (long unsigned int)adc4_raw[1], adc4_mV[1] / 1000.0f);
+      //printf("BP_MUX = %04ld (%.2f V)\n", (long unsigned int)adc4_raw[2], adc4_mV[2] / 1000.0f);
+      printf("TMR V1 = %04ld (%.2f V)\n", (long unsigned int)tmr_v1,    (tmr_v1 * VREF / ADC_MAX));
+      printf("TMR V2 = %04ld (%.2f V)\n", (long unsigned int)tmr_v2,    (tmr_v2 * VREF / ADC_MAX));
+      //printf("DCIN1  = %04ld (%.2f V)\n", (long unsigned int)dcin1,     (dcin1 * VREF / ADC_MAX));
+      //printf("THERM  = %04ld (%.2f V)\n", (long unsigned int)therm_ntc, (therm_ntc * VREF / ADC_MAX));
+      //printf("HW_ID  = %04ld (%.2f V)\n", (long unsigned int)hw_id,     (hw_id * VREF / ADC_MAX));
+      //printf("VBUS   = %04ld (%.2f V)\n", (long unsigned int)vbus,      (vbus * VREF / ADC_MAX));
+      //printf("VBAT   = %04ld (%.2f V)\n", (long unsigned int)vbat,      (vbat * VREF / ADC_MAX));
+      printf("BP_MUX = %04ld (%.2f V)\n", (long unsigned int)bp_mux,    (bp_mux * VREF / ADC_MAX));
+      //printf("ADC4 IN6  = %04ld (%.2f V)\n", (long unsigned int)adc6,  (adc6 * VREF / ADC_MAX));
+      //printf("ADC4 IN7  = %04ld (%.2f V)\n", (long unsigned int)adc7,  (adc7 * VREF / ADC_MAX));
+      //printf("ADC4 IN9  = %04ld (%.2f V)\n", (long unsigned int)adc9,  (adc9 * VREF / ADC_MAX));
+      //printf("ADC4 IN10 = %04ld (%.2f V)\n", (long unsigned int)adc10, (adc10 * VREF / ADC_MAX));
+      printf("\n");
+
+      int ch = (int) READ_REG(huart1.Instance->RDR);
+      if (ch == ESC)  // ESC key
+      {
+          printf("\nExit ADC4 monitor.\n");
+          break;
+      }
+      osDelay(500);
+  }
+
+}

@@ -64,26 +64,31 @@ void MX_JPEG_Init(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-#define HSYNC_WIDTH        10
-#define HBP                100
-#define HFP                75
-#define VSYNC_WIDTH        3
-#define VBP                150
-#define VFP                120
+/* Panel timing from ST7701S */
+#define HSYNC_WIDTH        8
+#define VSYNC_WIDTH        8
+#define HBP                50
+#define HFP                50
+#define VBP                40
+#define VFP                38
 #define ACTIVE_WIDTH       480
 #define ACTIVE_HEIGHT      480
 
-#define HSYNC              (HSYNC_WIDTH - 1)
-#define VSYNC              (VSYNC_WIDTH - 1)
+/* LTDC expects value-1 */
+#define LTDC_HSYNC          (HSYNC_WIDTH - 1)
+#define LTDC_VSYNC          (VSYNC_WIDTH - 1)
 
-#define ACC_HBP            (HSYNC_WIDTH + HBP - 1)
-#define ACC_VBP            (VSYNC_WIDTH + VBP - 1)
+/* Accumulated back porch */
+#define LTDC_ACC_HBP        (HSYNC_WIDTH + HBP - 1)
+#define LTDC_ACC_VBP        (VSYNC_WIDTH + VBP - 1)
 
-#define ACC_ACTIVE_WIDTH   (HSYNC_WIDTH + HBP + ACTIVE_WIDTH - 1)
-#define ACC_ACTIVE_HEIGHT  (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT - 1)
+/* Accumulated active area */
+#define LTDC_ACC_ACTIVE_W   (HSYNC_WIDTH + HBP + ACTIVE_WIDTH - 1)
+#define LTDC_ACC_ACTIVE_H   (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT - 1)
 
-#define TOTAL_WIDTH        (HSYNC_WIDTH + HBP + ACTIVE_WIDTH + HFP - 1)
-#define TOTAL_HEIGHT       (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT + VFP - 1)
+/* Total size */
+#define LTDC_TOTAL_W        (HSYNC_WIDTH + HBP + ACTIVE_WIDTH + HFP - 1)
+#define LTDC_TOTAL_H        (VSYNC_WIDTH + VBP + ACTIVE_HEIGHT + VFP - 1)
 
 #define LCD_WIDTH          480
 #define LCD_HEIGHT         481

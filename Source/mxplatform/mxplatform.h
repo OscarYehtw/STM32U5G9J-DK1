@@ -93,7 +93,8 @@ void MX_PLATFORM_Init(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-#define CF0F_PINMUX_ENABLED      0
+#define CF0F_PINMUX_ENABLED      1
+#define BRIGHTNESS_USE_LM3597    1
 
 /* MCU_BT_UART2 */
 #define BT_UART2_CTS_Pin         GPIO_PIN_0
@@ -150,6 +151,8 @@ void MX_PLATFORM_Init(void);
 #define DBG_GPIO2_Pin            GPIO_PIN_9
 
 /* MCU_IO_PB10: GPIO_Analog */
+#define PP3300_DISP_IO_SW_EN_Pin GPIO_PIN_10
+#define PP3300_DISP_GPIO_Port    GPIOB
 
 /* MCU_DATA_FLASH_SPI_CS_L:  OCTOSPIM_ P1_NCS*/
 #define DATA_FLASH_SPI_CS_Pin    GPIO_PIN_11
@@ -180,7 +183,9 @@ void MX_PLATFORM_Init(void);
 #define BT_REG_ON_Pin            GPIO_PIN_4
 #define BT_REG_ON_GPIO_Port      GPIOC
 
-/* MCU_IO_PC5: GPIO_Analog */
+/* DISP_MCU_NTC_READOUT: GPIO_Analog */
+#define DISP_NTC_Pin             GPIO_PIN_5
+#define DISP_NTC_GPIO_Port       GPIOC
 
 /* MCU_PWM_HVAC_PWR_LOAD_EN: GPIO_Output PWM TIM3_CH1*/
 #define HVAC_PWR_LOAD_Pin        GPIO_PIN_6
@@ -294,8 +299,8 @@ void MX_PLATFORM_Init(void);
 #define DISP_RST_Pin             GPIO_PIN_11
 
 /* MCU_PP1800_DISP_IO_SW_EN: GPIO_Output */
-#define DISP_IO_SW_EN_Pin        GPIO_PIN_12
-#define DISP_PORTE_GPIO_Port     GPIOE
+#define PP1800_DISP_IO_SW_EN_Pin  GPIO_PIN_12
+#define DISP_PORTE_GPIO_Port      GPIOE
 
 /* MCU_SAPS_CTRL_EN: GPIO_Output */
 #define SAPS_CTRL_EN_Pin         GPIO_PIN_13

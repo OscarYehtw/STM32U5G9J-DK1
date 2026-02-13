@@ -180,12 +180,8 @@ void SPI2_IRQHandler(void)
   */
 void OCTOSPI1_IRQHandler(void)
 {
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
-  HAL_XSPI_IRQHandler(&hospi[0]);
-#else
   HAL_XSPI_IRQHandler(&hospi[0]);
   //HAL_XSPI_IRQHandler(&hospi_nor[0]);
-#endif
 }
 
 /**
@@ -239,11 +235,8 @@ void EXTI8_IRQHandler(void)
   /* USER CODE BEGIN EXTI8_IRQn 0 */
 
   /* USER CODE END EXTI8_IRQn 0 */
-#if defined(CF0F_PINMUX_ENABLED) && (CF0F_PINMUX_ENABLED == 1)
   HAL_GPIO_EXTI_IRQHandler(RADAR_INT_Pin);
-#else
-  HAL_GPIO_EXTI_IRQHandler(DSI_TOUCH_INT_Pin);
-#endif
+  // HAL_GPIO_EXTI_IRQHandler(DSI_TOUCH_INT_Pin);
   /* USER CODE BEGIN EXTI8_IRQn 1 */
 
   /* USER CODE END EXTI8_IRQn 1 */
@@ -523,6 +516,20 @@ void ADC1_2_IRQHandler(void)
 
   /* USER CODE END ADC1_IRQn 0 */
   HAL_ADC_IRQHandler(&hadc1);
+  /* USER CODE BEGIN ADC1_IRQn 1 */
+
+  /* USER CODE END ADC1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles ADC4 global interrupt.
+  */
+void ADC4_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC4_IRQn 0 */
+
+  /* USER CODE END ADC4_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc4);
   /* USER CODE BEGIN ADC1_IRQn 1 */
 
   /* USER CODE END ADC1_IRQn 1 */
