@@ -49,6 +49,13 @@ extern "C" {
 #include "jpeg_utils_conf.h"
 #include "stm32_lcd.h"
 #include "linked_list.h"
+#include "image_480x480_argb8888.h"
+#include "image_480x480_argb8888r.h"
+#include "image_480x480_argb8888g.h"
+#include "image_480x480_argb8888b.h"
+#include "image_480x480_argb8888gl.h"
+#include "image_480x480_argb8888gd1.h"
+#include "image_480x480_argb8888gd2.h"
 #include "image_320x240_argb8888.h"
 #include "life_augmented_argb8888.h"
 

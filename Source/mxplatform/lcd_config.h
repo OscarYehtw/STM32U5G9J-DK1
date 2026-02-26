@@ -59,6 +59,7 @@ void MX_DSIHOST_DSI_Init(void);
 void MX_LTDC_Init(void);
 void MX_LCD_Init(void);
 void MX_JPEG_Init(void);
+void MX_SHOW_PIC(uint32_t index);
 
 /* USER CODE END EFP */
 

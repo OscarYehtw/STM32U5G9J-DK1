@@ -116,6 +116,7 @@ const SCMD cmd[] = {
     { "FLASHR",    cmd_flashr },
     { "FLASHW",    cmd_flashw },
     { "FBTEST",    cmd_fbtest },
+    { "SHOWPIC",   cmd_showpic },
     { "HELP",      cmd_help },
     { "?",         cmd_help }
 };

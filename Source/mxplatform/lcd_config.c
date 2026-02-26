@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define IMAGE_COUNT 8
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -54,6 +54,12 @@ static const uint32_t * Images[] =
 {
   image_320x240_argb8888,
   life_augmented_argb8888,
+  image_480x480_argb8888r,
+  image_480x480_argb8888g,
+  image_480x480_argb8888b,
+  //image_480x480_argb8888gl,
+  //image_480x480_argb8888gd1,
+  //image_480x480_argb8888gd2,
 };
 
 /* USER CODE END PV */
@@ -1218,6 +1224,35 @@ void HAL_LTDC_MspDeInit(LTDC_HandleTypeDef* hltdc)
     /* USER CODE END LTDC_MspDeInit 1 */
   }
 
+}
+
+void MX_SHOW_PIC(uint32_t index)
+{
+  UTIL_LCD_SetFuncDriver(&LCD_Driver);
+
+  /* Clear LCD */
+  UTIL_LCD_Clear(UTIL_LCD_COLOR_BLACK);
+
+  UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_WHITE);
+  UTIL_LCD_SetFont(&Font20);
+
+  /* Display title */
+  UTIL_LCD_FillRect(0, 70, LCD_WIDTH, 40, UTIL_LCD_COLOR_BLUE);
+  UTIL_LCD_DisplayStringAt(0, 80, (uint8_t *) "Nest Thermostat", CENTER_MODE);
+  //UTIL_LCD_DisplayStringAt(0, 100, (uint8_t *) " example ", CENTER_MODE);
+  if (index >= IMAGE_COUNT)
+  {
+      printf("Invalid image index\n");
+      return;
+  }
+
+  if (index <= 1)
+    CopyBuffer((uint32_t *)Images[index], (uint32_t *)LCD_FRAME_BUFFER, 67, 140, IMAGE_WIDTH, IMAGE_HEIGHT);
+  else
+    UTIL_LCD_FillRGBRect(0,  0, (uint8_t*)Images[index], LCD_WIDTH, 480);
+
+  return;
 }
 
 /******************************************************************************/

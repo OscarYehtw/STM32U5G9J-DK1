@@ -101,3 +101,25 @@ void cmd_backlight (char *par)
   printf("Backlight = %d%% (duty=%lu)\n", percent, (unsigned long)duty);
 #endif
 }
+
+/*----------------------------------------------------------------------------
+ *        cmd_showpic  --  Display 
+ *---------------------------------------------------------------------------*/
+void cmd_showpic(char *par)
+{
+    if (par == NULL || *par == '\0')
+    {
+        printf("Usage: showpic <0|1>\n");
+        return;
+    }
+
+    int index = strtol(par, NULL, 0);
+
+    if (index < 0 || index > 7)
+    {
+        printf("Image index must be 0 or 7\n");
+        return;
+    }
+
+    MX_SHOW_PIC(index);
+}
