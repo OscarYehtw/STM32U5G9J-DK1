@@ -179,7 +179,7 @@ void OUTPUT_PINMUX_Init(void)
   HAL_GPIO_Init(DISP_PORTD_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_PP1V8_LDO_EN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_PP1V8_LDO_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PD.7 MCU_RADAR_PP1V8_LDO_EN */
   GPIO_InitStruct.Pin  = RADAR_PP1V8_LDO_EN_Pin;
@@ -197,7 +197,7 @@ void OUTPUT_PINMUX_Init(void)
   HAL_GPIO_Init(DISP_PORTD_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_RST_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PD.10 MCU_RADAR_RST_L */
   GPIO_InitStruct.Pin  = RADAR_RST_Pin;
@@ -215,7 +215,7 @@ void OUTPUT_PINMUX_Init(void)
   HAL_GPIO_Init(BT_DEV_WAKE_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_OSC_EN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_OSC_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PD.15 MCU_RADAR_OSC_EN */
   GPIO_InitStruct.Pin  = RADAR_OSC_EN_Pin;
@@ -338,7 +338,7 @@ void OUTPUT_PINMUX_Init(void)
   HAL_GPIO_Init(ADC_HW_ID_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RADAR_PORTG_GPIO_Port, RADAR_PP1V2_LDO_EN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RADAR_PORTG_GPIO_Port, RADAR_PP1V2_LDO_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PG.9 MCU_RADAR_PP1V2_LDO_EN */
   GPIO_InitStruct.Pin  = RADAR_PP1V2_LDO_EN_Pin;

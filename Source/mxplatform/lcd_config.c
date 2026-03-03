@@ -216,6 +216,96 @@ uint32_t SetPanelConfig(void)
   return 0;
 }
 
+void DSI_Enter_VideoMode(void)
+{
+  DSI_VidCfgTypeDef VidCfg = {0};
+
+  if (HAL_DSI_Stop(&hdsi) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  VidCfg.ColorCoding = DSI_RGB888;
+  VidCfg.LooselyPacked = DSI_LOOSELY_PACKED_DISABLE;
+  VidCfg.Mode = DSI_VID_MODE_BURST;
+  VidCfg.PacketSize = 480;
+  VidCfg.NumberOfChunks = 0;
+  VidCfg.NullPacketSize = 0;
+  VidCfg.HSPolarity = DSI_HSYNC_ACTIVE_HIGH;
+  VidCfg.VSPolarity = DSI_VSYNC_ACTIVE_HIGH;
+  VidCfg.DEPolarity = DSI_DATA_ENABLE_ACTIVE_HIGH;
+
+  VidCfg.HorizontalSyncActive = 6;
+  VidCfg.HorizontalBackPorch = 15;
+  VidCfg.HorizontalLine = 1503;
+
+  VidCfg.VerticalSyncActive = 2;
+  VidCfg.VerticalBackPorch =20;
+  VidCfg.VerticalFrontPorch =40;
+  VidCfg.VerticalActive = 482;
+
+  VidCfg.LPCommandEnable = DSI_LP_COMMAND_DISABLE;
+  VidCfg.LPLargestPacketSize = 0;
+  VidCfg.LPVACTLargestPacketSize = 0;
+  VidCfg.LPHorizontalFrontPorchEnable = DSI_LP_HFP_ENABLE;
+  VidCfg.LPHorizontalBackPorchEnable = DSI_LP_HBP_ENABLE;
+  VidCfg.LPVerticalActiveEnable = DSI_LP_VACT_ENABLE;
+  VidCfg.LPVerticalFrontPorchEnable = DSI_LP_VFP_ENABLE;
+  VidCfg.LPVerticalBackPorchEnable = DSI_LP_VBP_ENABLE;
+  VidCfg.LPVerticalSyncActiveEnable = DSI_LP_VSYNC_ENABLE;
+  VidCfg.FrameBTAAcknowledgeEnable = DSI_FBTAA_ENABLE;
+  if (HAL_DSI_ConfigVideoMode(&hdsi, &VidCfg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  if (HAL_DSI_Start(&hdsi) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
+void DSI_Enter_CommandMode(void)
+{
+  DSI_CmdCfgTypeDef CmdCfg = {0};
+  DSI_LPCmdTypeDef LPCmd = {0};
+
+  CmdCfg.VirtualChannelID = 0;
+  CmdCfg.ColorCoding = DSI_RGB888;
+  CmdCfg.CommandSize = 480;
+  CmdCfg.TearingEffectSource = DSI_TE_EXTERNAL;
+  CmdCfg.TearingEffectPolarity = DSI_TE_RISING_EDGE;
+  CmdCfg.HSPolarity = DSI_HSYNC_ACTIVE_HIGH;
+  CmdCfg.VSPolarity = DSI_VSYNC_ACTIVE_HIGH;
+  CmdCfg.DEPolarity = DSI_DATA_ENABLE_ACTIVE_HIGH;
+  CmdCfg.VSyncPol = DSI_VSYNC_ACTIVE_HIGH;
+  CmdCfg.AutomaticRefresh = DSI_AR_DISABLE;
+  CmdCfg.TEAcknowledgeRequest = DSI_TE_ACKNOWLEDGE_DISABLE;
+  if (HAL_DSI_ConfigAdaptedCommandMode(&hdsi, &CmdCfg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  LPCmd.LPGenShortWriteNoP = DSI_LP_GSW0P_ENABLE;
+  LPCmd.LPGenShortWriteOneP = DSI_LP_GSW1P_ENABLE;
+  LPCmd.LPGenShortWriteTwoP = DSI_LP_GSW2P_ENABLE;
+  LPCmd.LPGenShortReadNoP = DSI_LP_GSR0P_ENABLE;
+  LPCmd.LPGenShortReadOneP = DSI_LP_GSR1P_ENABLE;
+  LPCmd.LPGenShortReadTwoP = DSI_LP_GSR2P_ENABLE;
+  LPCmd.LPGenLongWrite = DSI_LP_GLW_ENABLE;
+  LPCmd.LPDcsShortWriteNoP = DSI_LP_DSW0P_ENABLE;
+  LPCmd.LPDcsShortWriteOneP = DSI_LP_DSW1P_ENABLE;
+  LPCmd.LPDcsShortReadNoP = DSI_LP_DSR0P_ENABLE;
+  LPCmd.LPDcsLongWrite = DSI_LP_DLW_ENABLE;
+  LPCmd.LPMaxReadPacket = DSI_LP_MRDP_ENABLE;
+  if (HAL_DSI_ConfigCommand(&hdsi, &LPCmd) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
+
 /**
   * @brief  Configure the ST7701S MIPI-DSI Display Panel.
   *
@@ -237,6 +327,9 @@ uint32_t SetPanelConfig(void)
   */
 uint32_t SetPanelConfig_ST7701S(void)
 {
+
+  DSI_Enter_CommandMode();
+
   if (HAL_DSI_Start(&hdsi) != HAL_OK) return 1;
   HAL_Delay(120);
 
@@ -471,6 +564,8 @@ uint32_t SetPanelConfig_ST7701S(void)
   if (HAL_DSI_ShortWrite(&hdsi, 0, DSI_DCS_SHORT_PKT_WRITE_P1, 0x36, 0x00) != HAL_OK) return 45;
   HAL_Delay(50);
 
+  DSI_Enter_VideoMode();
+
   return 0;
 }
 
@@ -632,7 +727,9 @@ void MX_DSIHOST_DSI_Init(void)
   DSI_PLLInitTypeDef PLLInit = {0};
   DSI_HOST_TimeoutTypeDef HostTimeouts = {0};
   DSI_PHY_TimerTypeDef PhyTimings = {0};
+#if 0
   DSI_VidCfgTypeDef VidCfg = {0};
+#endif
 
   /* USER CODE BEGIN DSIHOST_Init 1 */
 
@@ -684,6 +781,8 @@ void MX_DSIHOST_DSI_Init(void)
   {
     Error_Handler();
   }
+
+#if 0
   VidCfg.ColorCoding = DSI_RGB888;
   VidCfg.LooselyPacked = DSI_LOOSELY_PACKED_DISABLE;
   VidCfg.Mode = DSI_VID_MODE_BURST;
@@ -694,7 +793,7 @@ void MX_DSIHOST_DSI_Init(void)
   VidCfg.VSPolarity = DSI_VSYNC_ACTIVE_HIGH;
   VidCfg.DEPolarity = DSI_DATA_ENABLE_ACTIVE_HIGH;
 
-#if 1
+  #if 1
   VidCfg.HorizontalSyncActive = 6;
   VidCfg.HorizontalBackPorch = 15;
   VidCfg.HorizontalLine = 1503;
@@ -702,7 +801,7 @@ void MX_DSIHOST_DSI_Init(void)
   VidCfg.VerticalBackPorch =20;
   VidCfg.VerticalFrontPorch =40;
   VidCfg.VerticalActive = 482;
-#else
+  #else
   VidCfg.PacketSize = ACTIVE_WIDTH;
   VidCfg.HorizontalSyncActive = HSYNC_WIDTH;
   VidCfg.HorizontalBackPorch  = HBP;
@@ -711,7 +810,7 @@ void MX_DSIHOST_DSI_Init(void)
   VidCfg.VerticalBackPorch   = VBP;
   VidCfg.VerticalFrontPorch  = VFP;
   VidCfg.VerticalActive      = ACTIVE_HEIGHT;
-#endif
+  #endif
   VidCfg.LPCommandEnable = DSI_LP_COMMAND_DISABLE;
   VidCfg.LPLargestPacketSize = 0;
   VidCfg.LPVACTLargestPacketSize = 0;
@@ -726,6 +825,8 @@ void MX_DSIHOST_DSI_Init(void)
   {
     Error_Handler();
   }
+#endif
+
   if (HAL_DSI_SetGenericVCID(&hdsi, 0) != HAL_OK)
   {
     Error_Handler();
@@ -821,17 +922,18 @@ void MX_LCD_Init(void)
 
   HAL_GPIO_WritePin(PP3300_DISP_GPIO_Port, PP3300_DISP_IO_SW_EN_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, PP1800_DISP_IO_SW_EN_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RADAR_PORTG_GPIO_Port, RADAR_PP1V2_LDO_EN_Pin, GPIO_PIN_SET);
   HAL_Delay(10);
   HAL_GPIO_WritePin(DISP_PORTE_GPIO_Port, DISP_RST_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(RADAR_PORTD_GPIO_Port, RADAR_RST_Pin, GPIO_PIN_SET);
   HAL_Delay(200);
 
   result = SetPanelConfig_ST7701S();
+  printf("MX_LCD_Init Status: %ld \n\r", result);
 
   if(result != 0)
   {
-    printf("MX_LCD_Init failed: %ld \n\r", result);
     Error_Handler();
-    printf("MX_LCD_Init success: %ld \n\r", result);
   }
 
   /* Prepare area to display on LCD */
@@ -864,9 +966,13 @@ void MX_LCD_Init(void)
   //UTIL_LCD_DisplayStringAt(0, 100, (uint8_t *) " example ", CENTER_MODE);
   ImageIndex = 0;
   CopyBuffer((uint32_t *)Images[ImageIndex++], (uint32_t *)LCD_FRAME_BUFFER, 67, 140, IMAGE_WIDTH, IMAGE_HEIGHT);
-
+  #if 0
+  ImageIndex = 2;
+  //CopyBuffer((uint32_t *)Images[ImageIndex++], (uint32_t *)LCD_FRAME_BUFFER, 0, 0, 480, 480);
+  UTIL_LCD_FillRGBRect(0,  0, (uint8_t*)Images[ImageIndex], LCD_WIDTH, 480);
+  //UTIL_LCD_FillRect(0, 0, LCD_WIDTH, LCD_HEIGHT, UTIL_LCD_COLOR_RED);
+  #endif
   BL_Driver_SetBrightness_8bit(0xFF);
-  
 }
 
 /**
